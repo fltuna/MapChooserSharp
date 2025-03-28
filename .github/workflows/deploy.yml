@@ -1,0 +1,89 @@
+﻿name: .NET CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/') == false && contains(github.event.head_commit.message, '[no ci]') == false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install dependencies
+        run: nuget restore
+
+      - name: Build
+        run: dotnet build -c Release -p:DebugType=None -p:DebugSymbols=false
+
+  publish:
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install dependencies
+        run: nuget restore
+
+      - name: Build
+        run: dotnet build -c Release -p:DebugType=None -p:DebugSymbols=false
+
+      - name: Create release artifacts
+        run: |
+          mkdir artifacts
+          Copy-Item -Path "MapChooserSharp\bin\Release\*\MapChooserSharp.dll" -Destination "artifacts\MapChooserSharp.dll" -Force
+          Copy-Item -Path "lang\" -Destination "artifacts\lang\" -Recurse -Force
+
+      - name: Compress artifacts
+        run:
+          Compress-Archive -Path artifacts/* -Destination MapChooserSharp.zip
+
+      - name: Upload release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: MapChooserSharp.zip
+
+  release:
+    runs-on: windows-latest
+    needs: publish
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: artifacts/
+
+      - name: check files
+        run : |
+          tree
+
+      - name: Create Release and Upload Asset
+        run: |
+          gh release create "${{ github.ref_name }}" --title "Release ${{ github.ref_name }}" --generate-notes --draft=false artifacts/MapChooserSharp.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,4 @@
+﻿MapChooserSharp/bin/*
+MapChooserSharp/obj/*
+.vs
+.idea/
