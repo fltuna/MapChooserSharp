@@ -1,10 +1,17 @@
 ﻿namespace MapChooserSharp.API.MapConfig;
 
+/// <summary>
+/// Map's cooldown
+/// </summary>
 public interface IMapCooldown
 {
-    // Map cooldown value specified in map config
+    /// <summary>
+    /// Map cooldown value specified in map config
+    /// </summary>
     public int MapConfigCooldown { get; }
     
-    // Current cooldown from database
+    /// <summary>
+    /// Current cooldown from database
+    /// </summary>
     public int CurrentCooldown { get; set; }
 }

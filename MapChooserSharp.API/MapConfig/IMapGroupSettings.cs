@@ -1,5 +1,8 @@
 ﻿namespace MapChooserSharp.API.MapConfig;
 
+/// <summary>
+/// Map group's name and cooldown
+/// </summary>
 public interface IMapGroupSettings
 {
     /// <summary>

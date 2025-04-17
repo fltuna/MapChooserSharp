@@ -1,5 +1,8 @@
 ﻿namespace MapChooserSharp.API.MapConfig;
 
+/// <summary>
+/// Map Configuration
+/// </summary>
 public interface IMapConfig
 {
     /// <summary>

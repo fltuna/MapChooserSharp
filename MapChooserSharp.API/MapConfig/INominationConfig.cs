@@ -1,5 +1,8 @@
 ﻿namespace MapChooserSharp.API.MapConfig;
 
+/// <summary>
+/// Nomination related settings
+/// </summary>
 public interface INominationConfig
 {
     /// <summary>

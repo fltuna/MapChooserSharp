@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.MapConfig;
@@ -29,6 +30,11 @@ public sealed class MapConfigRepository(IServiceProvider serviceProvider): Plugi
     {
         Plugin.RemoveCommand("mcs_maplist", CommandMapList);
         Plugin.RemoveCommand("mcs_mapinfo", CommandMapInfo);
+    }
+
+    public override void RegisterServices(IServiceCollection services)
+    {
+        services.AddSingleton(_mapConfigProvider);
     }
 
     private void ReloadMapConfiguration()
