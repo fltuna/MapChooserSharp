@@ -1,4 +1,6 @@
 ﻿MapChooserSharp/bin/*
 MapChooserSharp/obj/*
+MapChooserSharp.API/bin/*
+MapChooserSharp.API/obj/*
 .vs
 .idea/
