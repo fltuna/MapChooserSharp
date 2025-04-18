@@ -1,4 +1,5 @@
-﻿using MapChooserSharp.API.Events;
+﻿using System.Reflection;
+using MapChooserSharp.API.Events;
 using MapChooserSharp.API.Events.Nomination.MapNominatedEvent;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -23,41 +24,82 @@ public sealed class McsEventManager(IServiceProvider serviceProvider) : PluginMo
     
     
     
-    private readonly Dictionary<Type, List<Delegate>> _handlers = new();
+    private readonly Dictionary<Type, List<Delegate>> _withResultHandlers = new();
+    private readonly Dictionary<Type, List<Delegate>> _noResultHandlers = new();
     
+    /// <summary>
+    /// Register a handler for events with result
+    /// </summary>
     public void RegisterEventHandler<TEvent>(Func<TEvent, McsEventResultWithCallback> handler) 
-        where TEvent : IMcsEvent
+        where TEvent : IMcsEventWithResult
     {
         Type eventType = typeof(TEvent);
         
-        if (!_handlers.TryGetValue(eventType, out List<Delegate>? value))
+        if (!_withResultHandlers.TryGetValue(eventType, out List<Delegate>? value))
         {
             value = new List<Delegate>();
-            _handlers[eventType] = value;
+            _withResultHandlers[eventType] = value;
         }
 
         value.Add(handler);
     }
     
-    public void UnregisterEventHandler<TEvent>(Func<TEvent, McsEventResultWithCallback> handler)
-        where TEvent : IMcsEvent
+    /// <summary>
+    /// Register a handler for events without result
+    /// </summary>
+    public void RegisterEventHandler<TEvent>(Action<TEvent> handler) 
+        where TEvent : IMcsEventNoResult
     {
         Type eventType = typeof(TEvent);
         
-        if (_handlers.TryGetValue(eventType, out var handlers))
+        if (!_noResultHandlers.TryGetValue(eventType, out List<Delegate>? value))
+        {
+            value = new List<Delegate>();
+            _noResultHandlers[eventType] = value;
+        }
+
+        value.Add(handler);
+    }
+    
+    /// <summary>
+    /// Unregister a handler for events with result
+    /// </summary>
+    public void UnregisterEventHandler<TEvent>(Func<TEvent, McsEventResultWithCallback> handler)
+        where TEvent : IMcsEventWithResult
+    {
+        Type eventType = typeof(TEvent);
+        
+        if (_withResultHandlers.TryGetValue(eventType, out var handlers))
         {
             handlers.Remove(handler);
         }
     }
     
-    public McsEventResult FireEvent<TEvent>(TEvent eventInstance) 
-        where TEvent : IMcsEvent
+    /// <summary>
+    /// Unregister a handler for events without result
+    /// </summary>
+    public void UnregisterEventHandler<TEvent>(Action<TEvent> handler)
+        where TEvent : IMcsEventNoResult
+    {
+        Type eventType = typeof(TEvent);
+        
+        if (_noResultHandlers.TryGetValue(eventType, out var handlers))
+        {
+            handlers.Remove(handler);
+        }
+    }
+    
+    /// <summary>
+    /// Fire an event with result
+    /// </summary>
+    internal McsEventResult FireEvent<TEvent>(TEvent eventInstance) 
+        where TEvent : IMcsEventWithResult
     {
         Type eventType = typeof(TEvent);
         McsEventResult highestResult = McsEventResult.Continue;
         Action<McsEventResult>? finalCallback = null;
         
-        if (_handlers.TryGetValue(eventType, out var handlers))
+        if (_withResultHandlers.TryGetValue(eventType, out var handlers))
         {
             foreach (var handlerObj in handlers)
             {
@@ -73,17 +115,41 @@ public sealed class McsEventManager(IServiceProvider serviceProvider) : PluginMo
                     
                     if (highestResult >= McsEventResult.Stop)
                     {
+                        var method = typedHandler.Method;
+                        var declaringType = method.DeclaringType;
+                        var fullClassName = declaringType?.FullName ?? "Unknown";
+                        var methodName = method.Name;
+    
+                        DebugLogger.LogDebug($"The event {eventType} iteration is stopped by {fullClassName}::{methodName}");
                         break;
                     }
                 }
             }
             
-            // Execute callback
-            // If event is not cancelled by McsEventResult.Stop
-            // Then finalCallback should be null and nothing executed.
+            // Execute callback if present
             finalCallback?.Invoke(highestResult);
         }
         
         return highestResult;
+    }
+    
+    /// <summary>
+    /// Fire an event without result
+    /// </summary>
+    internal void FireEventNoResult<TEvent>(TEvent eventInstance) 
+        where TEvent : IMcsEventNoResult
+    {
+        Type eventType = typeof(TEvent);
+        
+        if (_noResultHandlers.TryGetValue(eventType, out var handlers))
+        {
+            foreach (var handlerObj in handlers)
+            {
+                if (handlerObj is Action<TEvent> typedHandler)
+                {
+                    typedHandler(eventInstance);
+                }
+            }
+        }
     }
 }

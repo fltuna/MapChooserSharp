@@ -32,6 +32,7 @@ public sealed class MapChooserSharp: TncssPluginBase
 
     protected override void RegisterRequiredPluginServices(IServiceCollection collection, IServiceProvider provider)
     {
+        DebugLogger = new SimpleDebugLogger(provider);
     }
 
     protected override void TncssOnPluginLoad(bool hotReload)
