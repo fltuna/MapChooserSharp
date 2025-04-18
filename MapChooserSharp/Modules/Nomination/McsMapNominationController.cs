@@ -69,7 +69,7 @@ public sealed class McsMapNominationController(IServiceProvider serviceProvider)
         var nominationBegin = new McsMapNominationBeginEvent(player, mapCfg);
         McsEventResult result = _mcsEventManager.FireEvent(nominationBegin);
         
-        if (result > McsEventResult.Changed)
+        if (result > McsEventResult.Handled)
         {
             return;
         }

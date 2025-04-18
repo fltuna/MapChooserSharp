@@ -22,7 +22,7 @@ public enum McsEventResult
     Handled = 2,
     
     /// <summary>
-    /// The original action cancelled, Also, cancels all other event listeners.
+    /// The original action cancelled, Also, cancels all other not executed event listeners.
     /// </summary>
     Stop = 3,
 }
