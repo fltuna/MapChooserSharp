@@ -2,5 +2,7 @@
 MapChooserSharp/obj/*
 MapChooserSharp.API/bin/*
 MapChooserSharp.API/obj/*
+MapChooserSharp.API.Example/bin/*
+MapChooserSharp.API.Example/obj/*
 .vs
 .idea/
