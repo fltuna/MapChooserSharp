@@ -6,6 +6,7 @@ using CounterStrikeSharp.API.Modules.Cvars.Validators;
 using CounterStrikeSharp.API.Modules.Entities;
 using MapChooserSharp.API.Events.MapVote;
 using MapChooserSharp.API.MapConfig;
+using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.Modules.EventManager;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -15,7 +16,7 @@ using TNCSSPluginFoundation.Utils.Other;
 
 namespace MapChooserSharp.Modules.MapCycle;
 
-public sealed class McsMapCycleController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider)
+public sealed class McsMapCycleController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsMapCycleControllerApi
 {
     public override string PluginModuleName => "McsMapCycleController";
     public override string ModuleChatPrefix => "McsMapCycleController";
@@ -118,8 +119,9 @@ public sealed class McsMapCycleController(IServiceProvider serviceProvider) : Pl
 
         if (workshopId == 0)
         {
-            DebugLogger.LogInformation(
-                $"No workshop ID defined! We will try -> ds_workshop_changelevel {NextMap.MapName}");
+            DebugLogger.LogInformation($"No workshop ID defined! We will try change level with {NextMap.MapName}");
+            // Use MapUtil.ChangeMap(string) instead of MapUtil.ChangeToWorkshopMap(string)
+            // Because, This IMapConfig is no guarantee official map or not.
             MapUtil.ChangeMap(NextMap.MapName);
             return;
         }

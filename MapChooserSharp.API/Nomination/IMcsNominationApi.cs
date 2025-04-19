@@ -3,7 +3,7 @@
 /// <summary>
 /// API for nomination module
 /// </summary>
-public interface INominationApi
+public interface IMcsNominationApi
 {
     
 }

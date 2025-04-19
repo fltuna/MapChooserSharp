@@ -10,6 +10,7 @@ using MapChooserSharp.API.RtvController;
 using MapChooserSharp.Models;
 using MapChooserSharp.Modules.EventManager;
 using MapChooserSharp.Modules.MapConfig;
+using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.Nomination;
 using MapChooserSharp.Modules.RockTheVote;
@@ -39,9 +40,9 @@ public sealed class MapChooserSharp: TncssPluginBase
     {
         RegisterModule<MapConfigRepository>();
         RegisterModule<McsEventManager>();
-        RegisterModule<McsMapNominationController>();
-        RegisterModule<McsMapVoteController>();
-        RegisterModule<McsRtvController>();
+        RegisterModule<McsMapMcsNominationController>();
+        RegisterModule<McsMcsMapVoteController>();
+        RegisterModule<McsMcsRtvController>();
     }
 
     protected override void TncssLateOnPluginLoad(ServiceProvider provider)
@@ -51,13 +52,14 @@ public sealed class MapChooserSharp: TncssPluginBase
 
     private void RegisterMcsApi(ServiceProvider provider)
     {
-        var nominationApi = provider.GetRequiredService<McsMapNominationController>();
-        var mapVoteApi = provider.GetRequiredService<McsMapVoteController>();
-        var rtvApi = provider.GetRequiredService<McsRtvController>();
+        var nominationApi = provider.GetRequiredService<McsMapMcsNominationController>();
+        var mapVoteApi = provider.GetRequiredService<McsMcsMapVoteController>();
+        var rtvApi = provider.GetRequiredService<McsMcsRtvController>();
         var eventManager = provider.GetRequiredService<McsEventManager>();
+        var mcsMapCycle = provider.GetRequiredService<McsMapCycleController>();
         
         
-        var mcsApi = new McsApi(eventManager, nominationApi, mapVoteApi, rtvApi);
+        var mcsApi = new McsApi(eventManager, mcsMapCycle, nominationApi, mapVoteApi, rtvApi);
         
         Capabilities.RegisterPluginCapability(IMapChooserSharpApi.Capability, () => mcsApi);
     }

@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core.Capabilities;
 using MapChooserSharp.API.Events;
+using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.API.Nomination;
 using MapChooserSharp.API.RtvController;
@@ -22,17 +23,22 @@ public interface IMapChooserSharpApi
     public IMcsEventSystem EventSystem { get; }
     
     /// <summary>
+    /// MapCycleController API, You can manipulate map cycle system
+    /// </summary>
+    public IMcsMapCycleControllerApi McsMapCycleController { get; }
+    
+    /// <summary>
     /// Nomination API, You can manipulate nomination system
     /// </summary>
-    public INominationApi NominationApi { get; }
+    public IMcsNominationApi McsNominationApi { get; }
     
     /// <summary>
     /// VoteController API, You can manipulate vote system
     /// </summary>
-    public IMapVoteControllerApi MapVoteControllerApi { get; }
+    public IMcsMapVoteControllerApi McsMapVoteControllerApi { get; }
     
     /// <summary>
     /// RTVController API, You can manipulate RTV system
     /// </summary>
-    public IRtvControllerApi RtvControllerApi { get; }
+    public IMcsRtvControllerApi McsRtvControllerApi { get; }
 }

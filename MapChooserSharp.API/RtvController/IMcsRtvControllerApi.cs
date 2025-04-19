@@ -3,7 +3,7 @@
 /// <summary>
 /// RTV Controller API
 /// </summary>
-public interface IRtvControllerApi
+public interface IMcsRtvControllerApi
 {
     
 }

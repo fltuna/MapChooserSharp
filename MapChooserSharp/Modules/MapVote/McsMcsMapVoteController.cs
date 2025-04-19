@@ -4,7 +4,7 @@ using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.MapVote;
 
-public sealed class McsMapVoteController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMapVoteControllerApi
+public sealed class McsMcsMapVoteController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsMapVoteControllerApi
 {
     public override string PluginModuleName => "McsMapVoteController";
     public override string ModuleChatPrefix => PluginModuleName;

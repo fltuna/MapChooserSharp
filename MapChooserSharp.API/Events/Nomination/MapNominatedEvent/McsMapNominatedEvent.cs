@@ -6,7 +6,7 @@ namespace MapChooserSharp.API.Events.Nomination.MapNominatedEvent;
 /// <summary>
 /// Event of nomination
 /// </summary>
-public class McsMapNominatedEvent(CCSPlayerController? player, IMapConfig mapConfig, string modulePrefix) : NominationEventBase(modulePrefix), IMcsEventNoResult
+public class McsMapNominatedEvent(CCSPlayerController? player, IMapConfig mapConfig, string modulePrefix) : McsNominationEventBase(modulePrefix), IMcsEventNoResult
 {
     /// <summary>
     /// Player who nominated map. if nominator is console, then param is null

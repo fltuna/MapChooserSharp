@@ -3,7 +3,7 @@
 /// <summary>
 /// MapVoteController API
 /// </summary>
-public interface IMapVoteControllerApi
+public interface IMcsMapVoteControllerApi
 {
     
 }
