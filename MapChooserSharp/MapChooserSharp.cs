@@ -38,11 +38,18 @@ public sealed class MapChooserSharp: TncssPluginBase
 
     protected override void TncssOnPluginLoad(bool hotReload)
     {
+        // Plugin core dependencies
         RegisterModule<MapConfigRepository>();
         RegisterModule<McsEventManager>();
+        
+        // Plugin core modules
         RegisterModule<McsMapMcsNominationController>();
+        
         RegisterModule<McsMcsMapVoteController>();
+        
         RegisterModule<McsMcsRtvController>();
+        
+        RegisterModule<McsMapCycleController>();
     }
 
     protected override void TncssLateOnPluginLoad(ServiceProvider provider)

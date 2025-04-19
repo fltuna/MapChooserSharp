@@ -8,6 +8,8 @@ using MapChooserSharp.API.Events.MapVote;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.Modules.EventManager;
+using MapChooserSharp.Modules.MapConfig;
+using MapChooserSharp.Modules.MapConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -22,8 +24,27 @@ public sealed class McsMapCycleController(IServiceProvider serviceProvider) : Pl
     public override string ModuleChatPrefix => "McsMapCycleController";
 
     private McsEventManager _mcsEventManager = null!;
+    private IMapConfigProvider _mapConfigProvider = null!;
 
+    
+    private IMapConfig? _nextMap = null;
 
+    public IMapConfig? NextMap
+    {
+        get => _nextMap;
+        private set => _nextMap = value;
+    }
+
+    private IMapConfig? _currentMap = null;
+
+    public IMapConfig? CurrentMap
+    {
+        get
+        {
+            return _currentMap ??= _mapConfigProvider.GetMapConfig(Server.MapName);
+        }
+        private set => _currentMap = value;
+    }
 
     public FakeConVar<int> NextMapTransitionDelay = new("mcs_nextmap_transition_delay", "", 10, ConVarFlags.FCVAR_NONE,
         new RangeValidator<int>(0, 30));
@@ -34,7 +55,7 @@ public sealed class McsMapCycleController(IServiceProvider serviceProvider) : Pl
     
     private ConVar? mp_timelimit = null;
 
-    public int TimeLeft
+    internal int TimeLeft
     {
         get
         {
@@ -74,7 +95,7 @@ public sealed class McsMapCycleController(IServiceProvider serviceProvider) : Pl
 
     protected override void OnInitialize()
     {
-
+        _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
     }
 
     protected override void OnAllPluginsLoaded()
@@ -95,24 +116,12 @@ public sealed class McsMapCycleController(IServiceProvider serviceProvider) : Pl
         Plugin.DeregisterEventHandler<EventRoundEnd>(OnRoundEnd);
     }
 
-    private IMapConfig? NextMap { get; set; }
-
-    public void SetNextMap(IMapConfig nextMap)
-    {
-        NextMap = nextMap;
-    }
-
-    public IMapConfig? GetNextMap()
-    {
-        return NextMap;
-    }
-
-    internal void ChangeToNextMap()
+    public bool ChangeToNextMap()
     {
         if (NextMap == null)
         {
             Logger.LogError("Failed to change map: next map is null");
-            return;
+            return false;
         }
 
         long workshopId = NextMap.WorkshopId;
@@ -123,16 +132,18 @@ public sealed class McsMapCycleController(IServiceProvider serviceProvider) : Pl
             // Use MapUtil.ChangeMap(string) instead of MapUtil.ChangeToWorkshopMap(string)
             // Because, This IMapConfig is no guarantee official map or not.
             MapUtil.ChangeMap(NextMap.MapName);
-            return;
+            return true;
         }
 
         DebugLogger.LogInformation($"We will try to change map to {NextMap.MapName} with workshop ID: {workshopId}");
         MapUtil.ChangeToWorkshopMap(workshopId);
+        return true;
     }
 
 
     private void OnMapStart(string mapName)
     {
+        CurrentMap = NextMap;
         NextMap = null;
     }
 
@@ -149,7 +160,7 @@ public sealed class McsMapCycleController(IServiceProvider serviceProvider) : Pl
     }
     
 
-    public string GetFormattedTimeLeft(int timeLeft)
+    internal string GetFormattedTimeLeft(int timeLeft)
     {
         int hours = timeLeft / 3600;
         int minutes = (timeLeft % 3600) / 60;
@@ -172,7 +183,7 @@ public sealed class McsMapCycleController(IServiceProvider serviceProvider) : Pl
     }
 
 
-    public string GetFormattedTimeLeft(int timeLeft, CCSPlayerController player)
+    internal string GetFormattedTimeLeft(int timeLeft, CCSPlayerController player)
     {
         SteamID? steamId = player.AuthorizedSteamID;
         if (steamId == null)
