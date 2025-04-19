@@ -50,6 +50,7 @@ public sealed class MapChooserSharp: TncssPluginBase
         RegisterModule<McsMcsRtvController>();
         
         RegisterModule<McsMapCycleController>();
+        RegisterModule<McsMapCycleCommands>();
     }
 
     protected override void TncssLateOnPluginLoad(ServiceProvider provider)
