@@ -107,6 +107,25 @@ public sealed class McsMapCycleController(IServiceProvider serviceProvider) : Pl
     private void OnMapStart(string mapName)
     {
         CurrentMap = NextMap;
+
+        // This is extra check for server startup
+        if (CurrentMap == null)
+        {
+            CurrentMap = _mapConfigProvider.GetMapConfig(mapName);
+            
+            // If map name isn't match with config then find with workshop ID
+            if (CurrentMap == null)
+            {
+                if (long.TryParse(ForceFullUpdate.GetWorkshopId(), out long workshopId))
+                {
+                    // Find map config my workshopId
+                    // But if not find with this way, CurrentMap become null.
+                    CurrentMap = _mapConfigProvider.GetMapConfig(workshopId);
+                }
+            }
+        }
+        
+        
         NextMap = null;
     }
 
