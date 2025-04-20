@@ -12,7 +12,7 @@ using TNCSSPluginFoundation.Utils.Entity;
 
 namespace MapChooserSharp.Modules.MapCycle;
 
-public sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider)
+internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider)
 {
     public override string PluginModuleName => "McsMapCycleCommands";
     public override string ModuleChatPrefix => "unused";

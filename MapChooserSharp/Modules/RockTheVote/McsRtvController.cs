@@ -5,7 +5,7 @@ using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.RockTheVote;
 
-public class McsRtvController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsRtvControllerApi
+internal class McsRtvController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsRtvControllerApi
 {
     public override string PluginModuleName => "McsRtvController";
     public override string ModuleChatPrefix => $" {ChatColors.Green}[RTV]{ChatColors.Default}";

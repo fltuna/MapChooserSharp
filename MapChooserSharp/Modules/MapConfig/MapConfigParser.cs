@@ -8,7 +8,7 @@ using Tomlyn.Model;
 
 namespace MapChooserSharp.Modules.MapConfig;
 
-public class MapConfigParser(string configPath)
+internal class MapConfigParser(string configPath)
 {
     private string ConfigPath { get; } = configPath;
 

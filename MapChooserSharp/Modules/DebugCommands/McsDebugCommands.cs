@@ -10,7 +10,7 @@ using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.DebugCommands;
 
-public sealed class McsDebugCommands(IServiceProvider serviceProvider): PluginModuleBase(serviceProvider)
+internal sealed class McsDebugCommands(IServiceProvider serviceProvider): PluginModuleBase(serviceProvider)
 {
     public override string PluginModuleName => "McsDebugCommands";
     public override string ModuleChatPrefix => $" {ChatColors.Purple}[MCS DEBUG]{ChatColors.Default}";

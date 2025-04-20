@@ -1,11 +1,12 @@
 ﻿using System.Reflection;
 using MapChooserSharp.API.Events;
+using MapChooserSharp.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.EventManager;
 
-public sealed class McsEventManager(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsEventSystem
+internal sealed class McsEventManager(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsInternalEventManager
 {
     public override string PluginModuleName => "McsEventManager";
     public override string ModuleChatPrefix => "McsEventManager";
@@ -13,7 +14,7 @@ public sealed class McsEventManager(IServiceProvider serviceProvider) : PluginMo
 
     public override void RegisterServices(IServiceCollection services)
     {
-        services.AddSingleton(this);
+        services.AddSingleton<IMcsInternalEventManager>(this);
     }
 
     protected override void OnInitialize()
@@ -91,7 +92,7 @@ public sealed class McsEventManager(IServiceProvider serviceProvider) : PluginMo
     /// <summary>
     /// Fire an event with result
     /// </summary>
-    internal McsEventResult FireEvent<TEvent>(TEvent eventInstance) 
+    public McsEventResult FireEvent<TEvent>(TEvent eventInstance) 
         where TEvent : IMcsEventWithResult
     {
         Type eventType = typeof(TEvent);
@@ -135,7 +136,7 @@ public sealed class McsEventManager(IServiceProvider serviceProvider) : PluginMo
     /// <summary>
     /// Fire an event without result
     /// </summary>
-    internal void FireEventNoResult<TEvent>(TEvent eventInstance) 
+    public void FireEventNoResult<TEvent>(TEvent eventInstance) 
         where TEvent : IMcsEventNoResult
     {
         Type eventType = typeof(TEvent);

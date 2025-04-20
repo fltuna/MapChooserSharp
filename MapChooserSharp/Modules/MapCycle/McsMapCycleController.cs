@@ -7,6 +7,7 @@ using CounterStrikeSharp.API.Modules.Entities;
 using MapChooserSharp.API.Events.MapVote;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapCycleController;
+using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.EventManager;
 using MapChooserSharp.Modules.MapConfig;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
@@ -18,12 +19,12 @@ using TNCSSPluginFoundation.Utils.Other;
 
 namespace MapChooserSharp.Modules.MapCycle;
 
-public sealed class McsMapCycleController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsMapCycleControllerApi
+internal sealed class McsMapCycleController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsMapCycleControllerApi
 {
     public override string PluginModuleName => "McsMapCycleController";
     public override string ModuleChatPrefix => "McsMapCycleController";
 
-    private McsEventManager _mcsEventManager = null!;
+    private IMcsInternalEventManager _mcsEventManager = null!;
     private IMapConfigProvider _mapConfigProvider = null!;
 
     
@@ -59,12 +60,11 @@ public sealed class McsMapCycleController(IServiceProvider serviceProvider) : Pl
     protected override void OnInitialize()
     {
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
     }
 
     protected override void OnAllPluginsLoaded()
     {
-        _mcsEventManager = ServiceProvider.GetRequiredService<McsEventManager>();
-        
         _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
         
         Plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);

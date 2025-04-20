@@ -6,6 +6,7 @@ using MapChooserSharp.API.Events;
 using MapChooserSharp.API.Events.Nomination;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.Nomination;
+using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.EventManager;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,28 +15,31 @@ using TNCSSPluginFoundation.Utils.Entity;
 
 namespace MapChooserSharp.Modules.Nomination;
 
-public sealed class McsMapNominationController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsNominationApi
+internal sealed class McsMapNominationController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsNominationApi
 {
     public override string PluginModuleName => "McsMapNominationController";
     public override string ModuleChatPrefix => $" {ChatColors.Green}[Nomination]{ChatColors.Default}";
 
-    private McsEventManager _mcsEventManager = null!;
+    private IMcsInternalEventManager _mcsEventManager = null!;
     private IMapConfigProvider _mapConfigProvider = null!;
-
-    protected override void OnInitialize()
-    {
-        Plugin.AddCommand("css_nominate", "", CommandNominateMap);
-    }
+    
+    
+    internal List<IMapConfig> NominatedMaps { get; } = new();
 
     public override void RegisterServices(IServiceCollection services)
     {
         services.AddSingleton(this);
     }
 
+    protected override void OnInitialize()
+    {
+        Plugin.AddCommand("css_nominate", "", CommandNominateMap);
+        _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
+        _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+    }
+
     protected override void OnAllPluginsLoaded()
     {
-        _mcsEventManager = ServiceProvider.GetRequiredService<McsEventManager>();
-        _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
         
         _mcsEventManager.RegisterEventHandler<McsNominationBeginEvent>(OnMapNominationBegin);
         _mcsEventManager.RegisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
@@ -134,7 +138,7 @@ public sealed class McsMapNominationController(IServiceProvider serviceProvider)
 
     private McsEventResultWithCallback OnMapNominationBegin(McsNominationBeginEvent @event)
     {
-        if (@event.Player == null || @event.Player.PlayerPawn.Value == null || @event.Player.PlayerPawn.Value.Health < 80)
+        if (@event.Player != null && @event.Player.PlayerPawn.Value != null && @event.Player.PlayerPawn.Value.Health < 80)
         {
             return McsEventResultWithCallback.Stop(result =>
             {

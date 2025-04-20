@@ -4,7 +4,7 @@ using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.MapConfig;
 
-public sealed class MapConfigRepository(IServiceProvider serviceProvider): PluginModuleBase(serviceProvider)
+internal sealed class MapConfigRepository(IServiceProvider serviceProvider): PluginModuleBase(serviceProvider)
 {
     public override string PluginModuleName => "MapConfigRepository";
     public override string ModuleChatPrefix => "MapConfigRepository";
