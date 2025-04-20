@@ -4,8 +4,6 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.Events;
 using MapChooserSharp.API.Events.Nomination;
-using MapChooserSharp.API.Events.Nomination.MapNominatedEvent;
-using MapChooserSharp.API.Events.Nomination.MapNominationBeginEvent;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.Nomination;
 using MapChooserSharp.Modules.EventManager;

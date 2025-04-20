@@ -1,7 +1,7 @@
 ﻿using CounterStrikeSharp.API.Core;
 using MapChooserSharp.API.MapConfig;
 
-namespace MapChooserSharp.API.Events.Nomination.MapNominationBeginEvent;
+namespace MapChooserSharp.API.Events.Nomination;
 
 /// <summary>
 /// Event of nomination

@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using MapChooserSharp.API.Events;
-using MapChooserSharp.API.Events.Nomination.MapNominatedEvent;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 
