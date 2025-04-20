@@ -116,7 +116,7 @@ public sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Plug
         {
             if (nextMap != null)
             {
-                Server.PrintToConsole($"Next map: {nextMap}");
+                Server.PrintToConsole($"Next map: {nextMap.MapName}");
             }
             else
             {
@@ -127,7 +127,7 @@ public sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Plug
         {
             if (nextMap != null)
             {
-                player.PrintToChat($"Next map: {nextMap}");
+                player.PrintToChat($"Next map: {nextMap.MapName}");
             }
             else
             {
@@ -143,22 +143,22 @@ public sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Plug
         {
             if (currentMap != null)
             {
-                Server.PrintToConsole($"Current map: {currentMap}");
+                Server.PrintToConsole($"Current map: {currentMap.MapName}");
             }
             else
             {
-                Server.PrintToConsole("Current map: NULL!");
+                Server.PrintToConsole($"Current map: {Server.MapName}!");
             }
         }
         else
         {
             if (currentMap != null)
             {
-                player.PrintToChat($"Next map: {currentMap}");
+                player.PrintToChat($"Next map: {currentMap.MapName}");
             }
             else
             {
-                player.PrintToChat($"Current map: NULL!");
+                player.PrintToChat($"Current map: {Server.MapName}!");
             }
         }
     }
