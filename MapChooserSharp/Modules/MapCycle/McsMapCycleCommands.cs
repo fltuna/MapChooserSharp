@@ -85,27 +85,40 @@ public sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Plug
         
         string arg1 = info.ArgByIndex(1);
 
+        bool commandFound = false;
+
 
         if (arg1.Equals("timeleft", StringComparison.OrdinalIgnoreCase))
         {
             player.ExecuteClientCommandFromServer("css_timeleft");
+            commandFound = true;
         }
         else if (arg1.Equals("nextmap", StringComparison.OrdinalIgnoreCase))
         {
             player.ExecuteClientCommandFromServer("css_nextmap");
+            commandFound = true;
         }
         else if (arg1.Equals("currentmap", StringComparison.OrdinalIgnoreCase))
         {
             player.ExecuteClientCommandFromServer("css_currentmap");
+            commandFound = true;
         }
             
-        return HookResult.Continue;
+        return commandFound ? HookResult.Handled : HookResult.Continue;
     }
     
     
     private void CommandTimeLeft(CCSPlayerController? player, CommandInfo info)
     {
-        info.ReplyToCommand(GetFormattedTimeLeft(TimeLeft, player));
+        string timeleft = GetFormattedTimeLeft(TimeLeft, player);
+        if (player == null)
+        {
+            Server.PrintToConsole($"Timeleft: {timeleft}");
+        }
+        else
+        {
+            player.PrintToChat($"Timeleft: {timeleft}");
+        }
     }
 
 
@@ -147,7 +160,7 @@ public sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Plug
             }
             else
             {
-                Server.PrintToConsole($"Current map: {Server.MapName}!");
+                Server.PrintToConsole($"Current map: {Server.MapName}");
             }
         }
         else
@@ -158,7 +171,7 @@ public sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Plug
             }
             else
             {
-                player.PrintToChat($"Current map: {Server.MapName}!");
+                player.PrintToChat($"Current map: {Server.MapName}");
             }
         }
     }
