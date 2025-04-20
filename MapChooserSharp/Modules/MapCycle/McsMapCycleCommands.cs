@@ -61,7 +61,7 @@ public sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Plug
         Plugin.AddCommand("css_timeleft", "Show timeleft", CommandTimeLeft);
         Plugin.AddCommand("css_nextmap", "Show next map", CommandNextMap);
         Plugin.AddCommand("css_currentmap", "Show current map", CommandCurrentMap);
-        Plugin.AddCommandListener("say", SayCommandListener);
+        Plugin.AddCommandListener("say", SayCommandListener, HookMode.Pre);
     }
 
     protected override void OnUnloadModule()
@@ -69,6 +69,7 @@ public sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Plug
         Plugin.RemoveCommand("css_timeleft", CommandTimeLeft);
         Plugin.RemoveCommand("css_nextmap", CommandNextMap);
         Plugin.RemoveCommand("css_currentmap", CommandCurrentMap);
+        Plugin.RemoveCommandListener("say", SayCommandListener, HookMode.Pre);
     }
 
 
