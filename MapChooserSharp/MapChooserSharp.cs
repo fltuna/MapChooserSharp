@@ -8,6 +8,7 @@ using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.API.Nomination;
 using MapChooserSharp.API.RtvController;
 using MapChooserSharp.Models;
+using MapChooserSharp.Modules.DebugCommands;
 using MapChooserSharp.Modules.EventManager;
 using MapChooserSharp.Modules.MapConfig;
 using MapChooserSharp.Modules.MapCycle;
@@ -51,6 +52,10 @@ public sealed class MapChooserSharp: TncssPluginBase
         
         RegisterModule<McsMapCycleController>();
         RegisterModule<McsMapCycleCommands>();
+        
+        #if DEBUG
+        RegisterModule<McsDebugCommands>();
+        #endif
     }
 
     protected override void TncssLateOnPluginLoad(ServiceProvider provider)
