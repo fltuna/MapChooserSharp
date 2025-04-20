@@ -37,14 +37,14 @@ public sealed class McsMapNominationController(IServiceProvider serviceProvider)
         _mcsEventManager = ServiceProvider.GetRequiredService<McsEventManager>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
         
-        _mcsEventManager.RegisterEventHandler<McsMapMcsNominationBeginEvent>(OnMapNominationBegin);
+        _mcsEventManager.RegisterEventHandler<McsNominationBeginEvent>(OnMapNominationBegin);
         _mcsEventManager.RegisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
 
     }
 
     protected override void OnUnloadModule()
     {
-        _mcsEventManager.UnregisterEventHandler<McsMapMcsNominationBeginEvent>(OnMapNominationBegin);
+        _mcsEventManager.UnregisterEventHandler<McsNominationBeginEvent>(OnMapNominationBegin);
         _mcsEventManager.UnregisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
     }
 
@@ -98,7 +98,7 @@ public sealed class McsMapNominationController(IServiceProvider serviceProvider)
 
     private void NominateMap(CCSPlayerController? player, IMapConfig mapConfig)
     {
-        var nominationBegin = new McsMapMcsNominationBeginEvent(player, mapConfig, ModuleChatPrefix);
+        var nominationBegin = new McsNominationBeginEvent(player, mapConfig, ModuleChatPrefix);
         McsEventResult result = _mcsEventManager.FireEvent(nominationBegin);
         
         if (result > McsEventResult.Handled)
@@ -132,7 +132,7 @@ public sealed class McsMapNominationController(IServiceProvider serviceProvider)
     
     
 
-    private McsEventResultWithCallback OnMapNominationBegin(McsMapMcsNominationBeginEvent @event)
+    private McsEventResultWithCallback OnMapNominationBegin(McsNominationBeginEvent @event)
     {
         if (@event.Player == null || @event.Player.PlayerPawn.Value == null || @event.Player.PlayerPawn.Value.Health < 80)
         {
