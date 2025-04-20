@@ -16,7 +16,7 @@ using TNCSSPluginFoundation.Utils.Entity;
 
 namespace MapChooserSharp.Modules.Nomination;
 
-public sealed class McsMapMcsNominationController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsNominationApi
+public sealed class McsMapNominationController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsNominationApi
 {
     public override string PluginModuleName => "McsMapNominationController";
     public override string ModuleChatPrefix => $" {ChatColors.Green}[Nomination]{ChatColors.Default}";

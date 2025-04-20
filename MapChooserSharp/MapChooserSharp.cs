@@ -43,11 +43,11 @@ public sealed class MapChooserSharp: TncssPluginBase
         RegisterModule<McsEventManager>();
         
         // Plugin core modules
-        RegisterModule<McsMapMcsNominationController>();
+        RegisterModule<McsMapNominationController>();
         
-        RegisterModule<McsMcsMapVoteController>();
+        RegisterModule<McsMapVoteController>();
         
-        RegisterModule<McsMcsRtvController>();
+        RegisterModule<McsRtvController>();
         
         RegisterModule<McsMapCycleController>();
         RegisterModule<McsMapCycleCommands>();
@@ -60,9 +60,9 @@ public sealed class MapChooserSharp: TncssPluginBase
 
     private void RegisterMcsApi(ServiceProvider provider)
     {
-        var nominationApi = provider.GetRequiredService<McsMapMcsNominationController>();
-        var mapVoteApi = provider.GetRequiredService<McsMcsMapVoteController>();
-        var rtvApi = provider.GetRequiredService<McsMcsRtvController>();
+        var nominationApi = provider.GetRequiredService<McsMapNominationController>();
+        var mapVoteApi = provider.GetRequiredService<McsMapVoteController>();
+        var rtvApi = provider.GetRequiredService<McsRtvController>();
         var eventManager = provider.GetRequiredService<McsEventManager>();
         var mcsMapCycle = provider.GetRequiredService<McsMapCycleController>();
         
