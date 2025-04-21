@@ -2,6 +2,7 @@
 using MapChooserSharp.API.Events;
 using MapChooserSharp.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.EventManager;
@@ -98,38 +99,54 @@ internal sealed class McsEventManager(IServiceProvider serviceProvider) : Plugin
         Type eventType = typeof(TEvent);
         McsEventResult highestResult = McsEventResult.Continue;
         Action<McsEventResult>? finalCallback = null;
+
+        if (!_withResultHandlers.TryGetValue(eventType, out var handlers)) 
+            return highestResult;
         
-        if (_withResultHandlers.TryGetValue(eventType, out var handlers))
+        
+        foreach (var handlerObj in handlers)
         {
-            foreach (var handlerObj in handlers)
+            if (handlerObj is not Func<TEvent, McsEventResultWithCallback> typedHandler)
+                continue;
+            
+            try
             {
-                if (handlerObj is Func<TEvent, McsEventResultWithCallback> typedHandler)
+
+                McsEventResultWithCallback result = typedHandler(eventInstance);
+
+                if (result.Result > highestResult)
                 {
-                    McsEventResultWithCallback result = typedHandler(eventInstance);
-                    
-                    if (result.Result > highestResult)
-                    {
-                        highestResult = result.Result;
-                        finalCallback = result.Callback;
-                    }
-                    
-                    if (highestResult >= McsEventResult.Stop)
-                    {
-                        var method = typedHandler.Method;
-                        var declaringType = method.DeclaringType;
-                        var fullClassName = declaringType?.FullName ?? "Unknown";
-                        var methodName = method.Name;
-    
-                        DebugLogger.LogDebug($"The event {eventType} iteration is stopped by {fullClassName}::{methodName}");
-                        break;
-                    }
+                    highestResult = result.Result;
+                    finalCallback = result.Callback;
+                }
+
+                if (highestResult >= McsEventResult.Stop)
+                {
+                    // Declare variables separately for better performance
+                    var method = typedHandler.Method;
+                    var declaringType = method.DeclaringType;
+                    var fullClassName = declaringType?.FullName ?? "Unknown";
+                    var methodName = method.Name;
+
+                    DebugLogger.LogDebug($"The event {eventType} iteration is stopped by {fullClassName}::{methodName}");
+                    break;
                 }
             }
-            
-            // Execute callback if present
-            finalCallback?.Invoke(highestResult);
+            catch (Exception e)
+            {
+                // Declare variables separately for better performance
+                var method = typedHandler.Method;
+                var declaringType = method.DeclaringType;
+                var fullClassName = declaringType?.FullName ?? "Unknown";
+                var methodName = method.Name;
+                        
+                Logger.LogError($"The {eventType} event handler {fullClassName}::{methodName} threw an exception ignoring...: \n{e}");
+            }
         }
-        
+            
+        // Execute callback if present
+        finalCallback?.Invoke(highestResult);
+
         return highestResult;
     }
     
@@ -145,9 +162,21 @@ internal sealed class McsEventManager(IServiceProvider serviceProvider) : Plugin
         {
             foreach (var handlerObj in handlers)
             {
-                if (handlerObj is Action<TEvent> typedHandler)
+                if (handlerObj is not Action<TEvent> typedHandler) 
+                    continue;
+                
+
+                try
                 {
                     typedHandler(eventInstance);
+                }
+                catch (Exception e)
+                {
+                    var method = typedHandler.Method;
+                    var declaringType = method.DeclaringType;
+                    var fullClassName = declaringType?.FullName ?? "Unknown";
+                    var methodName = method.Name;
+                    Logger.LogError($"The {eventType} event handler {fullClassName}::{methodName} threw an exception ignoring...: \n{e}");
                 }
             }
         }
