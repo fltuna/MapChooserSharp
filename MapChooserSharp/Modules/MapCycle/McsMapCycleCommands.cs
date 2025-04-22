@@ -5,6 +5,7 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities;
 using MapChooserSharp.API.MapCycleController;
+using MapChooserSharp.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -18,46 +19,13 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     public override string ModuleChatPrefix => "unused";
     
     private IMcsMapCycleControllerApi _mapCycleController = null!;
-    
-    public int InvalidTimeLeft { get; } = -1;
-    
-    private ConVar? mp_timelimit = null;
-
-    private int TimeLeft
-    {
-        get
-        {
-            var gameRules = EntityUtil.GetGameRules();
-            if (gameRules == null)
-            {
-                Logger.LogError("Failed to find the Game Rules entity!");
-                return InvalidTimeLeft;
-            }
-
-            if (mp_timelimit == null)
-            {
-                mp_timelimit = ConVar.Find("mp_timelimit");
-                if (mp_timelimit == null)
-                {
-                    Logger.LogWarning("Failed to find the mp_timelimit ConVar and try to find again.");
-                    return InvalidTimeLeft;
-                }
-            }
-
-            var timeLimit = mp_timelimit.GetPrimitiveValue<float>();
-            if (timeLimit < 0.001f)
-            {
-                return 0;
-            }
-
-            return (int)((gameRules.GameStartTime + timeLimit * 60.0f) - Server.CurrentTime);
-        }
-    }
+    private ITimeLeftUtil _timeLeftUtil = null!;
 
 
     protected override void OnInitialize()
     {
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
+        _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         Plugin.AddCommand("css_timeleft", "Show timeleft", CommandTimeLeft);
         Plugin.AddCommand("css_nextmap", "Show next map", CommandNextMap);
         Plugin.AddCommand("css_currentmap", "Show current map", CommandCurrentMap);
@@ -110,7 +78,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     
     private void CommandTimeLeft(CCSPlayerController? player, CommandInfo info)
     {
-        string timeleft = GetFormattedTimeLeft(TimeLeft, player);
+        string timeleft = _timeLeftUtil.GetFormattedTimeLeft(_timeLeftUtil.TimeLeft, player);
         if (player == null)
         {
             Server.PrintToConsole($"Timeleft: {timeleft}");
@@ -174,55 +142,6 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
                 player.PrintToChat($"Current map: {Server.MapName}");
             }
         }
-    }
-
-    private string GetFormattedTimeLeft(int timeLeft)
-    {
-        int hours = timeLeft / 3600;
-        int minutes = (timeLeft % 3600) / 60;
-        int seconds = timeLeft % 60;
-
-        if (hours > 0)
-        {
-            return $"{hours} {(hours == 1 ? "hour" : "hours")} " +
-                   $"{minutes} {(minutes == 1 ? "minute" : "minutes")} " +
-                   $"{seconds} {(seconds == 1 ? "second" : "seconds")}";
-        }
-
-        if (minutes > 0)
-        {
-            return $"{minutes} {(minutes == 1 ? "minute" : "minutes")} " +
-                   $"{seconds} {(seconds == 1 ? "second" : "seconds")}";
-        }
-
-        return $"{seconds} {(seconds == 1 ? "second" : "seconds")}";
-    }
-
-
-    private string GetFormattedTimeLeft(int timeLeft, CCSPlayerController? player)
-    {
-        SteamID? steamId = player?.AuthorizedSteamID;
-        if (steamId == null)
-            return GetFormattedTimeLeft(timeLeft);
-        
-        int hours = timeLeft / 3600;
-        int minutes = (timeLeft % 3600) / 60;
-        int seconds = timeLeft % 60;
-
-        var playerCulture = PlayerLanguageManager.Instance.GetLanguage(steamId);
-        using var tempCulture = new WithTemporaryCulture(playerCulture);
-
-        if (hours > 0)
-        {
-            return "TODO_TRANSLATE| HOURS";
-        }
-
-        if (minutes > 0)
-        {
-            return "TODO_TRANSLATE| MINUETS";
-        }
-
-        return "TODO_TRANSLATE| SECONDS";
     }
     
 }

@@ -16,6 +16,7 @@ using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.Nomination;
 using MapChooserSharp.Modules.RockTheVote;
+using MapChooserSharp.Util;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation;
 
@@ -43,6 +44,7 @@ public sealed class MapChooserSharp: TncssPluginBase
         // Plugin core dependencies
         RegisterModule<MapConfigRepository>();
         RegisterModule<McsEventManager>();
+        RegisterModule<TimeLeftUtil>();
         
         // Plugin core modules
         RegisterModule<McsMapNominationController>();
