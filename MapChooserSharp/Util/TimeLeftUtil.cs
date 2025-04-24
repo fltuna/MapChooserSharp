@@ -3,6 +3,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities;
+using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -11,21 +12,39 @@ using TNCSSPluginFoundation.Utils.Entity;
 
 namespace MapChooserSharp.Util;
 
-internal class TimeLeftUtil(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), ITimeLeftUtil
+internal class TimeLeftUtil(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), ITimeLeftUtil
 {
     public override string PluginModuleName => "TimeleftUtil";
     public override string ModuleChatPrefix => "unused";
 
     public override void RegisterServices(IServiceCollection services)
     {
-        services.AddSingleton<ITimeLeftUtil, TimeLeftUtil>();
+        services.AddSingleton<ITimeLeftUtil>(this);
     }
 
-    private int InvalidTimeLeft { get; } = -1;
+    protected override void OnInitialize()
+    {
+        if (hotReload)
+        {
+            ReDetermineExtendType();
+        }
+    }
+
+
+    public void ReDetermineExtendType()
+    {
+        ExtendType = DetermineExtendType();
+    }
+
+    public McsMapExtendType ExtendType { get; private set; } = McsMapExtendType.TimeLimit;
+
+    private const int InvalidTime = -1;
+
+    #region mp_timelimit
     
     private ConVar? mp_timelimit = null;
 
-    public int TimeLeft
+    public int TimeLimit
     {
         get
         {
@@ -33,7 +52,7 @@ internal class TimeLeftUtil(IServiceProvider serviceProvider) : PluginModuleBase
             if (gameRules == null)
             {
                 Logger.LogError("Failed to find the Game Rules entity!");
-                return InvalidTimeLeft;
+                return InvalidTime;
             }
 
             if (mp_timelimit == null)
@@ -42,7 +61,7 @@ internal class TimeLeftUtil(IServiceProvider serviceProvider) : PluginModuleBase
                 if (mp_timelimit == null)
                 {
                     Logger.LogWarning("Failed to find the mp_timelimit ConVar and try to find again.");
-                    return InvalidTimeLeft;
+                    return InvalidTime;
                 }
             }
 
@@ -54,6 +73,159 @@ internal class TimeLeftUtil(IServiceProvider serviceProvider) : PluginModuleBase
 
             return (int)((gameRules.GameStartTime + timeLimit * 60.0f) - Server.CurrentTime);
         }
+    }
+    
+    #endregion
+    
+    
+    #region mp_maxrounds
+    
+    
+    private ConVar? mp_maxrounds = null;
+
+    public int RoundsLeft
+    {
+        get
+        {
+            var gameRules = EntityUtil.GetGameRules();
+            if (gameRules == null)
+            {
+                Logger.LogError("Failed to find the Game Rules entity!");
+                return InvalidTime;
+            }
+
+            if (mp_maxrounds == null)
+            {
+                mp_maxrounds = ConVar.Find("mp_maxrounds");
+                if (mp_maxrounds == null)
+                {
+                    Logger.LogWarning("Failed to find the mp_maxrounds ConVar and try to find again.");
+                    return InvalidTime;
+                }
+            }
+
+            int maxRounds = mp_maxrounds.GetPrimitiveValue<int>();
+            if (maxRounds <= 0)
+            {
+                return 0;
+            }
+
+            return maxRounds - gameRules.TotalRoundsPlayed;
+        }
+    }
+
+
+    #endregion
+    
+    
+    #region mp_roundtime
+    
+    private ConVar? mp_roundtime = null;
+    
+    /// <summary>
+    /// Returns remaining round time in seconds
+    /// </summary>
+    public int RoundTimeLeft
+    {
+        get
+        {
+            var gameRules = EntityUtil.GetGameRules();
+            if (gameRules == null)
+            {
+                Logger.LogError("Failed to find the Game Rules entity!");
+                return InvalidTime;
+            }
+            
+            return (int)((gameRules.GameStartTime + gameRules.RoundTime) - Server.CurrentTime);
+        }
+    }
+    
+    #endregion
+
+    public bool ExtendTimeLimit(int minutes)
+    {
+        if (TimeLimit < 1)
+        {
+            DebugLogger.LogWarning("TimeLeft util tried to extend a time limit, but looks like current game mode is not a time limit based! aborting...");
+            return false;
+        }
+        
+        // Just in case
+        mp_timelimit ??= ConVar.Find("mp_maxrounds");
+
+        if (mp_timelimit == null)
+        {
+            DebugLogger.LogWarning("Failed to find the mp_maxrounds ConVar.");
+            return false;
+        }
+
+        float newTime = mp_timelimit.GetPrimitiveValue<float>() + minutes;
+        DebugLogger.LogTrace($"New {mp_timelimit.Name} is {newTime}");
+        
+        mp_timelimit.SetValue(newTime);
+        foreach (CCSPlayerController player in Utilities.GetPlayers())
+        {
+            player.ReplicateConVar(mp_timelimit.Name, $"{newTime}");
+        }
+        return true;
+    }
+
+    public bool ExtendRounds(int rounds)
+    {
+        if (RoundsLeft < 1)
+        {
+            DebugLogger.LogWarning("TimeLeft util tried to extend a max rounds, but looks like current game mode is not a round based! aborting...");
+            return false;
+        }
+        
+        // Just in case
+        mp_maxrounds ??= ConVar.Find("mp_maxrounds");
+
+        if (mp_maxrounds == null)
+        {
+            DebugLogger.LogWarning("Failed to find the mp_maxrounds ConVar.");
+            return false;
+        }
+        
+        int newMaxRounds = mp_maxrounds.GetPrimitiveValue<int>() + rounds;
+        DebugLogger.LogTrace($"New {mp_maxrounds.Name} is {newMaxRounds}");
+        
+        mp_maxrounds.SetValue(newMaxRounds);
+        foreach (CCSPlayerController player in Utilities.GetPlayers())
+        {
+            player.ReplicateConVar(mp_maxrounds.Name, $"{newMaxRounds}");
+        }
+        return true;
+    }
+
+    public bool ExtendRoundTime(int minutes)
+    {
+        if (RoundTimeLeft < 1)
+        {
+            DebugLogger.LogWarning("TimeLeft util tried to extend a round time limit, but looks like current game mode is not a round time limit based! aborting...");
+            return false;
+        }
+        
+        // Just in case
+        mp_roundtime ??= ConVar.Find("mp_maxrounds");
+
+        if (mp_roundtime == null)
+        {
+            DebugLogger.LogWarning("Failed to find the mp_maxrounds ConVar.");
+            return false;
+        }
+
+        int currentTime = mp_roundtime.GetPrimitiveValue<int>();
+        int newTime = currentTime + minutes;
+        DebugLogger.LogTrace($"New {mp_roundtime.Name} is {newTime}");
+        
+        mp_roundtime.SetValue(newTime);
+        GameRulesUtil.SetRoundTime(GameRulesUtil.GetRoundTime() + minutes*60);
+        foreach (CCSPlayerController player in Utilities.GetPlayers())
+        {
+            player.ReplicateConVar(mp_roundtime.Name, $"{newTime}");
+        }
+        return true;
     }
 
 
@@ -104,5 +276,36 @@ internal class TimeLeftUtil(IServiceProvider serviceProvider) : PluginModuleBase
         }
 
         return "TODO_TRANSLATE| SECONDS";
+    }
+
+
+    public string GetFormattedRoundsLeft(int roundsLeft)
+    {
+        if (roundsLeft < 0)
+            return $"Last round!";
+        
+        return $"{roundsLeft} {(roundsLeft == 1 ? "round" : "rounds")}";
+    }
+
+    public string GetFormattedRoundsLeft(int roundsLeft, CCSPlayerController? player)
+    {
+        if (player == null)
+            return GetFormattedRoundsLeft(roundsLeft);
+        
+        return $"TODO_TRANSLATE| {roundsLeft}";
+    }
+    
+    private McsMapExtendType DetermineExtendType()
+    {
+        if (TimeLimit > 0)
+            return McsMapExtendType.TimeLimit;
+        
+        if (RoundsLeft > 0)
+            return McsMapExtendType.Rounds;
+        
+        if (RoundTimeLeft > 0)
+            return McsMapExtendType.RoundTime;
+
+        throw new InvalidOperationException("Failed to determine extend type! the server is possibly misconfigured.");
     }
 }

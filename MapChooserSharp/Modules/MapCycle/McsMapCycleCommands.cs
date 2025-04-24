@@ -78,7 +78,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     
     private void CommandTimeLeft(CCSPlayerController? player, CommandInfo info)
     {
-        string timeleft = _timeLeftUtil.GetFormattedTimeLeft(_timeLeftUtil.TimeLeft, player);
+        string timeleft = _timeLeftUtil.GetFormattedTimeLeft(_timeLeftUtil.TimeLimit, player);
         if (player == null)
         {
             Server.PrintToConsole($"Timeleft: {timeleft}");

@@ -18,6 +18,7 @@ using MapChooserSharp.Modules.Nomination;
 using MapChooserSharp.Modules.RockTheVote;
 using MapChooserSharp.Util;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation;
 
 namespace MapChooserSharp;
@@ -41,10 +42,18 @@ public sealed class MapChooserSharp: TncssPluginBase
 
     protected override void TncssOnPluginLoad(bool hotReload)
     {
+        if (hotReload)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Logger.LogWarning("MapChooserSharp is hot reloaded! This will causes UNEXPECTED BEHAVIOUR. Developers is not responsible for any problems that occur by hot reloading.");
+            }
+        }
+        
         // Plugin core dependencies
         RegisterModule<MapConfigRepository>();
         RegisterModule<McsEventManager>();
-        RegisterModule<TimeLeftUtil>();
+        RegisterModule<TimeLeftUtil>(hotReload);
         
         // Plugin core modules
         RegisterModule<McsMapNominationController>();
@@ -53,7 +62,7 @@ public sealed class MapChooserSharp: TncssPluginBase
         
         RegisterModule<McsRtvController>();
         
-        RegisterModule<McsMapCycleController>();
+        RegisterModule<McsMapCycleController>(hotReload);
         RegisterModule<McsMapCycleCommands>();
         
         #if DEBUG
