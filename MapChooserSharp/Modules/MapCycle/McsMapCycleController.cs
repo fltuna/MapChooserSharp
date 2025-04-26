@@ -46,6 +46,8 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     
     public bool IsNextMapConfirmed => _nextMap != null;
 
+    internal bool ChangeMapOnNextRoundEnd { get; set; } = false;
+
     private IMapConfig? _currentMap = null;
 
     public IMapConfig? CurrentMap
@@ -119,6 +121,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         Plugin.RegisterListener<Listeners.OnMapEnd>(() =>
         {
             _isMapStarted = false;
+            ChangeMapOnNextRoundEnd = false;
         });
         Plugin.RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
     }
@@ -138,9 +141,6 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     {
         if (seconds <= 0)
             seconds = DefaultMapChangeDelay;
-        
-        if (_mcsRtvController.MapChangeTimingShouldRoundEnd.Value)
-            return;
         
         Plugin.AddTimer(seconds, ChangeToNextMapInternal, TimerFlags.STOP_ON_MAPCHANGE);
     }
@@ -211,8 +211,11 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         if (NextMap == null)
             return HookResult.Continue;
 
-        if (!_mcsRtvController.MapChangeTimingShouldRoundEnd.Value)
+        if (ChangeMapOnNextRoundEnd)
+        {
+            ChangeToNextMap(1.0F);
             return HookResult.Continue;
+        }
 
         McsMapExtendType extendType = _timeLeftUtil.ExtendType;
 

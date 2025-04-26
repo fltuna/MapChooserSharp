@@ -43,9 +43,11 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
 
     public FakeConVar<bool> MapChangeTimingShouldRoundEnd =
         new("mcs_rtv_map_change_timing_should_round_end",
-            "Map change should be round end? If true, ignores mcs_rtv_map_change_timing setting", false);
+            "Map change should be round end? If true, ignores mcs_rtv_map_change_timing setting", true);
 
-    private RtvStatus RtvCommandStatus { get; set; } = RtvStatus.Enabled;
+    
+    
+    internal RtvStatus RtvCommandStatus { get; private set; } = RtvStatus.Enabled;
 
     internal float RtvCommandUnlockTime { get; private set; } = 0.0F;
     
@@ -148,7 +150,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         {
             if (_mcsMapCycleController.IsNextMapConfirmed)
             {
-                _mcsMapCycleController.ChangeToNextMap(MapChangeTimingAfterRtvSuccess.Value);
+                ChangeToNextMap();
             }
             else
             {
@@ -157,6 +159,11 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         }
         
         return PlayerRtvResult.Success;
+    }
+
+    internal void InitiateRtvVote()
+    {
+        _mcsMapVoteController.InitiateVote(true);
     }
 
     internal void EnableRtvCommand()
@@ -171,6 +178,17 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         RtvCommandUnlockTimer?.Kill();
     }
 
+    internal void ChangeToNextMap()
+    {
+        Server.PrintToChatAll("TODO_TRANSLATE| RTV SPOKEN CHANGING MAP");
+        _mcsMapCycleController.ChangeMapOnNextRoundEnd = MapChangeTimingShouldRoundEnd.Value;
+
+        if (!MapChangeTimingShouldRoundEnd.Value)
+        {
+            _mcsMapCycleController.ChangeToNextMap(MapChangeTimingAfterRtvSuccess.Value);
+        }
+    }
+
     internal enum PlayerRtvResult
     {
         Success = 0,
@@ -180,7 +198,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         AnotherVoteOngoing
     }
 
-    private enum RtvStatus
+    internal enum RtvStatus
     {
         Enabled = 0,
         Disabled,
@@ -211,11 +229,6 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
     private void OnMapVoteInitialization(McsMapVoteInitiatedEvent @event)
     {
         RtvCommandStatus = RtvStatus.AnotherVoteOngoing;
-    }
-
-    private void InitiateRtvVote()
-    {
-        _mcsMapVoteController.InitiateVote(true);
     }
 
     private void CreateRtvCommandUnlockTimer(RtvCommandUnlockTimeOverride timeOverride)
