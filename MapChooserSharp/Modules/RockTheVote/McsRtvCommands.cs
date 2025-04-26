@@ -58,7 +58,6 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
         switch (status)
         {
             case McsRtvController.PlayerRtvResult.Success:
-                client.PrintToConsole("TODO_TRANSLATE| RTV OK");
                 break;
             
             case McsRtvController.PlayerRtvResult.AlreadyInRtv:
