@@ -32,7 +32,7 @@ public sealed class MapChooserSharp: TncssPluginBase
 
     public override string BaseCfgDirectoryPath => "unused";
     public override string ConVarConfigPath => Path.Combine(Server.GameDirectory, "csgo/cfg/MapChooserSharp/convars.cfg");
-    protected override string PluginPrefix => $" {ChatColors.Green}[MCS]{ChatColors.Default}";
+    public override string PluginPrefix => $" {ChatColors.Green}[MCS]{ChatColors.Default}";
 
 
     protected override void RegisterRequiredPluginServices(IServiceCollection collection, IServiceProvider provider)
