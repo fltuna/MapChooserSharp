@@ -291,6 +291,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             var pickedMaps = unusedMapList
                 .OrderBy(_ => random.Next())
                 .Where(map => map.Value.MapCooldown.CurrentCooldown <= 0)
+                .Where(map => !map.Value.OnlyNomination)
                 .Take(numToPick);
 
             foreach (var (key, value) in pickedMaps)
