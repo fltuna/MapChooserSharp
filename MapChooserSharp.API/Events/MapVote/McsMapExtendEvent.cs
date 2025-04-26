@@ -8,6 +8,7 @@ namespace MapChooserSharp.API.Events.MapVote;
 /// </summary>
 /// <param name="modulePrefix">Module Prefix</param>
 /// <param name="extendTime">How long the map will be extended in minutes</param>
+/// <param name="mapExtendType">Extend type of this event</param>
 public class McsMapExtendEvent(string modulePrefix, int extendTime, McsMapExtendType mapExtendType): McsEventParam(modulePrefix), IMcsEventNoResult
 {
     /// <summary>
