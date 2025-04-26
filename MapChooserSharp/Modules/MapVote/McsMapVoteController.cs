@@ -11,6 +11,8 @@ using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
+using MapChooserSharp.Modules.MapVote.Countdown;
+using MapChooserSharp.Modules.MapVote.Countdown.Interfaces;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.MapVote.Menus.Interfaces;
 using MapChooserSharp.Modules.MapVote.Menus.SimpleHtml;
@@ -33,6 +35,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private McsMapCycleController _mapCycleController = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
     private IMcsMapVoteUiFactory _voteUiFactory = null!;
+    
+    private McsCountdownUiController _countdownUiController = null!;
     
     
 
@@ -70,6 +74,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     {
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
         _voteUiFactory = ServiceProvider.GetRequiredService<IMcsMapVoteUiFactory>();
+        _countdownUiController = ServiceProvider.GetRequiredService<McsCountdownUiController>();
     }
 
 
@@ -310,11 +315,11 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             if (count <= 0)
             {
                 _mapVoteTimer?.Kill();
+                _countdownUiController.CloseCountdownUiAll();
                 StartVote();
                 return;
             }
-            
-            ShowCountDown(count);
+            _countdownUiController.ShowCountdownToAll(count);
             count--;
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
         
@@ -476,11 +481,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             if (count <= 0)
             {
                 _mapVoteTimer?.Kill();
+                _countdownUiController.CloseCountdownUiAll();
                 StartRunOffVote();
                 return;
             }
             
-            ShowCountDown(count);
+            _countdownUiController.ShowCountdownToAll(count);
             count--;
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }
@@ -633,12 +639,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     {
         var extendEvent = new McsMapExtendEvent(PluginModuleName, extendTime, extendType);
         _mcsEventManager.FireEventNoResult(extendEvent);
-    }
-    
-
-    private void ShowCountDown(int count)
-    {
-        Server.PrintToChatAll($"TODO_TRANSLATE| Countdown: {count}");
     }
 
     private void ShowVoteMenu(HashSet<int> voteParticipants)
