@@ -148,7 +148,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         {
             if (_mcsMapCycleController.IsNextMapConfirmed)
             {
-                _mcsMapCycleController.ChangeToNextMap();
+                _mcsMapCycleController.ChangeToNextMap(MapChangeTimingAfterRtvSuccess.Value);
             }
             else
             {

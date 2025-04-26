@@ -65,6 +65,8 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     
     private const float DefaultRoundRestartDelay = 7.0F;
 
+    private const float DefaultMapChangeDelay = 10.0F;
+
     public FakeConVar<int> VoteStartTimingTime = new("mcs_vote_start_timing_time", "When should vote started if map is based on mp_timelimit or mp_roundtime? (minutes)", 3,
         ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 15));
     
@@ -132,10 +134,10 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     }
 
 
-    public void ChangeToNextMap(float seconds = 0.0F)
+    public void ChangeToNextMap(float seconds)
     {
         if (seconds <= 0)
-            seconds = _mcsRtvController.MapChangeTimingAfterRtvSuccess.Value;
+            seconds = DefaultMapChangeDelay;
         
         if (_mcsRtvController.MapChangeTimingShouldRoundEnd.Value)
             return;
