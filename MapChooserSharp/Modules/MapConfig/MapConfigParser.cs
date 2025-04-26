@@ -362,11 +362,11 @@ internal class MapConfigParser(string configPath)
                     break;
                 case "AllowedSteamIds":
                     if (value is TomlArray allowedArray)
-                        config.AllowedSteamIds = ParseLongArray(allowedArray);
+                        config.AllowedSteamIds = ParseULongArray(allowedArray);
                     break;
                 case "DisallowedSteamIds":
                     if (value is TomlArray disallowedArray)
-                        config.DisallowedSteamIds = ParseLongArray(disallowedArray);
+                        config.DisallowedSteamIds = ParseULongArray(disallowedArray);
                     break;
                 case "MaxPlayers":
                     if (value is long maxPlayersValue)
@@ -396,12 +396,12 @@ internal class MapConfigParser(string configPath)
         }
     }
     
-    private List<long> ParseLongArray(TomlArray array)
+    private List<ulong> ParseULongArray(TomlArray array)
     {
-        List<long> result = new List<long>();
+        List<ulong> result = new List<ulong>();
         foreach (var item in array)
         {
-            if (item is long longValue)
+            if (item is ulong longValue)
             {
                 result.Add(longValue);
             }
@@ -785,8 +785,8 @@ internal class NullableMapConfig
     // Nomination config properties
     public List<string>? RequiredPermissions { get; set; }
     public bool? RestrictToAllowedUsersOnly { get; set; }
-    public List<long>? AllowedSteamIds { get; set; }
-    public List<long>? DisallowedSteamIds { get; set; }
+    public List<ulong>? AllowedSteamIds { get; set; }
+    public List<ulong>? DisallowedSteamIds { get; set; }
     public int? MaxPlayers { get; set; }
     public int? MinPlayers { get; set; }
     public bool? ProhibitAdminNomination { get; set; }

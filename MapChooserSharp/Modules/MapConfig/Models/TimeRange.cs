@@ -31,4 +31,9 @@ public class TimeRange(
         // If time is over a day (e.g. 22:00-6:00)
         return time >= StartTime || time <= EndTime;
     }
+
+    public override string ToString()
+    {
+        return StartTime + " - " + EndTime;
+    }
 }

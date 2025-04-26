@@ -19,12 +19,12 @@ public interface INominationConfig
     /// If this value is specified in config, then bypasses the required permission check.
     /// But, cannot bypass check if ProhibitAdminNomination is true and user is not a root user.
     /// </summary>
-    public List<long> AllowedSteamIds { get; }
+    public List<ulong> AllowedSteamIds { get; }
 
     /// <summary>
     /// If this value is specified in config, then the user cannot be nominated
     /// </summary>
-    public List<long> DisallowedSteamIds { get; }
+    public List<ulong> DisallowedSteamIds { get; }
     
     /// <summary>
     /// When player count is exceed this value, normal user will not able to nominate this map.

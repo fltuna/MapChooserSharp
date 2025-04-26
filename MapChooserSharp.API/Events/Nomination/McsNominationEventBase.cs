@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core;
 using MapChooserSharp.API.MapConfig;
+using MapChooserSharp.API.Nomination.Interfaces;
 
 namespace MapChooserSharp.API.Events.Nomination;
 
@@ -15,7 +16,7 @@ public abstract class McsNominationEventBase(string modulePrefix) : McsEventPara
     public abstract CCSPlayerController? Player { get; }
 
     /// <summary>
-    /// Map config data
+    /// Nomination Data
     /// </summary>
-    public abstract IMapConfig MapConfig { get; }
+    public abstract IMcsNominationData NominationData { get; }
 }

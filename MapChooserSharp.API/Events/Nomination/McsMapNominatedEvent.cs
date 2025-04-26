@@ -1,12 +1,13 @@
 ﻿using CounterStrikeSharp.API.Core;
 using MapChooserSharp.API.MapConfig;
+using MapChooserSharp.API.Nomination.Interfaces;
 
 namespace MapChooserSharp.API.Events.Nomination;
 
 /// <summary>
 /// Event of nomination
 /// </summary>
-public class McsMapNominatedEvent(CCSPlayerController? player, IMapConfig mapConfig, string modulePrefix) : McsNominationEventBase(modulePrefix), IMcsEventNoResult
+public class McsMapNominatedEvent(CCSPlayerController? player, IMcsNominationData nominationData, string modulePrefix) : McsNominationEventBase(modulePrefix), IMcsEventNoResult
 {
     /// <summary>
     /// Player who nominated map. if nominator is console, then param is null
@@ -14,7 +15,7 @@ public class McsMapNominatedEvent(CCSPlayerController? player, IMapConfig mapCon
     public override CCSPlayerController? Player { get; } = player;
 
     /// <summary>
-    /// Map config data
+    /// Nomination Data
     /// </summary>
-    public override IMapConfig MapConfig { get; } = mapConfig;
+    public override IMcsNominationData NominationData { get; } = nominationData;
 }

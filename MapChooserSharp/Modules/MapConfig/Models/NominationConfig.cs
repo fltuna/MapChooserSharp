@@ -5,8 +5,8 @@ namespace MapChooserSharp.Modules.MapConfig.Models;
 public class NominationConfig(
     List<string> requiredPermission,
     bool restrictToAllowedUsersOnly,
-    List<long> allowedSteamIds,
-    List<long> disallowedSteamIds,
+    List<ulong> allowedSteamIds,
+    List<ulong> disallowedSteamIds,
     int maxPlayers,
     int minPlayers,
     bool prohibitAdminNomination,
@@ -16,8 +16,8 @@ public class NominationConfig(
 {
     public List<string> RequiredPermissions { get; } = requiredPermission;
     public bool RestrictToAllowedUsersOnly { get; } = restrictToAllowedUsersOnly;
-    public List<long> AllowedSteamIds { get; } = allowedSteamIds;
-    public List<long> DisallowedSteamIds { get; } = disallowedSteamIds;
+    public List<ulong> AllowedSteamIds { get; } = allowedSteamIds;
+    public List<ulong> DisallowedSteamIds { get; } = disallowedSteamIds;
     public int MaxPlayers { get; } = maxPlayers;
     public int MinPlayers { get; } = minPlayers;
     public bool ProhibitAdminNomination { get; } = prohibitAdminNomination;
