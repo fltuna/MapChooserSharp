@@ -625,19 +625,19 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
     private void FireNextMapConfirmedEvent(IMapConfig mapConfig)
     {
-        var confirmedEvent = new McsNextMapConfirmedEvent(ModuleChatPrefix, mapConfig);
+        var confirmedEvent = new McsNextMapConfirmedEvent(Plugin.PluginPrefix, mapConfig);
         _mcsEventManager.FireEventNoResult(confirmedEvent);
     }
 
     private void FireMapNotChangedEvent()
     {
-        var notChangedEvent = new McsMapNotChangedEvent(ModuleChatPrefix);
+        var notChangedEvent = new McsMapNotChangedEvent(Plugin.PluginPrefix);
         _mcsEventManager.FireEventNoResult(notChangedEvent);
     }
 
     private void FireMapExtendEvent(int extendTime, McsMapExtendType extendType)
     {
-        var extendEvent = new McsMapExtendEvent(PluginModuleName, extendTime, extendType);
+        var extendEvent = new McsMapExtendEvent(Plugin.PluginPrefix, extendTime, extendType);
         _mcsEventManager.FireEventNoResult(extendEvent);
     }
 
