@@ -288,7 +288,11 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             var numToPick = Math.Min(mapSlotsRemaining, unusedMapPool.Count);
             DebugLogger.LogDebug($"{numToPick} maps will be chosen randomely");
             var unusedMapList = unusedMapPool.ToList();
-            var pickedMaps = unusedMapList.OrderBy(_ => random.Next()).Take(numToPick);
+            var pickedMaps = unusedMapList
+                .OrderBy(_ => random.Next())
+                .Where(map => map.Value.MapCooldown.CurrentCooldown <= 0)
+                .Take(numToPick);
+
             foreach (var (key, value) in pickedMaps)
             {
                 DebugLogger.LogTrace($"Adding random map: {key}");
