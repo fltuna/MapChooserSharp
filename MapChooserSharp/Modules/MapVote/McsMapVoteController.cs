@@ -322,7 +322,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             _countdownUiController.ShowCountdownToAll(count);
             count--;
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
-        
+
+        var voteInitiatedEvent = new McsMapVoteInitiatedEvent(Plugin.PluginPrefix);
+        _mcsEventManager.FireEventNoResult(voteInitiatedEvent);
         return McsMapVoteState.InitializeAccepted;
     }
 
@@ -347,6 +349,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         ShowVoteMenu(voteParticipants);
 
         _mapVoteTimer = Plugin.AddTimer(TEMP_MAP_VOTE_END_TIME, EndVote, TimerFlags.STOP_ON_MAPCHANGE);
+        var voteStartedEvent = new McsMapVoteStartedEvent(Plugin.PluginPrefix);
+        _mcsEventManager.FireEventNoResult(voteStartedEvent);
     }
     
     private void EndVote()
@@ -489,6 +493,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             _countdownUiController.ShowCountdownToAll(count);
             count--;
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+        
+        var voteInitiatedEvent = new McsMapVoteInitiatedEvent(Plugin.PluginPrefix);
+        _mcsEventManager.FireEventNoResult(voteInitiatedEvent);
     }
 
     private void StartRunOffVote()
@@ -512,6 +519,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         ShowVoteMenu(voteParticipants);
 
         _mapVoteTimer = Plugin.AddTimer(TEMP_MAP_VOTE_END_TIME, EndRunoffVote, TimerFlags.STOP_ON_MAPCHANGE);
+    
+        var voteStartedEvent = new McsMapVoteStartedEvent(Plugin.PluginPrefix);
+        _mcsEventManager.FireEventNoResult(voteStartedEvent);
     }
 
     private void EndRunoffVote()

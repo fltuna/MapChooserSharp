@@ -14,6 +14,7 @@ using MapChooserSharp.Modules.EventManager;
 using MapChooserSharp.Modules.MapConfig;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.RockTheVote;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -31,6 +32,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private IMcsInternalEventManager _mcsEventManager = null!;
     private IMapConfigProvider _mapConfigProvider = null!;
     private McsMapVoteController _mcsMapVoteController = null!;
+    private McsRtvController _mcsRtvController = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
 
     
@@ -41,6 +43,8 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         get => _nextMap;
         private set => _nextMap = value;
     }
+    
+    public bool IsNextMapConfirmed => _nextMap != null;
 
     private IMapConfig? _currentMap = null;
 
@@ -52,8 +56,6 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         }
         private set => _currentMap = value;
     }
-    
-    public bool ChangeMapImmediately { get; set; }= false;
 
     private bool _isMapStarted = false;
 
@@ -105,6 +107,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     protected override void OnAllPluginsLoaded()
     {
         _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
+        _mcsRtvController = ServiceProvider.GetRequiredService<McsRtvController>();
         
         _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
         _mcsEventManager.RegisterEventHandler<McsMapExtendEvent>(OnMapExtended);
@@ -128,14 +131,27 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         Plugin.DeregisterEventHandler<EventRoundEnd>(OnRoundEnd);
     }
 
-    public bool ChangeToNextMap()
+
+    public void ChangeToNextMap(float seconds = 0.0F)
+    {
+        if (seconds <= 0)
+            seconds = _mcsRtvController.MapChangeTimingAfterRtvSuccess.Value;
+        
+        if (_mcsRtvController.MapChangeTimingShouldRoundEnd.Value)
+            return;
+        
+        Plugin.AddTimer(seconds, ChangeToNextMapInternal, TimerFlags.STOP_ON_MAPCHANGE);
+    }
+
+    private void ChangeToNextMapInternal()
     {
         if (NextMap == null)
         {
             Logger.LogError("Failed to change map: next map is null");
-            return false;
+            return;
         }
 
+        DebugLogger.LogDebug("Changing to next map!");
         long workshopId = NextMap.WorkshopId;
 
         if (workshopId == 0)
@@ -144,12 +160,11 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
             // Use MapUtil.ChangeMap(string) instead of MapUtil.ChangeToWorkshopMap(string)
             // Because, This IMapConfig is no guarantee official map or not.
             MapUtil.ChangeMap(NextMap.MapName);
-            return true;
+            return;
         }
 
         DebugLogger.LogInformation($"We will try to change map to {NextMap.MapName} with workshop ID: {workshopId}");
         MapUtil.ChangeToWorkshopMap(workshopId);
-        return true;
     }
 
 
@@ -194,6 +209,9 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         if (NextMap == null)
             return HookResult.Continue;
 
+        if (!_mcsRtvController.MapChangeTimingShouldRoundEnd.Value)
+            return HookResult.Continue;
+
         McsMapExtendType extendType = _timeLeftUtil.ExtendType;
 
         if (extendType == McsMapExtendType.TimeLimit && _timeLeftUtil.TimeLimit > 0)
@@ -205,21 +223,12 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         if (extendType == McsMapExtendType.RoundTime && _timeLeftUtil.RoundTimeLeft > 0)
             return HookResult.Continue;
         
-        DebugLogger.LogDebug("Changing to next map!");
-        if (ChangeMapImmediately)
-        {
-            ChangeToNextMap();
-            return HookResult.Continue;
-        }
 
         ConVar? mp_round_restart_delay = ConVar.Find("mp_round_restart_delay");
 
         float delay = mp_round_restart_delay?.GetPrimitiveValue<float>() ?? DefaultRoundRestartDelay;
         
-        Plugin.AddTimer(delay-1, () =>
-        {
-            ChangeToNextMap();
-        }, TimerFlags.STOP_ON_MAPCHANGE);
+        ChangeToNextMap(delay-1);
         
         return HookResult.Continue;
     }
@@ -299,10 +308,25 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
             if (_mcsMapVoteController.CurrentVoteState == McsMapVoteState.NoActiveVote)
             {
-                _voteStartTimer?.Kill();
-                _voteStartTimer = null;
-                _mcsMapVoteController.InitiateVote();
+                InitiateVote();
             }
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+    }
+
+    internal void InitiateRtvVote()
+    {
+        if (_mcsMapVoteController.CurrentVoteState == McsMapVoteState.NextMapConfirmed)
+            return;
+        
+        _voteStartTimer?.Kill();
+        _voteStartTimer = null;
+        _mcsMapVoteController.InitiateVote();
+    }
+
+    private void InitiateVote()
+    {
+        _voteStartTimer?.Kill();
+        _voteStartTimer = null;
+        _mcsMapVoteController.InitiateVote();
     }
 }
