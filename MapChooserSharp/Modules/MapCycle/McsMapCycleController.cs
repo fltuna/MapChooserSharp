@@ -111,6 +111,10 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         _mcsEventManager.RegisterEventHandler<McsMapNotChangedEvent>(OnMapNotChanged);
         
         Plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);
+        Plugin.RegisterListener<Listeners.OnMapEnd>(() =>
+        {
+            _isMapStarted = false;
+        });
         Plugin.RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
     }
 
@@ -153,7 +157,17 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     {
         CurrentMap = NextMap;
         NextMap = null;
+        
 
+        // Wait for first people joined
+        Plugin.AddTimer(0.0F, () =>
+        {
+            ObtainCurrentMap(mapName);
+        });
+    }
+
+    private void ObtainCurrentMap(string mapName)
+    {
         // This is extra check for server startup
         if (CurrentMap == null)
         {
@@ -170,13 +184,13 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
                 }
             }
         }
-
-        // Wait for first people joined
-        Plugin.AddTimer(0.0F, RecreateVoteTimer);
     }
 
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
     {
+        if (!_isMapStarted)
+            return HookResult.Continue;
+        
         if (NextMap == null)
             return HookResult.Continue;
 
