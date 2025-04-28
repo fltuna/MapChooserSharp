@@ -99,7 +99,40 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             return;
         }
         
-        string executorName = PlayerUtil.GetPlayerName(player);
+        PrintNominationResult(player, mapConfig, isFirstNomination);
+        
+        
+        var eventNominated = new McsMapNominatedEvent(player, nominated, player.PlayerName);
+        _mcsEventManager.FireEventNoResult(eventNominated);
+    }
+
+    internal void AdminNominateMap()
+    {
+        
+    }
+    
+    
+    internal void ShowNominationMenu(CCSPlayerController player, Dictionary<string, IMapConfig>? mapCfgArg = null)
+    {
+        // TODO() Implement later
+        player.PrintToChat("TODO_MENU| Nomination menu");
+
+        Dictionary<string, IMapConfig>? mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
+    }
+    
+    internal void ShowAdminNominationMenu(CCSPlayerController player, Dictionary<string, IMapConfig>? mapCfgArg = null)
+    {
+        // TODO() Implement later
+        player.PrintToChat("TODO_MENU| Admin nomination menu");
+
+        Dictionary<string, IMapConfig>? mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
+    }
+
+
+
+    private void PrintNominationResult(CCSPlayerController player, IMapConfig mapConfig, bool isFirstNomination)
+    {
+        string executorName = player.PlayerName;
 
         if (isFirstNomination)
         {
@@ -124,20 +157,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             }
         }
         
-        
-        var eventNominated = new McsMapNominatedEvent(player, nominated, executorName);
-        _mcsEventManager.FireEventNoResult(eventNominated);
     }
-    
-    internal void ShowNominationMenu(CCSPlayerController player, Dictionary<string, IMapConfig>? mapCfgArg = null)
-    {
-        // TODO() Implement later
-        player.PrintToChat("TODO_MENU| Nomination menu");
-
-        Dictionary<string, IMapConfig>? mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
-    }
-
-
 
     private NominationCheck PlayerCanNominateMap(CCSPlayerController player, IMapConfig mapConfig)
     {
