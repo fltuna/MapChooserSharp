@@ -76,6 +76,18 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             NominatedMaps[mapConfig.MapName] = nominated;
         }
 
+        bool isFirstNomination = true;
+        foreach (var (key, value) in NominatedMaps)
+        {
+            if (value.NominationParticipants.Contains(player.Slot))
+            {
+                value.NominationParticipants.Remove(player.Slot);
+                isFirstNomination = false;
+                // break because player should be in 1 nomination, not multiple nomination.
+                break;
+            }
+        }
+
         nominated.NominationParticipants.Add(player.Slot);
         
         var nominationBegin = new McsNominationBeginEvent(player, nominated, ModuleChatPrefix);
@@ -86,17 +98,31 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             DebugLogger.LogInformation("Nomination begin event cancelled by a another plugin.");
             return;
         }
-
+        
         string executorName = PlayerUtil.GetPlayerName(player);
-        if (mapConfig.MapNameAlias != string.Empty)
+
+        if (isFirstNomination)
         {
-            Server.PrintToChatAll($"TODO_TRANSLATE| {executorName} nominated {mapConfig.MapNameAlias}");
+            if (mapConfig.MapNameAlias != string.Empty)
+            {
+                Server.PrintToChatAll($"TODO_TRANSLATE| {executorName} nominated {mapConfig.MapNameAlias}");
+            }
+            else
+            {
+                Server.PrintToChatAll($"TODO_TRANSLATE| {executorName} nominated {mapConfig.MapName}");
+            }
         }
         else
         {
-            Server.PrintToChatAll($"TODO_TRANSLATE| {executorName} nominated {mapConfig.MapName}");
+            if (mapConfig.MapNameAlias != string.Empty)
+            {
+                Server.PrintToChatAll($"TODO_TRANSLATE| {executorName} changed their nomination to {mapConfig.MapNameAlias}");
+            }
+            else
+            {
+                Server.PrintToChatAll($"TODO_TRANSLATE| {executorName} changed their nomination to {mapConfig.MapName}");
+            }
         }
-        
         
         
         var eventNominated = new McsMapNominatedEvent(player, nominated, executorName);
@@ -115,6 +141,15 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
 
     private NominationCheck PlayerCanNominateMap(CCSPlayerController player, IMapConfig mapConfig)
     {
+        if (NominatedMaps.TryGetValue(mapConfig.MapName, out var nominated))
+        {
+            if (nominated.NominationParticipants.Contains(player.Slot))
+                return NominationCheck.AlreadyNominated;
+
+            if (nominated.IsForceNominated)
+                return NominationCheck.NominatedByAdmin;
+        }
+        
         if (_mcsMapVoteController.CurrentVoteState != McsMapVoteState.NoActiveVote)
             return NominationCheck.DisabledAtThisTime;
 
@@ -202,6 +237,14 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             case NominationCheck.MapIsInCooldown:
                 player.PrintToChat($"TODO_TRANSLATE| Map is in cooldown: {mapConfig.MapCooldown.CurrentCooldown} left");
                 return false;
+            
+            case NominationCheck.AlreadyNominated:
+                player.PrintToChat($"TODO_TRANSLATE| You are already nominated {mapConfig.MapName}!");
+                return false;
+            
+            case NominationCheck.NominatedByAdmin:
+                player.PrintToChat($"TODO_TRANSLATE| This map is already nominated by an admin!");
+                return false;
         }
         
         return false;
@@ -219,5 +262,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         OnlySpecificDay,
         OnlySpecificTime,
         MapIsInCooldown,
+        AlreadyNominated,
+        NominatedByAdmin,
     }
 }
