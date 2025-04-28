@@ -47,15 +47,10 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     protected override void OnAllPluginsLoaded()
     {
         _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
-        
-        _mcsEventManager.RegisterEventHandler<McsNominationBeginEvent>(OnMapNominationBegin);
-        _mcsEventManager.RegisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
     }
 
     protected override void OnUnloadModule()
     {
-        _mcsEventManager.UnregisterEventHandler<McsNominationBeginEvent>(OnMapNominationBegin);
-        _mcsEventManager.UnregisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
     }
 
     
@@ -210,39 +205,6 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         }
         
         return false;
-    }
-    
-    
-    
-
-    private McsEventResultWithCallback OnMapNominationBegin(McsNominationBeginEvent @event)
-    {
-        if (@event.Player != null && @event.Player.PlayerPawn.Value != null && @event.Player.PlayerPawn.Value.Health < 80)
-        {
-            return McsEventResultWithCallback.Stop(result =>
-            {
-                @event.Player!.PrintToChat($"[McsMapNominationBeginEvent Listener] Your health is not enough to nominate!!! Cancelling nomination. Status: {result}");
-                @event.Player.PrintToChat($"{@event.ModulePrefix} You can use MCS module's prefix!");
-            });
-        }
-
-        return McsEventResult.Continue;
-    }
-
-    private void OnMapNominated(McsMapNominatedEvent @event)
-    {
-        var player = @event.Player;
-
-        string executorName = PlayerUtil.GetPlayerName(@event.Player);
-        
-        if (player == null)
-        {
-            Server.PrintToChatAll($"[McsMapNominatedEvent Listener] detected {executorName} nominated {@event.NominationData.MapConfig.MapName}");
-        }
-        else
-        {
-            Server.PrintToChatAll($"[McsMapNominatedEvent Listener] detected {executorName} nominated {@event.NominationData.MapConfig.MapName}");
-        }
     }
 
     private enum NominationCheck
