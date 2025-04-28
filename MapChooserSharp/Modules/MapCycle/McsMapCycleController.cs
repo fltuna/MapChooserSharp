@@ -246,19 +246,17 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
     private void OnMapExtended(McsMapExtendEvent @event)
     {
-        if (@event.MapExtendType == McsMapExtendType.TimeLimit)
+        switch (@event.MapExtendType)
         {
-            _timeLeftUtil.ExtendTimeLimit(@event.ExtendTime);
-        }
-
-        if (@event.MapExtendType == McsMapExtendType.Rounds)
-        {
-            _timeLeftUtil.ExtendRounds(@event.ExtendTime);
-        }
-
-        if (@event.MapExtendType == McsMapExtendType.RoundTime)
-        {
-            _timeLeftUtil.ExtendRoundTime(@event.ExtendTime);
+            case McsMapExtendType.TimeLimit:
+                _timeLeftUtil.ExtendTimeLimit(@event.ExtendTime);
+                break;
+            case McsMapExtendType.Rounds:
+                _timeLeftUtil.ExtendRounds(@event.ExtendTime);
+                break;
+            case McsMapExtendType.RoundTime:
+                _timeLeftUtil.ExtendRoundTime(@event.ExtendTime);
+                break;
         }
 
         RecreateVoteTimer();
