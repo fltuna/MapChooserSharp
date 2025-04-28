@@ -103,10 +103,17 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         nominated.NominationParticipants.Add(player.Slot);
         
         PrintNominationResult(player, mapConfig, isFirstNomination);
-        
-        
-        var eventNominated = new McsMapNominatedEvent(player, nominated, player.PlayerName);
-        _mcsEventManager.FireEventNoResult(eventNominated);
+
+        if (isFirstNomination)
+        {
+            var eventNominated = new McsMapNominatedEvent(player, nominated, ModuleChatPrefix);
+            _mcsEventManager.FireEventNoResult(eventNominated);
+        }
+        else
+        {
+            var eventNominationChanged = new McsMapNominationChangedEvent(player, nominated, ModuleChatPrefix);
+            _mcsEventManager.FireEventNoResult(eventNominationChanged);
+        }
     }
 
     internal void AdminNominateMap()
@@ -198,7 +205,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         if (nominationConfig.DisallowedSteamIds.Contains(steamId.SteamId64))
             return NominationCheck.NotAllowed;
         
-        if (!AdminManager.PlayerHasPermissions(player, nominationConfig.RequiredPermissions.ToArray()))
+        if (nominationConfig.RequiredPermissions.Any() && !AdminManager.PlayerHasPermissions(player, nominationConfig.RequiredPermissions.ToArray()))
             return NominationCheck.NotEnoughPermissions;
 
 
