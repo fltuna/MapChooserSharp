@@ -40,7 +40,6 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
 
     protected override void OnInitialize()
     {
-        Plugin.AddCommand("css_nominate", "", CommandNominateMap);
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
     }
@@ -55,60 +54,13 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
 
     protected override void OnUnloadModule()
     {
-        Plugin.RemoveCommand("css_nominate", CommandNominateMap);
         _mcsEventManager.UnregisterEventHandler<McsNominationBeginEvent>(OnMapNominationBegin);
         _mcsEventManager.UnregisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
     }
 
+    
 
-
-
-
-
-    private void CommandNominateMap(CCSPlayerController? player, CommandInfo info)
-    {
-        if (info.ArgCount < 2)
-        {
-            info.ReplyToCommand("TODO_TRANSLATE| Usage: !nominate <MapName>");
-            return;
-        }
-
-        string mapName = info.ArgByIndex(1);
-        var mapConfigs = _mapConfigProvider.GetMapConfigs();
-
-        var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).ToDictionary();
-        
-        if (!matchedMaps.Any())
-        {
-            info.ReplyToCommand($"TODO_TRANSLATE| No map(s) found with {mapName}");
-
-            if (player == null)
-                return;
-            
-            ShowNominationMenu(player);
-            return;
-        }
-
-        if (matchedMaps.Count > 1)
-        {
-            info.ReplyToCommand($"TODO_TRANSLATE| {matchedMaps.Count} maps found with {mapName}");
-
-            if (player == null)
-            {
-                info.ReplyToCommand("Please specify the identical name.");
-                return;
-            }
-            
-            ShowNominationMenu(player, matchedMaps);
-            return;
-        }
-        
-        NominateMap(player, matchedMaps.First().Value);
-    }
-
-
-
-    private void NominateMap(CCSPlayerController? player, IMapConfig mapConfig, bool isForce = false)
+    internal void NominateMap(CCSPlayerController? player, IMapConfig mapConfig, bool isForce = false)
     {
         if (player == null)
         {
@@ -154,6 +106,14 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         
         var eventNominated = new McsMapNominatedEvent(player, nominated, executorName);
         _mcsEventManager.FireEventNoResult(eventNominated);
+    }
+    
+    internal void ShowNominationMenu(CCSPlayerController player, Dictionary<string, IMapConfig>? mapCfgArg = null)
+    {
+        // TODO() Implement later
+        player.PrintToChat("TODO_MENU| Nomination menu");
+
+        Dictionary<string, IMapConfig>? mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
     }
 
 
@@ -250,15 +210,6 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         }
         
         return false;
-    }
-    
-    
-    private void ShowNominationMenu(CCSPlayerController player, Dictionary<string, IMapConfig>? mapCfgArg = null)
-    {
-        // TODO() Implement later
-        player.PrintToChat("TODO_MENU| Nomination menu");
-
-        Dictionary<string, IMapConfig>? mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
     }
     
     
