@@ -151,11 +151,11 @@ internal class TimeLeftUtil(IServiceProvider serviceProvider, bool hotReload) : 
         }
         
         // Just in case
-        mp_timelimit ??= ConVar.Find("mp_maxrounds");
+        mp_timelimit ??= ConVar.Find("mp_timelimit");
 
         if (mp_timelimit == null)
         {
-            DebugLogger.LogWarning("Failed to find the mp_maxrounds ConVar.");
+            DebugLogger.LogWarning("Failed to find the mp_timelimit ConVar.");
             return false;
         }
 
@@ -207,11 +207,11 @@ internal class TimeLeftUtil(IServiceProvider serviceProvider, bool hotReload) : 
         }
         
         // Just in case
-        mp_roundtime ??= ConVar.Find("mp_maxrounds");
+        mp_roundtime ??= ConVar.Find("mp_roundtime");
 
         if (mp_roundtime == null)
         {
-            DebugLogger.LogWarning("Failed to find the mp_maxrounds ConVar.");
+            DebugLogger.LogWarning("Failed to find the mp_roundtime ConVar.");
             return false;
         }
 
