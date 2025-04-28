@@ -73,9 +73,21 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         if (!NominatedMaps.TryGetValue(mapConfig.MapName, out var nominated))
         {
             nominated = new McsNominationData(mapConfig);
-            NominatedMaps[mapConfig.MapName] = nominated;
         }
-
+        
+        var nominationBegin = new McsNominationBeginEvent(player, nominated, ModuleChatPrefix);
+        McsEventResult result = _mcsEventManager.FireEvent(nominationBegin);
+        
+        if (result > McsEventResult.Handled)
+        {
+            DebugLogger.LogInformation("Nomination begin event cancelled by a another plugin.");
+            return;
+        }
+        
+        // When this nomination is first nomination of the map
+        // It will require to store, and takes no effect if already existed
+        NominatedMaps[mapConfig.MapName] = nominated;
+        
         bool isFirstNomination = true;
         foreach (var (key, value) in NominatedMaps)
         {
@@ -89,15 +101,6 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         }
 
         nominated.NominationParticipants.Add(player.Slot);
-        
-        var nominationBegin = new McsNominationBeginEvent(player, nominated, ModuleChatPrefix);
-        McsEventResult result = _mcsEventManager.FireEvent(nominationBegin);
-        
-        if (result > McsEventResult.Handled)
-        {
-            DebugLogger.LogInformation("Nomination begin event cancelled by a another plugin.");
-            return;
-        }
         
         PrintNominationResult(player, mapConfig, isFirstNomination);
         
