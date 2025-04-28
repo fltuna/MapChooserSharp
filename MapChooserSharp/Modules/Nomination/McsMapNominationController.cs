@@ -133,13 +133,13 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         if (steamId == null)
             return NominationCheck.Failed;
 
-
-        if (nominationConfig.RestrictToAllowedUsersOnly)
-            return NominationCheck.NotAllowed;
         
         // Bypasses admin check
         if (nominationConfig.AllowedSteamIds.Contains(steamId.SteamId64))
             return NominationCheck.Success;
+        
+        if (nominationConfig.RestrictToAllowedUsersOnly)
+            return NominationCheck.NotAllowed;
         
         // Bypasses admin check too
         if (nominationConfig.DisallowedSteamIds.Contains(steamId.SteamId64))
