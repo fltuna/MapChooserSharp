@@ -142,6 +142,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private const int FallBackDefaultExtendTime = 15;
     private const int FallBackDefaultExtendRound = 15;
 
+    private readonly Random _random = new();
     
 
     private IMapVoteContent? _mapVoteContent;
@@ -194,8 +195,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         DebugLogger.LogDebug($"This vote is initiated by RTV?: {isActivatedByRtv}");
         
         DebugLogger.LogTrace("Initializing MapVoteContent");
-
-        var random = new Random();
         
         // Respect menu's max elements
         int maxMenuElements = Math.Min(_voteUiFactory.MaxMenuElements, ConVarMaxVoteMenuElements.Value);
@@ -290,7 +289,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             DebugLogger.LogDebug($"{numToPick} maps will be chosen randomely");
             var unusedMapList = unusedMapPool.ToList();
             var pickedMaps = unusedMapList
-                .OrderBy(_ => random.Next())
+                .OrderBy(_ => _random.Next())
                 .Where(map => map.Value.MapCooldown.CurrentCooldown <= 0)
                 .Where(map => !map.Value.OnlyNomination)
                 .Take(numToPick);
@@ -389,28 +388,38 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
 
         int totalVotes = AllVotesCount;
-        
-        // TODO() Actual vote result (votes, possibleVotes, votePercentage)
-        PrintLocalizedChatToAll("MapVote.Broadcast.VoteFinished", 0 ,0 ,0);
 
-        if (isActivatedByRtv && totalVotes == 0)
+        if (totalVotes == 0)
         {
-            DebugLogger.LogDebug("There is no votes, and this vote is activated by RTV. extending time limit...");
-            CurrentVoteState = McsMapVoteState.NoActiveVote;
+            DebugLogger.LogDebug("There is no votes picking random map...");
 
-            McsMapExtendType extendType = _timeLeftUtil.ExtendType;
-            DebugLogger.LogTrace($"Determined extend type to extend {extendType}");
-            ExtendCurrentMap(extendType);
+            // Remove nullable map config (extend map and don't change)
+            _mapVoteContent.GetVotingMaps().RemoveAll(data => data.MapConfig == null);
+            
+            var pickedMaps = _mapVoteContent
+                .GetVotingMaps()
+                .OrderBy(_ => _random.Next())
+                .Take(1);
+
+            var mapCfg = pickedMaps.First().MapConfig!;
+            
+            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NoVotes", mapCfg.MapName);
+            FireNextMapConfirmedEvent(mapCfg);
+            EndVotePostInitialization();
+            CurrentVoteState = McsMapVoteState.NextMapConfirmed;
             return;
         }
-
+        
+        float votePercentage = (float)_mapVoteContent.GetVoteParticipants().Count / totalVotes;
+        PrintLocalizedChatToAll("MapVote.Broadcast.VoteFinished", totalVotes ,_mapVoteContent.GetVoteParticipants().Count , $"{votePercentage * 100:F2}");
+        
         List<IMapVoteData> winners = PickWinningMaps(_mapVoteContent.GetVotingMaps());
 
         // If winners count is higher than 2, then we'll start run off vote
         if (winners.Count > 1)
         {
             // TODO() Actual vote threshold
-            PrintLocalizedChatToAll("MapVote.Broadcast.StartingRunoffVote", 0.0);
+            PrintLocalizedChatToAll("MapVote.Broadcast.StartingRunoffVote", $"{TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD*100:F2}");
             
             _mapVoteTimer?.Kill();
             InitializeRunOffVote(winners);
@@ -418,12 +427,17 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         }
 
         var winMap = winners.First();
-
+        
+        // If MapConfig is null, then this is "extend map" or "don't change"
         if (winMap.MapConfig == null)
         {
-            ProcessNonMapWinner(_mapVoteContent);
+            ProcessNonMapWinner(_mapVoteContent, winMap);
             return;
         }
+        
+        float mapVotePercentage = (float)winMap.GetVoters().Count / totalVotes * 100.0F;
+
+        PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NextMapConfirmed", winMap.MapConfig.MapName, $"{mapVotePercentage:F2}", totalVotes);
 
         FireNextMapConfirmedEvent(winMap.MapConfig);
         EndVotePostInitialization();
@@ -564,27 +578,47 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         int totalVotes = AllVotesCount;
 
-        if (isActivatedByRtv && totalVotes == 0)
+        if (totalVotes == 0)
         {
-            DebugLogger.LogDebug("There is no votes, and this vote is activated by RTV. extending time limit...");
-            ProcessNonMapWinner(_mapVoteContent);
+            DebugLogger.LogDebug("There is no votes picking random map...");
+
+            // Remove nullable map config (extend map and don't change)
+            _mapVoteContent.GetVotingMaps().RemoveAll(data => data.MapConfig == null);
+            
+            var pickedMaps = _mapVoteContent
+                .GetVotingMaps()
+                .OrderBy(_ => _random.Next())
+                .Take(1);
+
+            var mapCfg = pickedMaps.First().MapConfig!;
+            
+            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NoVotes", mapCfg.MapName);
+            FireNextMapConfirmedEvent(mapCfg);
+            EndVotePostInitialization();
+            CurrentVoteState = McsMapVoteState.NextMapConfirmed;
             return;
         }
 
         List<IMapVoteData> winners = PickWinningMaps(_mapVoteContent.GetVotingMaps());
 
         var winMap = winners.First();
+
+        float votePercentage = (float)_mapVoteContent.GetVoteParticipants().Count / totalVotes;
         
-        // TODO() Actual vote result (votes, possibleVotes, votePercentage)
-        PrintLocalizedChatToAll("MapVote.Broadcast.VoteFinished", 0 ,0 ,0);
+        
+        PrintLocalizedChatToAll("MapVote.Broadcast.VoteFinished", totalVotes ,_mapVoteContent.GetVoteParticipants().Count , $"{votePercentage * 100:F2}");
         
         // If MapConfig is null, then this is "extend map" or "don't change"
         if (winMap.MapConfig == null)
         {
-            ProcessNonMapWinner(_mapVoteContent);
+            ProcessNonMapWinner(_mapVoteContent, winMap);
             return;
         }
+        
+        float mapVotePercentage = (float)winMap.GetVoters().Count / totalVotes * 100.0F;
 
+        PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NextMapConfirmed", winMap.MapConfig.MapName, $"{mapVotePercentage:F2}", totalVotes);
+        
         FireNextMapConfirmedEvent(winMap.MapConfig);
         
         EndVotePostInitialization();
@@ -617,16 +651,18 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
     #region Utilities
 
-    private void ProcessNonMapWinner(IMapVoteContent mapVoteContent)
+    private void ProcessNonMapWinner(IMapVoteContent mapVoteContent, IMapVoteData winnerData)
     {
+        float mapVotePercentage = (float)winnerData.GetVoters().Count / AllVotesCount * 100.0F;
+        
         if (mapVoteContent.IsRtvVote)
         {
-            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NotChanging");
+            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NotChanging", mapVotePercentage, AllVotesCount);
             FireMapNotChangedEvent();
         }
         else
         {
-            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.Extend");
+            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.Extend", mapVotePercentage, AllVotesCount);
             McsMapExtendType extendType = _timeLeftUtil.ExtendType;
             DebugLogger.LogTrace($"Determined extend type to extend {extendType}");
             ExtendCurrentMap(extendType);
