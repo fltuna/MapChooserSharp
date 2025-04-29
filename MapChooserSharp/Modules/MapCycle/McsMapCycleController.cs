@@ -27,7 +27,8 @@ namespace MapChooserSharp.Modules.MapCycle;
 internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), IMcsMapCycleControllerApi
 {
     public override string PluginModuleName => "McsMapCycleController";
-    public override string ModuleChatPrefix => "McsMapCycleController";
+    public override string ModuleChatPrefix => "unused";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
     private IMcsInternalEventManager _mcsEventManager = null!;
     private IMapConfigProvider _mapConfigProvider = null!;

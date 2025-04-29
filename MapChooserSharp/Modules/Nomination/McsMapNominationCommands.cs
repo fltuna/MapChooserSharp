@@ -10,6 +10,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
 {
     public override string PluginModuleName => "McsNominationCommands";
     public override string ModuleChatPrefix => "unused";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
     
     private McsMapNominationController _mapNominationController = null!;
     private IMapConfigProvider _mapConfigProvider = null!;

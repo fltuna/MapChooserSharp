@@ -19,6 +19,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
 {
     public override string PluginModuleName => "McsRtvController";
     public override string ModuleChatPrefix => $" {ChatColors.Green}[RTV]{ChatColors.Default}";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
 
     public FakeConVar<float> RtvCommandUnlockTimeNextMapConfirmed =

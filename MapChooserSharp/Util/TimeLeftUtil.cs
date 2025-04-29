@@ -16,6 +16,7 @@ internal class TimeLeftUtil(IServiceProvider serviceProvider, bool hotReload) : 
 {
     public override string PluginModuleName => "TimeleftUtil";
     public override string ModuleChatPrefix => "unused";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
     public override void RegisterServices(IServiceCollection services)
     {

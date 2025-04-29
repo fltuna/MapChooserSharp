@@ -27,7 +27,8 @@ namespace MapChooserSharp.Modules.MapVote;
 internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsMapVoteControllerApi
 {
     public override string PluginModuleName => "McsMapVoteController";
-    public override string ModuleChatPrefix => PluginModuleName;
+    public override string ModuleChatPrefix => "unused";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
     
     
     private IMcsInternalEventManager _mcsEventManager = null!;

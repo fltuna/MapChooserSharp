@@ -17,6 +17,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
 {
     public override string PluginModuleName => "McsMapCycleCommands";
     public override string ModuleChatPrefix => "unused";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
     
     private IMcsMapCycleControllerApi _mapCycleController = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;

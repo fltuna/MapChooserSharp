@@ -7,7 +7,8 @@ namespace MapChooserSharp.Modules.MapConfig;
 internal sealed class MapConfigRepository(IServiceProvider serviceProvider): PluginModuleBase(serviceProvider)
 {
     public override string PluginModuleName => "MapConfigRepository";
-    public override string ModuleChatPrefix => "MapConfigRepository";
+    public override string ModuleChatPrefix => "unused";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
     private IMapConfigProvider _mapConfigProvider = null!;
     

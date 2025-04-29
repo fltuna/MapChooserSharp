@@ -25,6 +25,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
 {
     public override string PluginModuleName => "McsMapNominationController";
     public override string ModuleChatPrefix => $" {ChatColors.Green}[Nomination]{ChatColors.Default}";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
     private IMcsInternalEventManager _mcsEventManager = null!;
     private McsMapVoteController _mcsMapVoteController = null!;

@@ -14,6 +14,7 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
 {
     public override string PluginModuleName => "McsDebugCommands";
     public override string ModuleChatPrefix => $" {ChatColors.Purple}[MCS DEBUG]{ChatColors.Default}";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
     private IMapConfigProvider _mapConfigProvider = null!;
     

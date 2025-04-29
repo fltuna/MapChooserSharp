@@ -15,6 +15,7 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
 {
     public override string PluginModuleName => "McsRtvCommands";
     public override string ModuleChatPrefix => $" {ChatColors.Green}[RTV]{ChatColors.Default}";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
     
     private McsRtvController _mcsRtvController = null!;
     private McsMapCycleController _mcsMapCycleController = null!;

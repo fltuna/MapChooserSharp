@@ -14,6 +14,7 @@ internal sealed class McsCountdownUiController(IServiceProvider serviceProvider,
 {
     public override string PluginModuleName => "McsCountdownUiController";
     public override string ModuleChatPrefix => "unused";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
     
     // player slot - Countdown type

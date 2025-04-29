@@ -10,7 +10,8 @@ namespace MapChooserSharp.Modules.EventManager;
 internal sealed class McsEventManager(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsInternalEventManager
 {
     public override string PluginModuleName => "McsEventManager";
-    public override string ModuleChatPrefix => "McsEventManager";
+    public override string ModuleChatPrefix => "unused";
+    protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
 
     public override void RegisterServices(IServiceCollection services)
