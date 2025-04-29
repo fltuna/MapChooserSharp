@@ -55,7 +55,15 @@ public class McsSimpleHtmlVoteUi(IServiceProvider provider) : IMcsMapVoteUserInt
 
         foreach (var (option, index) in _voteOptions.Select((value, i) => (value, i)))
         {
-            options.Add(new ChatMenuOption(option.OptionText, false, (controller, menuOption) =>
+            string optionText = option.OptionText
+                // If string contains Extend placeholder, then replace it.
+                .Replace(_voteController.PlaceHolderExtendMap,
+                    _plugin.LocalizeStringForPlayer(player, "Word.ExtendMap"))
+                // If string contains Don't change placeholder, then replace it.
+                .Replace(_voteController.PlaceHolderDontChangeMap,
+                    _plugin.LocalizeStringForPlayer(player, "Word.DontChangeMap"));
+            
+            options.Add(new ChatMenuOption(optionText, false, (controller, menuOption) =>
             {
                 _voteOptions[(byte)index].VoteCallback.Invoke(player, (byte)index);
             }));

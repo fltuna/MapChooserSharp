@@ -4,6 +4,8 @@
     "Prefix.RTV": "{green}[RTV]{default}",
     "Word.VotePending": "投票待ち",
     "Word.LastRound": "最後のラウンドです!",
+    "Word.ExtendMap": "現在のマップを延長",
+    "Word.DontChangeMap": "変更しない",
     "RTV.Notification.AlreadyVoted": "既にRTVに投票しています!",
     "RTV.Notification.IsInCooldown.Verbose": "RTVはクールダウン中です: 残り{lime}{0}{default}秒",
     "RTV.Notification.IsInCooldown.Normal": "RTVはクールダウン中です",

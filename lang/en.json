@@ -4,6 +4,8 @@
     "Prefix.RTV": "{green}[RTV]{default}",
     "Word.VotePending": "Pending Vote",
     "Word.LastRound": "Last round!",
+    "Word.ExtendMap": "Extend Current Map",
+    "Word.DontChangeMap": "Don't Change",
     "RTV.Notification.AlreadyVoted": "You've been already voted for RTV!",
     "RTV.Notification.IsInCooldown.Verbose": "RTV is in cooldown: {lime}{0}s{default} left",
     "RTV.Notification.IsInCooldown.Normal": "RTV is in cooldown",
