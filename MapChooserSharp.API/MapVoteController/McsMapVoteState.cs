@@ -31,6 +31,11 @@ public enum McsMapVoteState
     Voting,
     
     /// <summary>
+    /// Runoff voting in progress
+    /// </summary>
+    RunoffVoting,
+    
+    /// <summary>
     /// Finalizing vote
     /// </summary>
     Finalizing,

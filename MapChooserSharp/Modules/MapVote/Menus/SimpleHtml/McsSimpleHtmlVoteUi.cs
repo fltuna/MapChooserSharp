@@ -29,7 +29,7 @@ public class McsSimpleHtmlVoteUi(IServiceProvider provider) : IMcsMapVoteUserInt
 
     public void OpenMenu(CCSPlayerController player)
     {
-        if (_voteController.CurrentVoteState != McsMapVoteState.Voting)
+        if (_voteController.CurrentVoteState != McsMapVoteState.Voting && _voteController.CurrentVoteState != McsMapVoteState.RunoffVoting)
             return;
 
         // Unused variable, but it required to decide what language should use in menu.

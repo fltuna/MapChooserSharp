@@ -130,7 +130,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private bool TEMP_SHOULD_VOTE_MENU_SHUFFLE = false;
     private bool TEMP_SHOW_ALIAS_NAME = true;
     private float TEMP_MAP_VOTE_END_TIME = 15.0F;
-    private int TEMP_MAP_VOTE_COUNT_DOWN_TIME = 13;
+    private int TEMP_MAP_VOTE_COUNT_DOWN_TIME = 3;
     private float TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD = 0.2F;
 
     private const string IdExtendMap = "MapChooserSharp:ExtendMap";
@@ -418,7 +418,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         // If winners count is higher than 2, then we'll start run off vote
         if (winners.Count > 1)
         {
-            // TODO() Actual vote threshold
             PrintLocalizedChatToAll("MapVote.Broadcast.StartingRunoffVote", $"{TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD*100:F2}");
             
             _mapVoteTimer?.Kill();
@@ -492,7 +491,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         DebugLogger.LogDebug($"Possible participants count: {voteParticipants.Count}");
         
         
-        DebugLogger.LogTrace("Setting vote option");
+        DebugLogger.LogDebug("Setting vote option");
         var voteUi = _voteUiFactory.Create();
         voteUi.SetVoteOptions(voteOptions);
         voteUi.SetRandomShuffle(TEMP_SHOULD_VOTE_MENU_SHUFFLE);
@@ -535,9 +534,11 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return;
         }
         
-        CurrentVoteState = McsMapVoteState.Voting;
+        CurrentVoteState = McsMapVoteState.RunoffVoting;
         
         var voteParticipants = _mapVoteContent.GetVoteParticipants();
+        
+        DebugLogger.LogDebug($"Runoff vote participants: {voteParticipants.Count}");
         
         ShowVoteMenu(voteParticipants);
 
@@ -810,7 +811,15 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         if (AllVotesCount >= _mapVoteContent.GetVoteParticipants().Count)
         {
-            EndVote();
+            if (CurrentVoteState == McsMapVoteState.Voting)
+            {
+                EndVote();
+            }
+
+            if (CurrentVoteState == McsMapVoteState.RunoffVoting)
+            {
+                EndRunoffVote();
+            }
         }
     }
 
