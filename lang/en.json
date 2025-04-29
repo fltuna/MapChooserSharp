@@ -1,6 +1,6 @@
 ﻿{
-    "Prefix.Plugin": " {green}[MCS]{default}",
-    "Prefix.Nomination": " {green}[Nomination]{default}",
+    "Prefix.Plugin": "{green}[MCS]{default}",
+    "Prefix.Nomination": "{green}[Nomination]{default}",
     "Prefix.RTV": "{green}[RTV]{default}",
     "Word.VotePending": "Pending Vote",
     "Word.LastRound": "Last round!",
