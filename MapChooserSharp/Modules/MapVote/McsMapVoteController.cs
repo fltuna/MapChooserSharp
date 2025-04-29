@@ -238,7 +238,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             DebugLogger.LogWarning("There is no enough maps to initiate vote!");
             CurrentVoteState = McsMapVoteState.NoActiveVote;
             
-            Server.PrintToChatAll("TODO_TRANSLATE| There is no enough maps to initiate vote! please contact to server admin!");
+            PrintLocalizedChatToAll("MapVote.Broadcast.NotEnoughMapsToStartVote");
             return McsMapVoteState.Cancelling;
         }
         
@@ -390,7 +390,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         int totalVotes = AllVotesCount;
         
-        Server.PrintToChatAll("TODO_TRANSLATE| Vote finished! Received 0 of 0 votes (0%)");
+        // TODO() Actual vote result (votes, possibleVotes, votePercentage)
+        PrintLocalizedChatToAll("MapVote.Broadcast.VoteFinished", 0 ,0 ,0);
 
         if (isActivatedByRtv && totalVotes == 0)
         {
@@ -408,7 +409,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         // If winners count is higher than 2, then we'll start run off vote
         if (winners.Count > 1)
         {
-            Server.PrintToChatAll($"No map got over XXX% starting runoff vote");
+            // TODO() Actual vote threshold
+            PrintLocalizedChatToAll("MapVote.Broadcast.StartingRunoffVote", 0.0);
+            
             _mapVoteTimer?.Kill();
             InitializeRunOffVote(winners);
             return;
@@ -571,8 +574,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         List<IMapVoteData> winners = PickWinningMaps(_mapVoteContent.GetVotingMaps());
 
         var winMap = winners.First();
-    
-        Server.PrintToChatAll("TODO_TRANSLATE| Vote finished! Received 0 of 0 votes (0%)");
+        
+        // TODO() Actual vote result (votes, possibleVotes, votePercentage)
+        PrintLocalizedChatToAll("MapVote.Broadcast.VoteFinished", 0 ,0 ,0);
         
         // If MapConfig is null, then this is "extend map" or "don't change"
         if (winMap.MapConfig == null)
@@ -605,7 +609,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         string executorName = PlayerUtil.GetPlayerName(player);
         
-        Server.PrintToChatAll($"TODO_TRANSLATE| {executorName} cancelled the vote!");
+        PrintLocalizedChatToAll("MapVote.Broadcast.Admin.CancelVote", executorName);
         return McsMapVoteState.Cancelling;
     }
     
@@ -617,12 +621,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     {
         if (mapVoteContent.IsRtvVote)
         {
-            Server.PrintToChatAll($"TODO_TRANSlATE| Map will not changing");
+            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NotChanging");
             FireMapNotChangedEvent();
         }
         else
         {
-            Server.PrintToChatAll($"TODO_TRANSlATE| Extending map");
+            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.Extend");
             McsMapExtendType extendType = _timeLeftUtil.ExtendType;
             DebugLogger.LogTrace($"Determined extend type to extend {extendType}");
             ExtendCurrentMap(extendType);
@@ -805,19 +809,19 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             case McsMapExtendType.TimeLimit:
                 extendTime = _mapCycleController.CurrentMap?.ExtendTimePerExtends ?? FallBackDefaultExtendTime;
 
-                Server.PrintToChatAll($"TODO_TRANSLATE| Map is extended for {extendTime} minutes");
+                PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.ExtendForTime", extendTime);
                 FireMapExtendEvent(extendTime, type);
                 break;
             case McsMapExtendType.RoundTime:
                 extendTime = _mapCycleController.CurrentMap?.ExtendTimePerExtends ?? FallBackDefaultExtendTime;
                 
-                Server.PrintToChatAll($"TODO_TRANSLATE| Map is extended for {extendTime} minutes");
+                PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.ExtendForTime", extendTime);
                 FireMapExtendEvent(extendTime, type);
                 break;
             case McsMapExtendType.Rounds:
                 var extendRound = _mapCycleController.CurrentMap?.ExtendRoundsPerExtends ?? FallBackDefaultExtendRound;
                 
-                Server.PrintToChatAll($"TODO_TRANSLATE| Map is extended for {extendRound} rounds");
+                PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.ExtendForRound", extendRound);
                 FireMapExtendEvent(extendRound, type);
                 break;
         }

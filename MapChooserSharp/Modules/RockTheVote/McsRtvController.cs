@@ -18,8 +18,8 @@ namespace MapChooserSharp.Modules.RockTheVote;
 internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), IMcsRtvControllerApi
 {
     public override string PluginModuleName => "McsRtvController";
-    public override string ModuleChatPrefix => $" {ChatColors.Green}[RTV]{ChatColors.Default}";
-    protected override bool UseTranslationKeyInModuleChatPrefix => false;
+    public override string ModuleChatPrefix => "Prefix.RTV";
+    protected override bool UseTranslationKeyInModuleChatPrefix => true;
 
 
     public FakeConVar<float> RtvCommandUnlockTimeNextMapConfirmed =
@@ -145,7 +145,8 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         // CountsRequiredToInitiateRtv is possibly 0, so if 0 visual required is set to 1, otherwise actual count.
         int visualRequiredCount = CountsRequiredToInitiateRtv > 0 ? CountsRequiredToInitiateRtv : 1;
         
-        Server.PrintToChatAll($"TODO_TRANSLATE| PLAYER {player.PlayerName} RTV ({_rtvVoteParticipants.Count}/{visualRequiredCount})");
+        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.PlayerCastRtv", player.PlayerName, _rtvVoteParticipants.Count, visualRequiredCount);
+        
 
         if (_rtvVoteParticipants.Count >= CountsRequiredToInitiateRtv)
         {
@@ -181,11 +182,15 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
 
     internal void ChangeToNextMap()
     {
-        Server.PrintToChatAll("TODO_TRANSLATE| RTV SPOKEN CHANGING MAP");
         _mcsMapCycleController.ChangeMapOnNextRoundEnd = MapChangeTimingShouldRoundEnd.Value;
 
-        if (!MapChangeTimingShouldRoundEnd.Value)
+        if (MapChangeTimingShouldRoundEnd.Value)
         {
+            PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.ChangeToNextMapNextRound");
+        }
+        else
+        {
+            PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.ChangeToNextMapImmediately", MapChangeTimingAfterRtvSuccess.Value);
             _mcsMapCycleController.ChangeToNextMap(MapChangeTimingAfterRtvSuccess.Value);
         }
     }

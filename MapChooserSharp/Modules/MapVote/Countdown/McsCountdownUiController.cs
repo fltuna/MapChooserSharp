@@ -32,10 +32,10 @@ internal sealed class McsCountdownUiController(IServiceProvider serviceProvider,
     protected override void OnInitialize()
     {
         Plugin.RegisterEventHandler<EventPlayerConnectFull>(OnPlayerConnectFull);
-        _countdownUis[McsCountdownType.CenterHud] = new McsCenterHudCountdownUi();
-        _countdownUis[McsCountdownType.CenterAlert] = new McsCenterAlertCountdownUi();
-        _countdownUis[McsCountdownType.CenterHtml] = new McsCenterHtmlCountdownUi();
-        _countdownUis[McsCountdownType.Chat] = new McsChatCountdownUi();
+        _countdownUis[McsCountdownType.CenterHud] = new McsCenterHudCountdownUi(ServiceProvider);
+        _countdownUis[McsCountdownType.CenterAlert] = new McsCenterAlertCountdownUi(ServiceProvider);
+        _countdownUis[McsCountdownType.CenterHtml] = new McsCenterHtmlCountdownUi(ServiceProvider);
+        _countdownUis[McsCountdownType.Chat] = new McsChatCountdownUi(ServiceProvider);
 
         if (hotReload)
         {

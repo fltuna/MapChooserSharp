@@ -79,14 +79,15 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     
     private void CommandTimeLeft(CCSPlayerController? player, CommandInfo info)
     {
+        // TODO() Support round time and round count
         string timeleft = _timeLeftUtil.GetFormattedTimeLeft(_timeLeftUtil.TimeLimit, player);
         if (player == null)
         {
-            Server.PrintToConsole($"Timeleft: {timeleft}");
+            Server.PrintToConsole(Plugin.LocalizeString("MapCycle.Command.Notification.TimeLeft", timeleft));
         }
         else
         {
-            player.PrintToChat($"Timeleft: {timeleft}");
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.TimeLeft", timeleft));
         }
     }
 
@@ -98,22 +99,22 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (nextMap != null)
             {
-                Server.PrintToConsole($"Next map: {nextMap.MapName}");
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.NextMap", nextMap.MapName));
             }
             else
             {
-                Server.PrintToConsole("Next map: TODO_TRANSLATE_VOTE_PENDING");
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.NextMap", LocalizeString("Word.VotePending")));
             }
         }
         else
         {
             if (nextMap != null)
             {
-                player.PrintToChat($"Next map: {nextMap.MapName}");
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", nextMap.MapName));
             }
             else
             {
-                player.PrintToChat($"Next map: TODO_TRANSLATE_VOTE_PENDING");
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", LocalizeStringForPlayer(player, "Word.VotePending")));
             }
         }
     }
@@ -125,22 +126,23 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (currentMap != null)
             {
-                Server.PrintToConsole($"Current map: {currentMap.MapName}");
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.CurrentMap", currentMap.MapName));
             }
             else
             {
-                Server.PrintToConsole($"Current map: {Server.MapName}");
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.CurrentMap", Server.MapName));
             }
         }
         else
         {
             if (currentMap != null)
             {
-                player.PrintToChat($"Next map: {currentMap.MapName}");
+                // TODO() Use alias name if available 
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.CurrentMap", currentMap.MapName));
             }
             else
             {
-                player.PrintToChat($"Current map: {Server.MapName}");
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.CurrentMap", Server.MapName));
             }
         }
     }

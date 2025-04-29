@@ -8,14 +8,15 @@ using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
+using TNCSSPluginFoundation.Utils.Entity;
 
 namespace MapChooserSharp.Modules.RockTheVote;
 
 public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider)
 {
     public override string PluginModuleName => "McsRtvCommands";
-    public override string ModuleChatPrefix => $" {ChatColors.Green}[RTV]{ChatColors.Default}";
-    protected override bool UseTranslationKeyInModuleChatPrefix => false;
+    public override string ModuleChatPrefix => _mcsRtvController.ModuleChatPrefix;
+    protected override bool UseTranslationKeyInModuleChatPrefix => true;
     
     private McsRtvController _mcsRtvController = null!;
     private McsMapCycleController _mcsMapCycleController = null!;
@@ -62,19 +63,20 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
                 break;
             
             case McsRtvController.PlayerRtvResult.AlreadyInRtv:
-                client.PrintToChat("TODO_TRANSLATE| YOU'VE ALREADY VOTED");
+                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.AlreadyVoted"));
                 break;
             
             case McsRtvController.PlayerRtvResult.CommandInCooldown:
-                client.PrintToChat($"TODO_TRANSLATE| RTV IS IN COOLDOWN {(_mcsRtvController.RtvCommandUnlockTime - Server.CurrentTime):F0}s");
+                // TODO() Toggle verbose option in plugin config
+                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.IsInCooldown.Verbose", $"{_mcsRtvController.RtvCommandUnlockTime - Server.CurrentTime:F0}"));
                 break;
             
             case McsRtvController.PlayerRtvResult.CommandDisabled:
-                client.PrintToChat("TODO_TRANSLATE| RTV IS DISABLED");
+                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.Disabled"));
                 break;
             
             case McsRtvController.PlayerRtvResult.AnotherVoteOngoing:
-                client.PrintToChat("TODO_TRANSLATE| YOU CANNOT RTV WHILE IN VOTE");
+                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.YouCantRtvWhileVote"));
                 break;
         }
     }
@@ -87,16 +89,18 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
         {
             if (client == null)
             {
-                Server.PrintToConsole("TODO_TRANSLATE| ANOTHER VOTE IS IN PROGRESS!");
+                Server.PrintToConsole(LocalizeString("RTV.Notification.Admin.AnotherVoteInProgress"));
             }
             else
             {
-                client.PrintToChat("TODO_TRANSLATE| ANOTHER VOTE IS IN PROGRESS!");
+                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.Admin.AnotherVoteInProgress"));
             }
             return;
         }
 
-        Server.PrintToChatAll("TODO_TRANSLATE| ADMIN Enabled RTV");
+        string executorName = PlayerUtil.GetPlayerName(client);
+        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.EnabledRtv", executorName);
+        
         _mcsRtvController.EnableRtvCommand();
     }
 
@@ -107,16 +111,18 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
         {
             if (client == null)
             {
-                Server.PrintToConsole("TODO_TRANSLATE| ANOTHER VOTE IS IN PROGRESS!");
+                Server.PrintToConsole(LocalizeString("RTV.Notification.Admin.AnotherVoteInProgress"));
             }
             else
             {
-                client.PrintToChat("TODO_TRANSLATE| ANOTHER VOTE IS IN PROGRESS!");
+                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.Admin.AnotherVoteInProgress"));
             }
             return;
         }
 
-        Server.PrintToChatAll("TODO_TRANSLATE| ADMIN Disabled RTV");
+        string executorName = PlayerUtil.GetPlayerName(client);
+        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.DisableRtv", executorName);
+        
         _mcsRtvController.DisableRtvCommand();
     }
 
@@ -127,11 +133,11 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
         {
             if (client == null)
             {
-                Server.PrintToConsole("TODO_TRANSLATE| ANOTHER VOTE IS IN PROGRESS!");
+                Server.PrintToConsole(LocalizeString("RTV.Notification.Admin.AnotherVoteInProgress"));
             }
             else
             {
-                client.PrintToChat("TODO_TRANSLATE| ANOTHER VOTE IS IN PROGRESS!");
+                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.Admin.AnotherVoteInProgress"));
             }
             return;
         }
@@ -143,7 +149,9 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
             return;
         }
         
-        Server.PrintToChatAll("TODO_TRANSLATE| ADMIN FORCE TRIGGERED RTV");
+        string executorName = PlayerUtil.GetPlayerName(client);
+        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.ForceRtv", executorName);
+        
         _mcsRtvController.EnableRtvCommand();
         _mcsRtvController.InitiateRtvVote();
     }

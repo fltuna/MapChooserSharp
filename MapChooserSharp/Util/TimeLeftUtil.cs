@@ -232,6 +232,12 @@ internal class TimeLeftUtil(IServiceProvider serviceProvider, bool hotReload) : 
 
     public string GetFormattedTimeLeft(int timeLeft)
     {
+        if (timeLeft < 0)
+        {
+            return Plugin.LocalizeString("Word.LastRound");
+        }
+        
+        
         int hours = timeLeft / 3600;
         int minutes = (timeLeft % 3600) / 60;
         int seconds = timeLeft % 60;
@@ -266,23 +272,32 @@ internal class TimeLeftUtil(IServiceProvider serviceProvider, bool hotReload) : 
         var playerCulture = PlayerLanguageManager.Instance.GetLanguage(steamId);
         using var tempCulture = new WithTemporaryCulture(playerCulture);
 
+        
+        if (timeLeft <= 0)
+        {
+            return Plugin.LocalizeStringForPlayer(player!, "Word.LastRound");
+        }
+        
         if (hours > 0)
         {
-            return "TODO_TRANSLATE| HOURS";
+            return Plugin.LocalizeStringForPlayer(player!, "MapCycle.Command.Notification.TimeLeft.TimeFormat.Hours",
+                hours, minutes, seconds);
         }
 
         if (minutes > 0)
         {
-            return "TODO_TRANSLATE| MINUETS";
+            return Plugin.LocalizeStringForPlayer(player!, "MapCycle.Command.Notification.TimeLeft.TimeFormat.Minutes",
+                minutes, seconds);
         }
-
-        return "TODO_TRANSLATE| SECONDS";
+        
+        return Plugin.LocalizeStringForPlayer(player!, "MapCycle.Command.Notification.TimeLeft.TimeFormat.Seconds",
+            seconds);
     }
 
 
     public string GetFormattedRoundsLeft(int roundsLeft)
     {
-        if (roundsLeft < 0)
+        if (roundsLeft <= 0)
             return $"Last round!";
         
         return $"{roundsLeft} {(roundsLeft == 1 ? "round" : "rounds")}";
@@ -293,7 +308,7 @@ internal class TimeLeftUtil(IServiceProvider serviceProvider, bool hotReload) : 
         if (player == null)
             return GetFormattedRoundsLeft(roundsLeft);
         
-        return $"TODO_TRANSLATE| {roundsLeft}";
+        return Plugin.LocalizeStringForPlayer(player, "MapCycle.Command.Notification.TimeLeft.TimeFormat.Rounds");
     }
     
     private McsMapExtendType DetermineExtendType()

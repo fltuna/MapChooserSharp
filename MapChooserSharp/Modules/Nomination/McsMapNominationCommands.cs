@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Commands;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,8 +10,8 @@ namespace MapChooserSharp.Modules.Nomination;
 internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider)
 {
     public override string PluginModuleName => "McsNominationCommands";
-    public override string ModuleChatPrefix => "unused";
-    protected override bool UseTranslationKeyInModuleChatPrefix => false;
+    public override string ModuleChatPrefix => _mapNominationController.ModuleChatPrefix;
+    protected override bool UseTranslationKeyInModuleChatPrefix => true;
     
     private McsMapNominationController _mapNominationController = null!;
     private IMapConfigProvider _mapConfigProvider = null!;
@@ -32,9 +33,16 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
     
     private void CommandNominateMap(CCSPlayerController? player, CommandInfo info)
     {
+        if (player == null)
+        {
+            Server.PrintToConsole("Please use css_nominate_addmap instead.");
+            return;
+        }
+        
         if (info.ArgCount < 2)
         {
-            info.ReplyToCommand("TODO_TRANSLATE| Usage: !nominate <MapName>");
+            player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.Usage"));
+
             return;
         }
 
@@ -45,25 +53,16 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         
         if (!matchedMaps.Any())
         {
-            info.ReplyToCommand($"TODO_TRANSLATE| No map(s) found with {mapName}");
+            player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.NotMapsFound", mapName));
 
-            if (player == null)
-                return;
-            
             _mapNominationController.ShowNominationMenu(player);
             return;
         }
 
         if (matchedMaps.Count > 1)
         {
-            info.ReplyToCommand($"TODO_TRANSLATE| {matchedMaps.Count} maps found with {mapName}");
+            player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.MultipleResult", matchedMaps.Count, mapName));
 
-            if (player == null)
-            {
-                info.ReplyToCommand("Please specify the identical name.");
-                return;
-            }
-            
             _mapNominationController.ShowNominationMenu(player, matchedMaps);
             return;
         }

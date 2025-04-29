@@ -37,7 +37,7 @@ public class McsSimpleHtmlVoteUi(IServiceProvider provider) : IMcsMapVoteUserInt
         
         
         _debugLogger.LogTrace($"[Player {player.PlayerName}] Creating vote menu");
-        CenterHtmlMenu menu = new("TODO TRANSLATE| Map Vote", _plugin);
+        CenterHtmlMenu menu = new(_plugin.LocalizeStringForPlayer(player, "MapVote.Menu.MenuTitle"), _plugin);
 
         // If menu option is already exists (this is intended for !revote feature)
         if (_chachedMenuOptions.TryGetValue(player.Slot, out var menuOps))

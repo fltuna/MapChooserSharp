@@ -24,8 +24,8 @@ namespace MapChooserSharp.Modules.Nomination;
 internal sealed class McsMapNominationController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsNominationApi
 {
     public override string PluginModuleName => "McsMapNominationController";
-    public override string ModuleChatPrefix => $" {ChatColors.Green}[Nomination]{ChatColors.Default}";
-    protected override bool UseTranslationKeyInModuleChatPrefix => false;
+    public override string ModuleChatPrefix => "Prefix.Nomination";
+    protected override bool UseTranslationKeyInModuleChatPrefix => true;
 
     private IMcsInternalEventManager _mcsEventManager = null!;
     private McsMapVoteController _mcsMapVoteController = null!;
@@ -149,22 +149,22 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         {
             if (mapConfig.MapNameAlias != string.Empty)
             {
-                Server.PrintToChatAll($"TODO_TRANSLATE| {executorName} nominated {mapConfig.MapNameAlias}");
+                PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.Nominated", executorName, mapConfig.MapNameAlias);
             }
             else
             {
-                Server.PrintToChatAll($"TODO_TRANSLATE| {executorName} nominated {mapConfig.MapName}");
+                PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.Nominated", executorName, mapConfig.MapName);
             }
         }
         else
         {
             if (mapConfig.MapNameAlias != string.Empty)
             {
-                Server.PrintToChatAll($"TODO_TRANSLATE| {executorName} changed their nomination to {mapConfig.MapNameAlias}");
+                PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.NominationChanged", executorName, mapConfig.MapNameAlias);
             }
             else
             {
-                Server.PrintToChatAll($"TODO_TRANSLATE| {executorName} changed their nomination to {mapConfig.MapName}");
+                PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.NominationChanged", executorName, mapConfig.MapName);
             }
         }
         
@@ -234,47 +234,53 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
                 return true;
             
             case NominationCheck.Failed:
-                player.PrintToChat("TODO_TRANSLATE| Failed to nominate map");
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.Generic.WithMapName", mapConfig.MapName));
                 return false;
             
             case NominationCheck.NotEnoughPermissions:
-                player.PrintToChat("TODO_TRANSLATE| You don't have enough permissions to nominate this map");
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.NotEnoughPermission", mapConfig.MapName));
                 return false;
             
             case NominationCheck.TooMuchPlayers:
-                player.PrintToChat("TODO_TRANSLATE| Too much players to nominate this map");
+                int playerCountCurrently = Utilities.GetPlayers().Select(p => p is { IsBot: false, IsHLTV: false }).Count();
+                int maxPlayers = mapConfig.NominationConfig.MaxPlayers;
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.TooMuchPlayers", mapConfig.MapName, playerCountCurrently, maxPlayers));
                 return false;
             
             case NominationCheck.NotEnoughPlayers:
-                player.PrintToChat("TODO_TRANSLATE| Not enough players to nominate this map");
+                playerCountCurrently = Utilities.GetPlayers().Select(p => p is { IsBot: false, IsHLTV: false }).Count();
+                int minPlayers = mapConfig.NominationConfig.MaxPlayers;
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.NotEnoughPlayers", mapConfig.MapName, playerCountCurrently, minPlayers));
                 return false;
             
             case NominationCheck.NotAllowed:
-                player.PrintToChat("TODO_TRANSLATE| You are not allowed to nominate this map");
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.NotAllowed", mapConfig.MapName));
                 return false;
             
             case NominationCheck.DisabledAtThisTime:
-                player.PrintToChat("TODO_TRANSLATE| Nomination is disabled at this time");
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.DisableAtThisTime"));
                 return false;
             
             case NominationCheck.OnlySpecificDay:
-                player.PrintToChat($"TODO_TRANSLATE| Only Specific day(s) is allowed to nominate this map ({string.Join(", ", mapConfig.NominationConfig.DaysAllowed)}");
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.OnlySpecificDay", mapConfig.MapName));
+                player.PrintToChat(GetTextWithModulePrefixForPlayer(player, LocalizeStringForPlayer(player, "Nomination.Notification.Failure.OnlySpecificDay.Days", string.Join(", ", mapConfig.NominationConfig.DaysAllowed))));
                 return false;
             
             case NominationCheck.OnlySpecificTime:
-                player.PrintToChat($"TODO_TRANSLATE| Only Specific time(s) is allowed to nominate this map ({string.Join(", ", mapConfig.NominationConfig.AllowedTimeRanges)}");
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.OnlySpecificTime", mapConfig.MapName));
+                player.PrintToChat(GetTextWithModulePrefixForPlayer(player, LocalizeStringForPlayer(player, "Nomination.Notification.Failure.OnlySpecificTime.Times", string.Join(", ", mapConfig.NominationConfig.AllowedTimeRanges))));
                 return false;
             
             case NominationCheck.MapIsInCooldown:
-                player.PrintToChat($"TODO_TRANSLATE| Map is in cooldown: {mapConfig.MapCooldown.CurrentCooldown} left");
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.MapIsInCooldown", mapConfig.MapName, mapConfig.MapCooldown.CurrentCooldown));
                 return false;
             
             case NominationCheck.AlreadyNominated:
-                player.PrintToChat($"TODO_TRANSLATE| You are already nominated {mapConfig.MapName}!");
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.AlreadyNominatedSameMap", mapConfig.MapName));
                 return false;
             
             case NominationCheck.NominatedByAdmin:
-                player.PrintToChat($"TODO_TRANSLATE| This map is already nominated by an admin!");
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.AlreadyNominatedByAdmin", mapConfig.MapName));
                 return false;
         }
         
