@@ -67,6 +67,7 @@
     "MapCycle.Command.Notification.CurrentMap": "現在のマップ: {lime}{0}{default}",
     "MapCycle.Command.Notification.MapInfo": "マップ情報: {0}",
     "MapCycle.Command.Notification.MapInfo.NotAvailable": "現在のマップにはマップ情報が存在しません",
+    "MapCycle.Command.Notification.ExtendsLeft": "残り延長回数: {lime}{0}{default}",
     "MapCycle.Command.Notification.TimeLeft": "残り時間: {lime}{0}{default}",
     "MapCycle.Command.Notification.TimeLeft.TimeFormat.Hours": "{0} 時間 {1} 分 {2} 秒",
     "MapCycle.Command.Notification.TimeLeft.TimeFormat.Minutes": "{0} 分 {1} 秒",

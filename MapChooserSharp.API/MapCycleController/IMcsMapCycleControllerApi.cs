@@ -18,4 +18,14 @@ public interface IMcsMapCycleControllerApi
     /// Shouldn't be null, but sometimes can be nullable.
     /// </summary>
     public IMapConfig? CurrentMap { get; }
+    
+    /// <summary>
+    /// Extend count of current map
+    /// </summary>
+    public int ExtendCount { get; }
+    
+    /// <summary>
+    /// Returns remaining extend count
+    /// </summary>
+    public int ExtendsLeft { get; }
 }

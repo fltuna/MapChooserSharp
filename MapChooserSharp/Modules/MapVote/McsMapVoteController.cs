@@ -196,7 +196,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         }
         
         
-        if (isActivatedByRtv)
+        if (isActivatedByRtv && _mapCycleController.ExtendsLeft > 0)
         {
             DebugLogger.LogDebug("This vote is activated by RTV, first vote option is \"Don't change\"");
             McsVoteOption voteOption = new McsVoteOption(PlaceHolderDontChangeMap, CastPlayerVote);
@@ -204,7 +204,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             IMapVoteData voteData = new MapVoteData(null, IdDontChangeMap);
             mapsToVote.Add(voteData);
         }
-        else
+        if (!isActivatedByRtv && _mapCycleController.ExtendsLeft > 0)
         {
             DebugLogger.LogDebug("This vote is not activated by RTV, first vote option is \"Extend current map\"");
             McsVoteOption voteOption = new McsVoteOption(PlaceHolderExtendMap, CastPlayerVote);

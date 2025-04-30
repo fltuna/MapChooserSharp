@@ -60,6 +60,12 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         private set => _currentMap = value;
     }
 
+    public int ExtendCount { get; private set; } = 0;
+    private int ExtendLimit { get; set; } = 0;
+    
+    public int ExtendsLeft => ExtendLimit - ExtendCount;
+
+
     private bool _isMapStarted = false;
 
     private Timer? _voteStartTimer = null;
@@ -69,6 +75,8 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private const float DefaultRoundRestartDelay = 7.0F;
 
     private const float DefaultMapChangeDelay = 10.0F;
+
+    private const int DefaultMapExtends = 3;
 
     public FakeConVar<int> VoteStartTimingTime = new("mcs_vote_start_timing_time", "When should vote started if map is based on mp_timelimit or mp_roundtime? (minutes)", 3,
         ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 15));
@@ -117,6 +125,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
         if (hotReload)
         {
+            OnMapStart(Server.MapName);
             _timeLeftUtil.ReDetermineExtendType();
             _isMapStarted = true;
             RecreateVoteTimer();
@@ -127,7 +136,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     {
         _mcsEventManager.UnregisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
         _mcsEventManager.UnregisterEventHandler<McsMapExtendEvent>(OnMapExtended);
-        _mcsEventManager.RegisterEventHandler<McsMapNotChangedEvent>(OnMapNotChanged);
+        _mcsEventManager.UnregisterEventHandler<McsMapNotChangedEvent>(OnMapNotChanged);
         
         Plugin.RemoveListener<Listeners.OnMapStart>(OnMapStart);
         Plugin.DeregisterEventHandler<EventRoundEnd>(OnRoundEnd);
@@ -169,6 +178,8 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
     private void OnMapStart(string mapName)
     {
+        ExtendCount = 0;
+        
         CurrentMap = NextMap;
         NextMap = null;
         
@@ -198,6 +209,8 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
                 }
             }
         }
+
+        ExtendLimit = CurrentMap?.MaxExtends ?? DefaultMapExtends;
     }
 
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
@@ -243,6 +256,8 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
     private void OnMapExtended(McsMapExtendEvent @event)
     {
+        ExtendCount++;
+        
         switch (@event.MapExtendType)
         {
             case McsMapExtendType.TimeLimit:
