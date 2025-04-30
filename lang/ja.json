@@ -41,6 +41,7 @@
     "MapVote.Menu.MenuTitleWithCountDown": "マップ投票 | 残り{0}秒",
     "MapVote.Broadcast.Countdown": "投票が {lime}{0}{default} 秒で始まります",
     "MapVote.Broadcast.CenterHtml": "投票が {0} 秒で始まります",
+    "MapVote.Command.Notification.Revote.NoActiveVote": "現在投票は行われていません!",
     "MapVote.Broadcast.NotEnoughMapsToStartVote": "マップ投票を開始するために十分なマップが存在しません! サーバー管理者にお問い合わせください!",
     "MapVote.Broadcast.VoteFinished": "投票が完了しました! {1}/{0} ({2}%)",
     "MapVote.Broadcast.StartingRunoffVote": "どのマップの投票率も {0}% を超えませんでした! 最終投票を開始します!",
