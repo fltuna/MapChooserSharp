@@ -415,6 +415,14 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NextMapConfirmed", winMap.MapConfig.MapName, $"{mapVotePercentage:F2}", totalVotes);
 
+        if (winMap.MapConfig.MapDescription != string.Empty)
+        {
+            foreach (CCSPlayerController player in Utilities.GetPlayers())
+            {
+                player.PrintToChat(GetTextWithPluginPrefixForPlayer(player, winMap.MapConfig.MapDescription));
+            }
+        }
+
         FireVoteFinishedEvent();
         FireNextMapConfirmedEvent(winMap.MapConfig);
         EndVotePostInitialization();
@@ -595,7 +603,15 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         float mapVotePercentage = (float)winMap.GetVoters().Count / totalVotes * 100.0F;
 
         PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NextMapConfirmed", winMap.MapConfig.MapName, $"{mapVotePercentage:F2}", totalVotes);
-
+        
+        if (winMap.MapConfig.MapDescription != string.Empty)
+        {
+            foreach (CCSPlayerController player in Utilities.GetPlayers())
+            {
+                player.PrintToChat(GetTextWithPluginPrefixForPlayer(player, winMap.MapConfig.MapDescription));
+            }
+        }
+        
         FireVoteFinishedEvent();
         FireNextMapConfirmedEvent(winMap.MapConfig);
         
