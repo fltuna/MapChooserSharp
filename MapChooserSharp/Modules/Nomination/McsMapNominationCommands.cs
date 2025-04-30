@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
@@ -30,11 +31,13 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
         
         Plugin.AddCommand("css_nominate", "Nominate a map", CommandNominateMap);
+        Plugin.AddCommand("css_nominate_addmap", "Insert a map to nomination", CommandNominateAddMap);
     }
 
     protected override void OnUnloadModule()
     {
         Plugin.RemoveCommand("css_nominate", CommandNominateMap);
+        Plugin.RemoveCommand("css_nominate_addmap", CommandNominateAddMap);
     }
     
     
@@ -83,5 +86,71 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         _mapNominationController.NominateMap(player, matchedMaps.First().Value);
     }
 
+    [RequiresPermissions(@"css/map")]
+    private void CommandNominateAddMap(CCSPlayerController? player, CommandInfo info)
+    {
+        if (_mcsMapVoteController.CurrentVoteState == McsMapVoteState.NextMapConfirmed)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
+            }
+            return;
+        }
+        
+        if (info.ArgCount < 2)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("NominationAddMap.Command.Notification.Usage"));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "NominationAddMap.Command.Notification.Usage"));
+            }
+            return;
+        }
 
+        string mapName = info.ArgByIndex(1);
+        var mapConfigs = _mapConfigProvider.GetMapConfigs();
+
+        var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).ToDictionary();
+        
+        if (!matchedMaps.Any())
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("Nomination.Command.Notification.NotMapsFound", mapName));
+
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.NotMapsFound", mapName));
+
+                _mapNominationController.ShowAdminNominationMenu(player);
+            }
+            return;
+        }
+
+        if (matchedMaps.Count > 1)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("Nomination.Command.Notification.MultipleResult", matchedMaps.Count, mapName));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.MultipleResult", matchedMaps.Count, mapName));
+
+                _mapNominationController.ShowNominationMenu(player, matchedMaps);
+            }
+            return;
+        }
+
+        _mapNominationController.AdminNominateMap(player, matchedMaps.First().Value);
+    }
 }

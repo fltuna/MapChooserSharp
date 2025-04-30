@@ -21,5 +21,5 @@ public interface IMcsNominationData
     /// <summary>
     /// Is force nominated by admin
     /// </summary>
-    public bool IsForceNominated { get; }
+    public bool IsForceNominated { get; set; }
 }

@@ -76,7 +76,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     }
     
 
-    internal void NominateMap(CCSPlayerController? player, IMapConfig mapConfig, bool isForce = false)
+    internal void NominateMap(CCSPlayerController? player, IMapConfig mapConfig)
     {
         if (player == null)
         {
@@ -137,8 +137,48 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         }
     }
 
-    internal void AdminNominateMap()
+    internal void AdminNominateMap(CCSPlayerController? player, IMapConfig mapConfig)
     {
+        if (mapConfig.NominationConfig.ProhibitAdminNomination)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole("TODO_TRANSLATE| This map is not allowed to nominate as admin nomination");
+            }
+            else
+            {
+                player.PrintToChat("TODO_TRANSLATE| This map is not allowed to nominate as admin nomination");
+            }
+            return;
+        }
+
+        bool isFirstNomination = NominatedMaps.TryGetValue(mapConfig.MapName, out var nominated);
+
+        if (!isFirstNomination || nominated == null)
+        {
+            nominated = new McsNominationData(mapConfig);
+        }
+        
+        // When this nomination is first nomination of the map
+        // It will require to store, and takes no effect if already existed
+        NominatedMaps[mapConfig.MapName] = nominated;
+        
+        nominated.IsForceNominated = true;
+
+        var adminNominateEvent = new McsMapAdminNominatedEvent(player, nominated, GetTextWithModulePrefix(""));
+        _mcsEventManager.FireEventNoResult(adminNominateEvent);
+
+
+        string executorName = PlayerUtil.GetPlayerName(player);
+
+        if (isFirstNomination)
+        {
+            PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.Admin.ChangedToAdminNomination", executorName, mapConfig.MapName);
+        }
+        else
+        {
+            PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.Admin.Nominated", executorName, mapConfig.MapName);
+        }
         
     }
     
@@ -148,7 +188,8 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         // TODO() Implement later
         player.PrintToChat("TODO_MENU| Nomination menu");
 
-        Dictionary<string, IMapConfig>? mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
+        // If mapCfgArg is null, it will get all map configs for listing
+        Dictionary<string, IMapConfig> mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
     }
     
     internal void ShowAdminNominationMenu(CCSPlayerController player, Dictionary<string, IMapConfig>? mapCfgArg = null)
@@ -156,7 +197,8 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         // TODO() Implement later
         player.PrintToChat("TODO_MENU| Admin nomination menu");
 
-        Dictionary<string, IMapConfig>? mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
+        // If mapCfgArg is null, it will get all map configs for listing
+        Dictionary<string, IMapConfig> mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
     }
 
 
