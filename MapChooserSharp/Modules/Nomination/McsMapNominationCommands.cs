@@ -1,7 +1,10 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Commands;
+using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
+using MapChooserSharp.Modules.MapCycle;
+using MapChooserSharp.Modules.MapVote;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 
@@ -15,12 +18,16 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
     
     private McsMapNominationController _mapNominationController = null!;
     private IMapConfigProvider _mapConfigProvider = null!;
+    private McsMapVoteController _mcsMapVoteController = null!;
+    private McsMapCycleController _mapCycleController = null!;
 
 
-    protected override void OnInitialize()
+    protected override void OnAllPluginsLoaded()
     {
         _mapNominationController = ServiceProvider.GetRequiredService<McsMapNominationController>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
+        _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
         
         Plugin.AddCommand("css_nominate", "Nominate a map", CommandNominateMap);
     }
@@ -36,6 +43,12 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         if (player == null)
         {
             Server.PrintToConsole("Please use css_nominate_addmap instead.");
+            return;
+        }
+
+        if (_mcsMapVoteController.CurrentVoteState == McsMapVoteState.NextMapConfirmed)
+        {
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
             return;
         }
         
