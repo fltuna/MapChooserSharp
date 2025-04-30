@@ -5,6 +5,7 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.Events;
+using MapChooserSharp.API.Events.MapVote;
 using MapChooserSharp.API.Events.Nomination;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapVoteController;
@@ -43,6 +44,11 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     {
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        
+        
+        _mcsEventManager.RegisterEventHandler<McsMapVoteFinishedEvent>(OnVoteFinished);
+        
+        Plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);
     }
 
     protected override void OnAllPluginsLoaded()
@@ -54,6 +60,16 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     {
     }
 
+
+    private void OnVoteFinished(McsMapVoteFinishedEvent @event)
+    {
+        ResetNominations();
+    }
+
+    private void OnMapStart(string mapName)
+    {
+        ResetNominations();
+    }
     
 
     internal void NominateMap(CCSPlayerController? player, IMapConfig mapConfig, bool isForce = false)
@@ -76,7 +92,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             nominated = new McsNominationData(mapConfig);
         }
         
-        var nominationBegin = new McsNominationBeginEvent(player, nominated, ModuleChatPrefix);
+        var nominationBegin = new McsNominationBeginEvent(player, nominated, GetTextWithModulePrefix(""));
         McsEventResult result = _mcsEventManager.FireEvent(nominationBegin);
         
         if (result > McsEventResult.Handled)
@@ -107,12 +123,12 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
 
         if (isFirstNomination)
         {
-            var eventNominated = new McsMapNominatedEvent(player, nominated, ModuleChatPrefix);
+            var eventNominated = new McsMapNominatedEvent(player, nominated, GetTextWithModulePrefix(""));
             _mcsEventManager.FireEventNoResult(eventNominated);
         }
         else
         {
-            var eventNominationChanged = new McsMapNominationChangedEvent(player, nominated, ModuleChatPrefix);
+            var eventNominationChanged = new McsMapNominationChangedEvent(player, nominated, GetTextWithModulePrefix(""));
             _mcsEventManager.FireEventNoResult(eventNominationChanged);
         }
     }
@@ -285,6 +301,12 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         }
         
         return false;
+    }
+    
+    
+    private void ResetNominations()
+    {
+        NominatedMaps.Clear();
     }
 
     private enum NominationCheck
