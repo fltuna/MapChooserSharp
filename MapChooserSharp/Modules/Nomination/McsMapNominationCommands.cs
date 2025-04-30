@@ -32,12 +32,14 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         
         Plugin.AddCommand("css_nominate", "Nominate a map", CommandNominateMap);
         Plugin.AddCommand("css_nominate_addmap", "Insert a map to nomination", CommandNominateAddMap);
+        Plugin.AddCommand("css_nominate_removemap", "Remove a map from nomination", CommandNominateRemoveMap);
     }
 
     protected override void OnUnloadModule()
     {
         Plugin.RemoveCommand("css_nominate", CommandNominateMap);
         Plugin.RemoveCommand("css_nominate_addmap", CommandNominateAddMap);
+        Plugin.RemoveCommand("css_nominate_removemap", CommandNominateRemoveMap);
     }
     
     
@@ -152,5 +154,74 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         }
 
         _mapNominationController.AdminNominateMap(player, matchedMaps.First().Value);
+    }
+
+    [RequiresPermissions(@"css/map")]
+    private void CommandNominateRemoveMap(CCSPlayerController? player, CommandInfo info)
+    {
+        if (_mcsMapVoteController.CurrentVoteState == McsMapVoteState.NextMapConfirmed)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
+            }
+            return;
+        }
+        
+        if (info.ArgCount < 2)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("NominationRemoveMap.Command.Notification.Usage"));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "NominationRemoveMap.Command.Notification.Usage"));
+            }
+            return;
+        }
+
+        string mapName = info.ArgByIndex(1);
+        var mapConfigs = _mapNominationController.NominatedMaps;
+
+        var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).ToDictionary();
+        
+        if (!matchedMaps.Any())
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("Nomination.Command.Notification.NotMapsFound", mapName));
+
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.NotMapsFound", mapName));
+
+                _mapNominationController.ShowAdminNominationMenu(player);
+            }
+            return;
+        }
+
+        if (matchedMaps.Count > 1)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("Nomination.Command.Notification.MultipleResult", matchedMaps.Count, mapName));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.MultipleResult", matchedMaps.Count, mapName));
+
+                _mapNominationController.ShowRemoveNominationMenu(player);
+            }
+            return;
+        }
+
+        // TODO() Remove map
+        _mapNominationController.RemoveNomination(player, matchedMaps.First().Key);
     }
 }

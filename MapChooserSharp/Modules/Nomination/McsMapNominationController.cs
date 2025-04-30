@@ -201,7 +201,18 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         Dictionary<string, IMapConfig> mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
     }
 
+    internal void ShowRemoveNominationMenu(CCSPlayerController player)
+    {
+        player.PrintToChat("TODO_MENU| Admin remove nomination menu");
+    }
 
+
+    internal void RemoveNomination(CCSPlayerController? player, string key)
+    {
+        string executorName = PlayerUtil.GetPlayerName(player);
+        PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.Admin.RemovedNomiantion", executorName, key);
+        NominatedMaps.Remove(key);
+    }
 
     private void PrintNominationResult(CCSPlayerController player, IMapConfig mapConfig, bool isFirstNomination)
     {

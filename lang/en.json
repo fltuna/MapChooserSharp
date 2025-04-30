@@ -22,6 +22,7 @@
     "Nomination.Broadcast.NominationChanged": "{0} changed their nomination to {lime}{1}{default}",
     "Nomination.Broadcast.Admin.Nominated": "Admin {0} inserted {lime}{1}{default} into nomination",
     "Nomination.Broadcast.Admin.ChangedToAdminNomination": "Admin {0} changed {lime}{1}{default} to admin nomination",
+    "Nomination.Broadcast.Admin.RemovedNomiantion": "Admin {0} removed {lime}{1}{default} from nomination",
     "Nomination.Notification.Failure.Generic": "Failed to nominate this map",
     "Nomination.Notification.Failure.Generic.WithMapName": "Failed to nominate {lime}{0}{default}",
     "Nomination.Notification.Failure.NotEnoughPermission": "You don't have enough permissions to nominate {lime}{0}{default}",

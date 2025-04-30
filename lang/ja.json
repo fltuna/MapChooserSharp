@@ -22,6 +22,7 @@
     "Nomination.Broadcast.NominationChanged": "{0} が自身のノミネートを {lime}{1}{default} に変更しました",
     "Nomination.Broadcast.Admin.Nominated": "管理者 {0} が {lime}{1}{default} をノミネーションに追加しました",
     "Nomination.Broadcast.Admin.ChangedToAdminNomination": "管理者 {0} が {lime}{1}{default} を管理者ノミネーションに変更しました",
+    "Nomination.Broadcast.Admin.RemovedNomiantion": "管理者 {0} が {lime}{1}{default} をノミネーションから削除しました",
     "Nomination.Notification.Failure.Generic": "マップのノミネートに失敗しました。",
     "Nomination.Notification.Failure.Generic.WithMapName": "{lime}{0}{default} のノミネートに失敗しました",
     "Nomination.Notification.Failure.NotEnoughPermission": "{lime}{0}{default} をノミネートするための権限が足りません",
