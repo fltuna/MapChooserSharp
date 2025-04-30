@@ -50,7 +50,7 @@ public sealed class MapChooserSharp: TncssPluginBase
         {
             for (int i = 0; i < 5; i++)
             {
-                Logger.LogWarning("MapChooserSharp is hot reloaded! This will causes UNEXPECTED BEHAVIOUR. Developers is not responsible for any problems that occur by hot reloading.");
+                Logger.LogWarning("MapChooserSharp is hot reloaded! This will causes UNEXPECTED BEHAVIOUR. Developers is not responsible for any problems that occur by hot reloading. Especially API will not work when hot reloaded.");
             }
         }
         
