@@ -354,7 +354,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             if (player.IsBot || player.IsHLTV)
                 continue;
             
-            MenuManager.CloseActiveMenu(player);
+            _mapVoteContent.VoteUi.CloseMenu(player);
         }
         
         foreach (IMapVoteData voteData in _mapVoteContent.GetVotingMaps())
@@ -542,8 +542,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         {
             if (player.IsBot || player.IsHLTV)
                 continue;
-        
-            MenuManager.CloseActiveMenu(player);
+            
+            _mapVoteContent.VoteUi.CloseMenu(player);
         }
     
         foreach (IMapVoteData voteData in _mapVoteContent.GetVotingMaps())
@@ -617,6 +617,16 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return CurrentVoteState;
         }
 
+        foreach (int participantSlot in _mapVoteContent!.GetVoteParticipants())
+        {
+            var target = Utilities.GetPlayerFromSlot(participantSlot);
+            
+            if (target == null)
+                continue;
+            
+            _mapVoteContent.VoteUi.CloseMenu(target);
+        }
+        
         FireVoteCancelEvent();
         EndVotePostInitialization();
 

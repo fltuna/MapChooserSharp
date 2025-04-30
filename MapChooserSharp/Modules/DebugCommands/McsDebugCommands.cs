@@ -28,7 +28,6 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
         Plugin.AddCommand("mcs_maplist", "", CommandMapList);
         Plugin.AddCommand("mcs_mapinfo", "", CommandMapInfo);
         Plugin.AddCommand("css_startvote", "test", CommandStartVote);
-        Plugin.AddCommand("css_cancelvote", "test", CommandTestCancelVote);
         Plugin.AddCommand("css_removevote", "test", CommandTestRemoveVote);
         Plugin.AddCommand("css_state", "test", CommandTestCurrentState);
     }
@@ -38,7 +37,6 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
         Plugin.RemoveCommand("mcs_maplist", CommandMapList);
         Plugin.RemoveCommand("mcs_mapinfo", CommandMapInfo);
         Plugin.RemoveCommand("css_startvote", CommandStartVote);
-        Plugin.RemoveCommand("css_cancelvote", CommandTestCancelVote);
         Plugin.RemoveCommand("css_removevote", CommandTestRemoveVote);
         Plugin.RemoveCommand("css_state", CommandTestCurrentState);
     }
@@ -156,11 +154,6 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
     private void CommandStartVote(CCSPlayerController? player, CommandInfo info)
     {
         _mcsMapVoteController.InitiateVote();
-    }
-
-    private void CommandTestCancelVote(CCSPlayerController? player, CommandInfo info)
-    {
-        _mcsMapVoteController.CancelVote(player);
     }
 
     private void CommandTestCurrentState(CCSPlayerController? player, CommandInfo info)
