@@ -49,9 +49,11 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         services.AddTransient<IMcsMapVoteUiFactory, McsSimpleHtmlVoteUiFactory>();
     }
 
-
-    protected override void OnInitialize()
+    protected override void OnAllPluginsLoaded()
     {
+        _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
+        _voteUiFactory = ServiceProvider.GetRequiredService<IMcsMapVoteUiFactory>();
+        _countdownUiController = ServiceProvider.GetRequiredService<McsCountdownUiController>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
@@ -63,13 +65,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         {
             CurrentVoteState = McsMapVoteState.NoActiveVote;
         });
-    }
-
-    protected override void OnAllPluginsLoaded()
-    {
-        _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
-        _voteUiFactory = ServiceProvider.GetRequiredService<IMcsMapVoteUiFactory>();
-        _countdownUiController = ServiceProvider.GetRequiredService<McsCountdownUiController>();
     }
 
 

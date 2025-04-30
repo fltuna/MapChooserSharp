@@ -23,7 +23,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     private ITimeLeftUtil _timeLeftUtil = null!;
 
 
-    protected override void OnInitialize()
+    protected override void OnAllPluginsLoaded()
     {
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();

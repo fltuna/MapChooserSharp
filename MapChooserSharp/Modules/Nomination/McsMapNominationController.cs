@@ -40,8 +40,9 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         services.AddSingleton(this);
     }
 
-    protected override void OnInitialize()
+    protected override void OnAllPluginsLoaded()
     {
+        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
         
@@ -50,11 +51,6 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         _mcsEventManager.RegisterEventHandler<McsMapVoteCancelledEvent>(OnVoteCancelled);
         
         Plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);
-    }
-
-    protected override void OnAllPluginsLoaded()
-    {
-        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
     }
 
     protected override void OnUnloadModule()

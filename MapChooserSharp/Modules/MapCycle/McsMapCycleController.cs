@@ -81,11 +81,25 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         services.AddSingleton(this);
     }
 
-    protected override void OnInitialize()
+    protected override void OnAllPluginsLoaded()
     {
+        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
+        _mcsRtvController = ServiceProvider.GetRequiredService<McsRtvController>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
+        
+        _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
+        _mcsEventManager.RegisterEventHandler<McsMapExtendEvent>(OnMapExtended);
+        _mcsEventManager.RegisterEventHandler<McsMapNotChangedEvent>(OnMapNotChanged);
+        
+        Plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);
+        Plugin.RegisterListener<Listeners.OnMapEnd>(() =>
+        {
+            _isMapStarted = false;
+            ChangeMapOnNextRoundEnd = false;
+        });
+        Plugin.RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
         
         // This is for late timer start
         // Since we cannot obtain McsMapExtendType before map is fully loaded
@@ -107,24 +121,6 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
             _isMapStarted = true;
             RecreateVoteTimer();
         }
-    }
-
-    protected override void OnAllPluginsLoaded()
-    {
-        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
-        _mcsRtvController = ServiceProvider.GetRequiredService<McsRtvController>();
-        
-        _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
-        _mcsEventManager.RegisterEventHandler<McsMapExtendEvent>(OnMapExtended);
-        _mcsEventManager.RegisterEventHandler<McsMapNotChangedEvent>(OnMapNotChanged);
-        
-        Plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);
-        Plugin.RegisterListener<Listeners.OnMapEnd>(() =>
-        {
-            _isMapStarted = false;
-            ChangeMapOnNextRoundEnd = false;
-        });
-        Plugin.RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
     }
 
     protected override void OnUnloadModule()

@@ -24,20 +24,17 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
     private McsRtvController _mcsRtvController = null!;
     private McsMapCycleController _mcsMapCycleController = null!;
     
-    protected override void OnInitialize()
+    protected override void OnAllPluginsLoaded()
     {
+        _mcsRtvController = ServiceProvider.GetRequiredService<McsRtvController>();
+        _mcsMapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
+        
         Plugin.AddCommand("css_rtv", "Rock The Vote", CommandRtv);
         Plugin.AddCommand("css_enablertv", "Enable RTV", CommandEnableRtv);
         Plugin.AddCommand("css_disablertv", "Disable RTV", CommandDisableRtv);
         Plugin.AddCommand("css_forcertv", "Force RTV", CommandForceRtv);
         
         Plugin.AddCommandListener("say", SayCommandListener, HookMode.Pre);
-    }
-
-    protected override void OnAllPluginsLoaded()
-    {
-        _mcsRtvController = ServiceProvider.GetRequiredService<McsRtvController>();
-        _mcsMapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
     }
 
     protected override void OnUnloadModule()

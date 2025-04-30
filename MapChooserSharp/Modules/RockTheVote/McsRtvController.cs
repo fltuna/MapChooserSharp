@@ -72,8 +72,20 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         services.AddSingleton(this);
     }
 
-    protected override void OnInitialize()
+    protected override void OnAllPluginsLoaded()
     {
+        _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
+        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
+        _mcsMapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
+        
+        _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
+        _mcsEventManager.RegisterEventHandler<McsMapNotChangedEvent>(OnMapNotChanged);
+        _mcsEventManager.RegisterEventHandler<McsMapExtendEvent>(OnMapExtended);
+            
+        _mcsEventManager.RegisterEventHandler<McsMapVoteInitiatedEvent>(OnMapVoteInitialization);
+        _mcsEventManager.RegisterEventHandler<McsMapVoteCancelledEvent>(OnVoteCancelled);
+        
+        
         Plugin.RegisterListener<Listeners.OnMapStart>((mapName) =>
         {
             RtvCommandStatus = RtvStatus.Enabled;
@@ -102,20 +114,6 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         {
             CountsRequiredToInitiateRtv = (int)Math.Truncate(Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }) * RtvVoteStartThreshold.Value);
         }
-    }
-
-    protected override void OnAllPluginsLoaded()
-    {
-        _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
-        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
-        _mcsMapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
-        
-        _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
-        _mcsEventManager.RegisterEventHandler<McsMapNotChangedEvent>(OnMapNotChanged);
-        _mcsEventManager.RegisterEventHandler<McsMapExtendEvent>(OnMapExtended);
-            
-        _mcsEventManager.RegisterEventHandler<McsMapVoteInitiatedEvent>(OnMapVoteInitialization);
-        _mcsEventManager.RegisterEventHandler<McsMapVoteCancelledEvent>(OnVoteCancelled);
     }
 
     protected override void OnUnloadModule()
