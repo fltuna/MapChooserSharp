@@ -333,8 +333,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             count--;
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
 
-        var voteInitiatedEvent = new McsMapVoteInitiatedEvent(Plugin.PluginPrefix);
-        _mcsEventManager.FireEventNoResult(voteInitiatedEvent);
+        FireVoteInitiatedEvent();
         return McsMapVoteState.InitializeAccepted;
     }
 
@@ -359,8 +358,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         ShowVoteMenu(voteParticipants);
 
         _mapVoteTimer = Plugin.AddTimer(TEMP_MAP_VOTE_END_TIME, EndVote, TimerFlags.STOP_ON_MAPCHANGE);
-        var voteStartedEvent = new McsMapVoteStartedEvent(Plugin.PluginPrefix);
-        _mcsEventManager.FireEventNoResult(voteStartedEvent);
+
+        FireVoteStartedEvent();
     }
     
     private void EndVote()
@@ -443,6 +442,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NextMapConfirmed", winMap.MapConfig.MapName, $"{mapVotePercentage:F2}", totalVotes);
 
+        FireVoteFinishedEvent();
         FireNextMapConfirmedEvent(winMap.MapConfig);
         EndVotePostInitialization();
         CurrentVoteState = McsMapVoteState.NextMapConfirmed;
@@ -520,9 +520,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             _countdownUiController.ShowCountdownToAll(count);
             count--;
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
-        
-        var voteInitiatedEvent = new McsMapVoteInitiatedEvent(Plugin.PluginPrefix);
-        _mcsEventManager.FireEventNoResult(voteInitiatedEvent);
+
+        FireVoteInitiatedEvent();
     }
 
     private void StartRunOffVote()
@@ -548,9 +547,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         ShowVoteMenu(voteParticipants);
 
         _mapVoteTimer = Plugin.AddTimer(TEMP_MAP_VOTE_END_TIME, EndRunoffVote, TimerFlags.STOP_ON_MAPCHANGE);
-    
-        var voteStartedEvent = new McsMapVoteStartedEvent(Plugin.PluginPrefix);
-        _mcsEventManager.FireEventNoResult(voteStartedEvent);
+
+        FireVoteStartedEvent();
     }
 
     private void EndRunoffVote()
@@ -624,7 +622,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         float mapVotePercentage = (float)winMap.GetVoters().Count / totalVotes * 100.0F;
 
         PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NextMapConfirmed", winMap.MapConfig.MapName, $"{mapVotePercentage:F2}", totalVotes);
-        
+
+        FireVoteFinishedEvent();
         FireNextMapConfirmedEvent(winMap.MapConfig);
         
         EndVotePostInitialization();
@@ -687,21 +686,41 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
     private void FireNextMapConfirmedEvent(IMapConfig mapConfig)
     {
-        var confirmedEvent = new McsNextMapConfirmedEvent(Plugin.PluginPrefix, mapConfig);
+        var confirmedEvent = new McsNextMapConfirmedEvent(LocalizeString(Plugin.PluginPrefix), mapConfig);
         _mcsEventManager.FireEventNoResult(confirmedEvent);
     }
 
     private void FireMapNotChangedEvent()
     {
-        var notChangedEvent = new McsMapNotChangedEvent(Plugin.PluginPrefix);
+        var notChangedEvent = new McsMapNotChangedEvent(LocalizeString(Plugin.PluginPrefix));
         _mcsEventManager.FireEventNoResult(notChangedEvent);
     }
 
     private void FireMapExtendEvent(int extendTime, McsMapExtendType extendType)
     {
-        var extendEvent = new McsMapExtendEvent(Plugin.PluginPrefix, extendTime, extendType);
+        var extendEvent = new McsMapExtendEvent(LocalizeString(Plugin.PluginPrefix), extendTime, extendType);
         _mcsEventManager.FireEventNoResult(extendEvent);
     }
+
+    private void FireVoteInitiatedEvent()
+    {
+        var voteInitiatedEvent = new McsMapVoteInitiatedEvent(LocalizeString(Plugin.PluginPrefix));
+        _mcsEventManager.FireEventNoResult(voteInitiatedEvent);
+    }
+
+    private void FireVoteStartedEvent()
+    {
+        var voteStartedEvent = new McsMapVoteStartedEvent(LocalizeString(Plugin.PluginPrefix));
+        _mcsEventManager.FireEventNoResult(voteStartedEvent);
+    }
+
+    private void FireVoteFinishedEvent()
+    {
+        var voteFinishedEvent = new McsMapVoteFinishedEvent(LocalizeString(Plugin.PluginPrefix));
+        _mcsEventManager.FireEventNoResult(voteFinishedEvent);
+    }
+    
+    
 
     private void ShowVoteMenu(HashSet<int> voteParticipants)
     {
