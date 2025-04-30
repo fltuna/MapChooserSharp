@@ -131,7 +131,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private bool TEMP_SHOW_ALIAS_NAME = true;
     private float TEMP_MAP_VOTE_END_TIME = 15.0F;
     private int TEMP_MAP_VOTE_COUNT_DOWN_TIME = 3;
-    private float TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD = 0.2F;
+    
+    // If vote is not higher than TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD, then it will pick up maps, that higher than this percentage.
+    private float TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD_WHEN_NO_WINNERS = 0.3F;
+    
+    // If vote is higher than this percent, it will end the vote.
+    private float TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD = 0.7F;
 
     private const string IdExtendMap = "MapChooserSharp:ExtendMap";
     private const string IdDontChangeMap = "MapChooserSharp:DontChangeMap";
@@ -736,9 +741,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         int topVotes = sortedVotingMaps.First().GetVoters().Count;
         DebugLogger.LogTrace($"Top voted map: {sortedVotingMaps.First().MapName}, total {topVotes} votes");
-
-
-        float winnerPickupThreshold = TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD;
+        
 
         int totalVotes = AllVotesCount;
         
@@ -752,10 +755,42 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         {
             float votePercentage = (float)map.GetVoters().Count / totalVotes;
             
-            DebugLogger.LogTrace($"{map.MapName} Vote percentage: {votePercentage*100:F1}% > Threshold {winnerPickupThreshold*100:F0}%");
-            if (votePercentage >= winnerPickupThreshold)
+            DebugLogger.LogTrace($"{map.MapName} Vote percentage: {votePercentage*100:F1}% > Threshold {TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD*100:F0}%");
+            if (votePercentage >= TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD)
             {
                 winners.Add(map);
+            }
+        }
+        
+        if (!winners.Any())
+        {
+            DebugLogger.LogDebug($"No winning map found! Picking maps with over {TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD_WHEN_NO_WINNERS*100:F0}% of votes");
+            foreach (IMapVoteData map in sortedVotingMaps)
+            {
+                float votePercentage = (float)map.GetVoters().Count / totalVotes;
+            
+                DebugLogger.LogTrace($"{map.MapName} Vote percentage: {votePercentage*100:F1}% > Threshold {TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD_WHEN_NO_WINNERS*100:F0}%");
+                if (votePercentage >= TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD_WHEN_NO_WINNERS)
+                {
+                    winners.Add(map);
+                }
+            }
+
+            // If only 1 map is higher than TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD_WHEN_NO_WINNERS
+            // Then add 1 more maps
+            if (winners.Count <= 1)
+            {
+                DebugLogger.LogDebug($"Not enough maps for starting vote, we'll pick up one more map for runoff vote.");
+                foreach (IMapVoteData map in sortedVotingMaps)
+                {
+                    if (winners.Count > 1)
+                        break;
+                    
+                    if (winners.Contains(map))
+                        continue;
+                    
+                    winners.Add(map);
+                }
             }
         }
         
