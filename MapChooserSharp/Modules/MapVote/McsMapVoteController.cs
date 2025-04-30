@@ -264,6 +264,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
                 .OrderBy(_ => _random.Next())
                 .Where(map => map.Value.MapCooldown.CurrentCooldown <= 0)
                 .Where(map => !map.Value.OnlyNomination)
+                .Where(map => !map.Value.NominationConfig.RestrictToAllowedUsersOnly)
+                .Where(map => map.Value.NominationConfig.MinPlayers <= Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }))
+                .Where(map => map.Value.NominationConfig.MaxPlayers > Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }))
+                .Where(map => !map.Value.NominationConfig.RequiredPermissions.Any())
+                .Where(map => map.Value.NominationConfig.DaysAllowed.Any() && map.Value.NominationConfig.DaysAllowed.Contains(DateTime.Today.DayOfWeek) )
+                .Where(map => map.Value.NominationConfig.AllowedTimeRanges.Any() && map.Value.NominationConfig.AllowedTimeRanges.Count(range => range.IsInRange(TimeOnly.FromDateTime(DateTime.Now))) < 1 )
                 .Take(numToPick);
 
             foreach (var (key, value) in pickedMaps)
