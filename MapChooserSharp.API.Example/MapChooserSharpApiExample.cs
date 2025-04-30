@@ -1,8 +1,10 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Capabilities;
+using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.Events;
 using MapChooserSharp.API.Events.Nomination;
+using MapChooserSharp.API.Events.RockTheVote;
 
 namespace MapChooserSharp.API.Example;
 
@@ -30,12 +32,16 @@ public class MapChooserSharpApiExample: BasePlugin
         
         _mcsApi.EventSystem.RegisterEventHandler<McsNominationBeginEvent>(OnMapNominationBegin);
         _mcsApi.EventSystem.RegisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
+        _mcsApi.EventSystem.RegisterEventHandler<McsPlayerRtvCastEvent>(OnPlayerRtv);
+        _mcsApi.EventSystem.RegisterEventHandler<McsAdminForceRtvEvent>(OnForceRtv);
     }
 
     public override void Unload(bool hotReload)
     {
         _mcsApi.EventSystem.UnregisterEventHandler<McsNominationBeginEvent>(OnMapNominationBegin);
         _mcsApi.EventSystem.UnregisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
+        _mcsApi.EventSystem.UnregisterEventHandler<McsPlayerRtvCastEvent>(OnPlayerRtv);
+        _mcsApi.EventSystem.UnregisterEventHandler<McsAdminForceRtvEvent>(OnForceRtv);
     }
     
     
@@ -68,5 +74,28 @@ public class MapChooserSharpApiExample: BasePlugin
         {
             Server.PrintToChatAll($"[McsMapNominatedEvent Listener] detected {player.PlayerName} nominated {@event.NominationData.MapConfig.MapName}");
         }
+    }
+
+
+    private McsEventResultWithCallback OnPlayerRtv(McsPlayerRtvCastEvent @event)
+    {
+        Server.PrintToChatAll($"{@event.ModulePrefix} {@event.Player.PlayerName} cast rtv");
+        return McsEventResult.Continue;
+    }
+    
+    private McsEventResultWithCallback OnForceRtv(McsAdminForceRtvEvent @event)
+    {
+        var player = @event.Player;
+
+        if (player == null)
+        {
+            Server.PrintToChatAll($"{@event.ModulePrefix} {ChatColors.DarkRed}CONSOLE{ChatColors.Default} cast force rtv");
+        }
+        else
+        {
+            Server.PrintToChatAll($"{@event.ModulePrefix} {player.PlayerName}cast force rtv");
+        }
+        
+        return McsEventResult.Continue;
     }
 }

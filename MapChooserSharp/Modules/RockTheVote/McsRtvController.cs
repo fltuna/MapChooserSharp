@@ -4,13 +4,16 @@ using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Cvars.Validators;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
+using MapChooserSharp.API.Events;
 using MapChooserSharp.API.Events.MapVote;
+using MapChooserSharp.API.Events.RockTheVote;
 using MapChooserSharp.API.RtvController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
+using TNCSSPluginFoundation.Utils.Entity;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace MapChooserSharp.Modules.RockTheVote;
@@ -129,6 +132,16 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
 
     internal PlayerRtvResult AddPlayerToRtv(CCSPlayerController player)
     {
+        var rtvCastEvent = new McsPlayerRtvCastEvent(player, GetTextWithModulePrefix(""));
+        var result = _mcsEventManager.FireEvent(rtvCastEvent);
+        
+        if (result > McsEventResult.Handled)
+        {
+            DebugLogger.LogInformation("Rtv cast event is cancelled by a another plugin.");
+            return PlayerRtvResult.NotAllowed;
+        }
+        
+        
         if (RtvCommandStatus == RtvStatus.AnotherVoteOngoing)
             return PlayerRtvResult.AnotherVoteOngoing;
         
@@ -168,16 +181,46 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         _mcsMapVoteController.InitiateVote(true);
     }
 
-    internal void EnableRtvCommand()
+    internal void InitiateForceRtvVote(CCSPlayerController? client)
+    {
+        var forceRtvEvent = new McsAdminForceRtvEvent(client, GetTextWithModulePrefix(""));
+        var result = _mcsEventManager.FireEvent(forceRtvEvent);
+        
+        if (result > McsEventResult.Handled)
+        {
+            DebugLogger.LogInformation("Admin force rtv event is cancelled by a another plugin.");
+            return;
+        }
+        
+        if (_mcsMapCycleController.IsNextMapConfirmed)
+        {
+            ChangeToNextMap();
+            return;
+        }
+        
+        string executorName = PlayerUtil.GetPlayerName(client);
+        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.ForceRtv", executorName);
+        
+        EnableRtvCommand();
+        InitiateRtvVote();
+    }
+
+    internal void EnableRtvCommand(CCSPlayerController? client = null)
     {
         RtvCommandStatus = RtvStatus.Enabled;
         RtvCommandUnlockTimer?.Kill();
+
+        string executorName = PlayerUtil.GetPlayerName(client);
+        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.EnabledRtv", executorName);
     }
 
-    internal void DisableRtvCommand()
+    internal void DisableRtvCommand(CCSPlayerController? client = null)
     {
         RtvCommandStatus = RtvStatus.Disabled;
         RtvCommandUnlockTimer?.Kill();
+
+        string executorName = PlayerUtil.GetPlayerName(client);
+        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.DisableRtv", executorName);
     }
 
     internal void ChangeToNextMap()
@@ -201,7 +244,8 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         AlreadyInRtv,
         CommandInCooldown,
         CommandDisabled,
-        AnotherVoteOngoing
+        AnotherVoteOngoing,
+        NotAllowed
     }
 
     internal enum RtvStatus

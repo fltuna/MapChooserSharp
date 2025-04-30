@@ -3,7 +3,10 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
+using MapChooserSharp.API.Events;
+using MapChooserSharp.API.Events.RockTheVote;
 using MapChooserSharp.API.MapVoteController;
+using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,6 +81,10 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
             case McsRtvController.PlayerRtvResult.AnotherVoteOngoing:
                 client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.YouCantRtvWhileVote"));
                 break;
+            
+            case McsRtvController.PlayerRtvResult.NotAllowed:
+                // Do nothing, because this only happen when cancelled through API, so APIs responsibility
+                break;
         }
     }
 
@@ -97,11 +104,8 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
             }
             return;
         }
-
-        string executorName = PlayerUtil.GetPlayerName(client);
-        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.EnabledRtv", executorName);
         
-        _mcsRtvController.EnableRtvCommand();
+        _mcsRtvController.EnableRtvCommand(client);
     }
 
     [RequiresPermissions(@"css/map")]
@@ -119,11 +123,8 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
             }
             return;
         }
-
-        string executorName = PlayerUtil.GetPlayerName(client);
-        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.DisableRtv", executorName);
         
-        _mcsRtvController.DisableRtvCommand();
+        _mcsRtvController.DisableRtvCommand(client);
     }
 
     [RequiresPermissions(@"css/map")]
@@ -142,18 +143,7 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
             return;
         }
 
-    
-        if (_mcsMapCycleController.IsNextMapConfirmed)
-        {
-            _mcsRtvController.ChangeToNextMap();
-            return;
-        }
-        
-        string executorName = PlayerUtil.GetPlayerName(client);
-        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.ForceRtv", executorName);
-        
-        _mcsRtvController.EnableRtvCommand();
-        _mcsRtvController.InitiateRtvVote();
+        _mcsRtvController.InitiateForceRtvVote(client);
     }
 
     private HookResult SayCommandListener(CCSPlayerController? player, CommandInfo info)
