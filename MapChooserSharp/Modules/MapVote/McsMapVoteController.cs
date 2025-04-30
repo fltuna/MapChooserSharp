@@ -686,37 +686,37 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
     private void FireNextMapConfirmedEvent(IMapConfig mapConfig)
     {
-        var confirmedEvent = new McsNextMapConfirmedEvent(LocalizeString(Plugin.PluginPrefix), mapConfig);
+        var confirmedEvent = new McsNextMapConfirmedEvent(GetTextWithPluginPrefix(""), mapConfig);
         _mcsEventManager.FireEventNoResult(confirmedEvent);
     }
 
     private void FireMapNotChangedEvent()
     {
-        var notChangedEvent = new McsMapNotChangedEvent(LocalizeString(Plugin.PluginPrefix));
+        var notChangedEvent = new McsMapNotChangedEvent(GetTextWithPluginPrefix(""));
         _mcsEventManager.FireEventNoResult(notChangedEvent);
     }
 
     private void FireMapExtendEvent(int extendTime, McsMapExtendType extendType)
     {
-        var extendEvent = new McsMapExtendEvent(LocalizeString(Plugin.PluginPrefix), extendTime, extendType);
+        var extendEvent = new McsMapExtendEvent(GetTextWithPluginPrefix(""), extendTime, extendType);
         _mcsEventManager.FireEventNoResult(extendEvent);
     }
 
     private void FireVoteInitiatedEvent()
     {
-        var voteInitiatedEvent = new McsMapVoteInitiatedEvent(LocalizeString(Plugin.PluginPrefix));
+        var voteInitiatedEvent = new McsMapVoteInitiatedEvent(GetTextWithPluginPrefix(""));
         _mcsEventManager.FireEventNoResult(voteInitiatedEvent);
     }
 
     private void FireVoteStartedEvent()
     {
-        var voteStartedEvent = new McsMapVoteStartedEvent(LocalizeString(Plugin.PluginPrefix));
+        var voteStartedEvent = new McsMapVoteStartedEvent(GetTextWithPluginPrefix(""));
         _mcsEventManager.FireEventNoResult(voteStartedEvent);
     }
 
     private void FireVoteFinishedEvent()
     {
-        var voteFinishedEvent = new McsMapVoteFinishedEvent(LocalizeString(Plugin.PluginPrefix));
+        var voteFinishedEvent = new McsMapVoteFinishedEvent(GetTextWithPluginPrefix(""));
         _mcsEventManager.FireEventNoResult(voteFinishedEvent);
     }
     
