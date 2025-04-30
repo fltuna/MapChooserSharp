@@ -1,8 +1,12 @@
-﻿using CounterStrikeSharp.API;
+﻿using System.Text;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.MapVoteController;
+using MapChooserSharp.API.Nomination.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
@@ -31,6 +35,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
         
         Plugin.AddCommand("css_nominate", "Nominate a map", CommandNominateMap);
+        Plugin.AddCommand("css_nomlist", "Shows nomination list", CommandNomList);
         Plugin.AddCommand("css_nominate_addmap", "Insert a map to nomination", CommandNominateAddMap);
         Plugin.AddCommand("css_nominate_removemap", "Remove a map from nomination", CommandNominateRemoveMap);
     }
@@ -38,6 +43,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
     protected override void OnUnloadModule()
     {
         Plugin.RemoveCommand("css_nominate", CommandNominateMap);
+        Plugin.RemoveCommand("css_nomlist", CommandNomList);
         Plugin.RemoveCommand("css_nominate_addmap", CommandNominateAddMap);
         Plugin.RemoveCommand("css_nominate_removemap", CommandNominateRemoveMap);
     }
@@ -223,5 +229,83 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
 
         // TODO() Remove map
         _mapNominationController.RemoveNomination(player, matchedMaps.First().Key);
+    }
+
+
+    private void CommandNomList(CCSPlayerController? player, CommandInfo info)
+    {
+        if (player == null)
+            return;
+
+        if (_mapNominationController.NominatedMaps.Count < 1)
+        {
+            player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "NominationList.Command.Notification.ThereIsNoNomination"));
+            return;
+        }
+        
+        
+        player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "NominationList.Command.Notification.ListHeader"));
+
+        bool isVerbose = false;
+
+        if (info.ArgCount > 1)
+        {
+            if (info.ArgByIndex(1).Equals("full"))
+            {
+                isVerbose = true;
+            }
+        }
+        
+        int index = 1;
+        foreach (var (key, value) in _mapNominationController.NominatedMaps)
+        {
+            PrintNominatedMap(player, key, index, value, isVerbose);
+            index++;
+        }
+    }
+
+    private void PrintNominatedMap(CCSPlayerController player, string mapName, int index, IMcsNominationData nominationData, bool isVerbose = false)
+    {
+        StringBuilder nominatedText = new StringBuilder();
+
+        if (isVerbose)
+        {
+            StringBuilder nominators = new StringBuilder();
+
+            if (nominationData.IsForceNominated)
+            {
+                nominators.Append(LocalizeStringForPlayer(player, "NominationList.Command.Notification.AdminNomination"));
+            }
+            else
+            {
+                foreach (int participantSlot in nominationData.NominationParticipants)
+                {
+                    var target = Utilities.GetPlayerFromSlot(participantSlot);
+                    
+                    if (target == null)
+                        continue;
+                    
+                    nominators.Append($"{LocalizeStringForPlayer(player, "NominationList.Command.Notification.Verbose.PlayerName", target.PlayerName)}, ");
+                }
+            }
+            
+            
+                
+                
+            nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Verbose", index, mapName, nominators.ToString()));
+        }
+        else
+        {
+            if (nominationData.IsForceNominated)
+            {
+                nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Verbose", index, mapName, LocalizeStringForPlayer(player, "NominationList.Command.Notification.AdminNomination")));
+            }
+            else
+            {
+                nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Content", index, mapName, nominationData.NominationParticipants.Count));
+            }
+        }
+        
+        player.PrintToChat(GetTextWithModulePrefixForPlayer(player, nominatedText.ToString()));
     }
 }
