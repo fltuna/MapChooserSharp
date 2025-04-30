@@ -8,6 +8,7 @@ using CounterStrikeSharp.API.Modules.Timers;
 using MapChooserSharp.API.Events.MapVote;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapVoteController;
+using MapChooserSharp.API.Nomination.Interfaces;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
@@ -17,6 +18,7 @@ using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.MapVote.Menus.Interfaces;
 using MapChooserSharp.Modules.MapVote.Menus.SimpleHtml;
 using MapChooserSharp.Modules.MapVote.Models;
+using MapChooserSharp.Modules.Nomination;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 using TNCSSPluginFoundation.Utils.Entity;
@@ -34,6 +36,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private IMcsInternalEventManager _mcsEventManager = null!;
     private IMapConfigProvider _mapConfigProvider = null!;
     private McsMapCycleController _mapCycleController = null!;
+    private McsMapNominationController _mapNominationController = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
     private IMcsMapVoteUiFactory _voteUiFactory = null!;
     
@@ -52,6 +55,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     protected override void OnAllPluginsLoaded()
     {
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
+        _mapNominationController = ServiceProvider.GetRequiredService<McsMapNominationController>();
         _voteUiFactory = ServiceProvider.GetRequiredService<IMcsMapVoteUiFactory>();
         _countdownUiController = ServiceProvider.GetRequiredService<McsCountdownUiController>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
@@ -153,6 +157,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         List<IMapVoteData> mapsToVote = new();
         List<IMcsVoteOption> voteOptions = new();
 
+        
+        
         void AddToVotingMaps(string mapName)
         {
             // If map is already added to voting maps
@@ -189,9 +195,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return McsMapVoteState.Cancelling;
         }
         
-        // TODO() Add maps from nomination
-        
-        
         
         if (isActivatedByRtv)
         {
@@ -209,6 +212,31 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             IMapVoteData voteData = new MapVoteData(null, IdExtendMap);
             mapsToVote.Add(voteData);
         }
+        
+        
+        Dictionary<string, IMcsNominationData> adminNominations = _mapNominationController
+            .NominatedMaps
+            .Where(v => v.Value.IsForceNominated)
+            .ToDictionary();
+
+        
+        Dictionary<string, IMcsNominationData> sortedNominatedMaps = _mapNominationController
+            .NominatedMaps
+            .OrderByDescending(v => v.Value.NominationParticipants.Count)
+            .ToDictionary();
+        
+        
+        DebugLogger.LogDebug("Adding admin nominated maps to vote map list");
+        foreach (var (key, value) in adminNominations)
+        {
+            AddToVotingMaps(key);
+        }
+        
+        DebugLogger.LogDebug("Adding nominated maps to vote map list");
+        foreach (var (key, value) in sortedNominatedMaps)
+        {
+            AddToVotingMaps(key);
+        }
 
 
 
@@ -216,10 +244,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         HashSet<int> voteParticipants = Utilities.GetPlayers().Where(p => p is { IsHLTV: false, IsBot: false }).Select(p => p.Slot).ToHashSet();
         DebugLogger.LogDebug($"Possible participants count: {voteParticipants.Count}");
         
-        DebugLogger.LogDebug("Adding admin nominated maps to vote map list");
-        
-        
-        DebugLogger.LogDebug("Adding nominated maps to vote map list");
 
         
         
