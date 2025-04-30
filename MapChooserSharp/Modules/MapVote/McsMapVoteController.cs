@@ -819,7 +819,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         _mapVoteContent.GetVotingMaps()[voteIndex].AddVoter(player.Slot);
         _mapVoteContent.VoteUi.CloseMenu(player);
 
-        if (AllVotesCount >= _mapVoteContent.GetVoteParticipants().Count && false)
+        if (AllVotesCount >= _mapVoteContent.GetVoteParticipants().Count)
         {
             if (CurrentVoteState == McsMapVoteState.Voting)
             {
