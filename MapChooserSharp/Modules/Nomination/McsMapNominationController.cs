@@ -47,6 +47,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         
         
         _mcsEventManager.RegisterEventHandler<McsMapVoteFinishedEvent>(OnVoteFinished);
+        _mcsEventManager.RegisterEventHandler<McsMapVoteCancelledEvent>(OnVoteCancelled);
         
         Plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);
     }
@@ -58,10 +59,17 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
 
     protected override void OnUnloadModule()
     {
+        _mcsEventManager.UnregisterEventHandler<McsMapVoteFinishedEvent>(OnVoteFinished);
+        _mcsEventManager.UnregisterEventHandler<McsMapVoteCancelledEvent>(OnVoteCancelled);
     }
 
 
     private void OnVoteFinished(McsMapVoteFinishedEvent @event)
+    {
+        ResetNominations();
+    }
+
+    private void OnVoteCancelled(McsMapVoteCancelledEvent @event)
     {
         ResetNominations();
     }

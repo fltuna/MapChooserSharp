@@ -69,6 +69,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         Plugin.AddCommand("css_cancelvote", "test", CommandTestCancelVote);
         Plugin.AddCommand("css_removevote", "test", CommandTestRemoveVote);
         Plugin.AddCommand("css_loltest", "test", CommandTestInsertVote);
+        Plugin.AddCommand("css_state", "test", CommandTestCurrentState);
     }
 
     protected override void OnAllPluginsLoaded()
@@ -88,6 +89,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         Plugin.RemoveCommand("css_cancelvote", CommandTestCancelVote);
         Plugin.RemoveCommand("css_removevote", CommandTestRemoveVote);
         Plugin.RemoveCommand("css_loltest", CommandTestInsertVote);
+        Plugin.RemoveCommand("css_state", CommandTestCurrentState);
     }
 
     private void CommandTestInsertVote(CCSPlayerController? player, CommandInfo info)
@@ -171,7 +173,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
     private void CommandTestCancelVote(CCSPlayerController? player, CommandInfo info)
     {
-        CancelVote();
+        CancelVote(player);
+    }
+
+    private void CommandTestCurrentState(CCSPlayerController? player, CommandInfo info)
+    {
+        info.ReplyToCommand($"{CurrentVoteState}");
     }
     
     private void CommandTestRemoveVote(CCSPlayerController? player, CommandInfo info)
@@ -644,6 +651,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return CurrentVoteState;
         }
 
+        FireVoteCancelEvent();
         EndVotePostInitialization();
 
         string executorName = PlayerUtil.GetPlayerName(player);
@@ -718,6 +726,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     {
         var voteFinishedEvent = new McsMapVoteFinishedEvent(GetTextWithPluginPrefix(""));
         _mcsEventManager.FireEventNoResult(voteFinishedEvent);
+    }
+
+    private void FireVoteCancelEvent()
+    {
+        var voteCancelledEvent = new McsMapVoteCancelledEvent(GetTextWithPluginPrefix(""));
+        _mcsEventManager.FireEventNoResult(voteCancelledEvent);
     }
     
     

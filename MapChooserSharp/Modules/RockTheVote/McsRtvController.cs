@@ -115,6 +115,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         _mcsEventManager.RegisterEventHandler<McsMapExtendEvent>(OnMapExtended);
             
         _mcsEventManager.RegisterEventHandler<McsMapVoteInitiatedEvent>(OnMapVoteInitialization);
+        _mcsEventManager.RegisterEventHandler<McsMapVoteCancelledEvent>(OnVoteCancelled);
     }
 
     protected override void OnUnloadModule()
@@ -124,6 +125,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         _mcsEventManager.UnregisterEventHandler<McsMapExtendEvent>(OnMapExtended);
         
         _mcsEventManager.UnregisterEventHandler<McsMapVoteInitiatedEvent>(OnMapVoteInitialization);
+        _mcsEventManager.UnregisterEventHandler<McsMapVoteCancelledEvent>(OnVoteCancelled);
     }
     
     
@@ -201,15 +203,18 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         string executorName = PlayerUtil.GetPlayerName(client);
         PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.ForceRtv", executorName);
         
-        EnableRtvCommand();
+        EnableRtvCommand(client, true);
         InitiateRtvVote();
     }
 
-    internal void EnableRtvCommand(CCSPlayerController? client = null)
+    internal void EnableRtvCommand(CCSPlayerController? client, bool silently = false)
     {
         RtvCommandStatus = RtvStatus.Enabled;
         RtvCommandUnlockTimer?.Kill();
 
+        if (silently)
+            return;
+        
         string executorName = PlayerUtil.GetPlayerName(client);
         PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.EnabledRtv", executorName);
     }
@@ -274,6 +279,11 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
     {
         ResetRtvStatus();
         CreateRtvCommandUnlockTimer(RtvCommandUnlockTimeOverride.MapExtended);
+    }
+
+    private void OnVoteCancelled(McsMapVoteCancelledEvent @event)
+    {
+        ResetRtvStatus();
     }
 
     private void OnMapVoteInitialization(McsMapVoteInitiatedEvent @event)
