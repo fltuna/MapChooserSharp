@@ -6,6 +6,7 @@ using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities;
 using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.Interfaces;
+using MapChooserSharp.Modules.MapConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -30,6 +31,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         Plugin.AddCommand("css_timeleft", "Show timeleft", CommandTimeLeft);
         Plugin.AddCommand("css_nextmap", "Show next map", CommandNextMap);
         Plugin.AddCommand("css_currentmap", "Show current map", CommandCurrentMap);
+        Plugin.AddCommand("css_mapinfo", "Show current map's information if available", CommandMapInfo);
         Plugin.AddCommandListener("say", SayCommandListener, HookMode.Pre);
     }
 
@@ -38,6 +40,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         Plugin.RemoveCommand("css_timeleft", CommandTimeLeft);
         Plugin.RemoveCommand("css_nextmap", CommandNextMap);
         Plugin.RemoveCommand("css_currentmap", CommandCurrentMap);
+        Plugin.RemoveCommand("css_mapinfo", CommandMapInfo);
         Plugin.RemoveCommandListener("say", SayCommandListener, HookMode.Pre);
     }
 
@@ -144,6 +147,23 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
             {
                 player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.CurrentMap", Server.MapName));
             }
+        }
+    }
+
+    private void CommandMapInfo(CCSPlayerController? player, CommandInfo info)
+    {
+        if (player == null)
+            return;
+        
+        var currentMap = _mapCycleController.CurrentMap;
+        
+        if (currentMap != null && currentMap.MapDescription != string.Empty)
+        {
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo", currentMap.MapDescription));
+        }
+        else
+        {
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.NotAvailable"));
         }
     }
     

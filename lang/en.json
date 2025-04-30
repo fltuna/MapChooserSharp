@@ -65,6 +65,8 @@
     "MapVote.Broadcast.VoteResult.ExtendForRound": "Map is extended for {lime}{0}{default} rounds",
     "MapCycle.Command.Notification.NextMap": "Next map: {lime}{0}{default}",
     "MapCycle.Command.Notification.CurrentMap": "Current map: {lime}{0}{default}",
+    "MapCycle.Command.Notification.MapInfo": "Map info: {0}",
+    "MapCycle.Command.Notification.MapInfo.NotAvailable": "No map info avaialbe in this map",
     "MapCycle.Command.Notification.TimeLeft": "Timeleft: {lime}{0}{default}",
     "MapCycle.Command.Notification.TimeLeft.TimeFormat.Hours": "{0} hours {1} minutes {2} seconds",
     "MapCycle.Command.Notification.TimeLeft.TimeFormat.Minutes": "{0} minutes {1} seconds",
