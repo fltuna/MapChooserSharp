@@ -63,13 +63,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         {
             CurrentVoteState = McsMapVoteState.NoActiveVote;
         });
-        
-        Plugin.AddCommand("css_startvote", "test", CommandStartVote);
-        Plugin.AddCommand("css_revote", "test", CommandTestRevote);
-        Plugin.AddCommand("css_cancelvote", "test", CommandTestCancelVote);
-        Plugin.AddCommand("css_removevote", "test", CommandTestRemoveVote);
-        Plugin.AddCommand("css_loltest", "test", CommandTestInsertVote);
-        Plugin.AddCommand("css_state", "test", CommandTestCurrentState);
     }
 
     protected override void OnAllPluginsLoaded()
@@ -83,23 +76,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     protected override void OnUnloadModule()
     {
         Plugin.RemoveListener<Listeners.OnClientDisconnect>(OnClientDisconnect);
-        
-        Plugin.RemoveCommand("css_startvote", CommandStartVote);
-        Plugin.RemoveCommand("css_revote", CommandTestRevote);
-        Plugin.RemoveCommand("css_cancelvote", CommandTestCancelVote);
-        Plugin.RemoveCommand("css_removevote", CommandTestRemoveVote);
-        Plugin.RemoveCommand("css_loltest", CommandTestInsertVote);
-        Plugin.RemoveCommand("css_state", CommandTestCurrentState);
-    }
-
-    private void CommandTestInsertVote(CCSPlayerController? player, CommandInfo info)
-    {
-        if (player == null)
-            return;
-        
-        
-        _mapVoteContent!.GetVotingMaps()[0].AddVoter(player.Slot);
-        _mapVoteContent!.GetVotingMaps()[1].AddVoter(player.Slot);
     }
     
 
@@ -155,41 +131,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private IMapVoteContent? _mapVoteContent;
 
     private Timer? _mapVoteTimer;
-
-    #region TestCommands
-    
-    private void CommandStartVote(CCSPlayerController? player, CommandInfo info)
-    {
-        InitiateVote();
-    }
-
-    private void CommandTestRevote(CCSPlayerController? player, CommandInfo info)
-    {
-        if (player == null)
-            return;
-
-        PlayerReVote(player);
-    }
-
-    private void CommandTestCancelVote(CCSPlayerController? player, CommandInfo info)
-    {
-        CancelVote(player);
-    }
-
-    private void CommandTestCurrentState(CCSPlayerController? player, CommandInfo info)
-    {
-        info.ReplyToCommand($"{CurrentVoteState}");
-    }
-    
-    private void CommandTestRemoveVote(CCSPlayerController? player, CommandInfo info)
-    {
-        if (player == null)
-            return;
-        
-        RemovePlayerVote(player.Slot);
-    }
-    
-    #endregion
 
     #region Vote Logic
     
@@ -844,6 +785,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return;
         }
 
+        DebugLogger.LogDebug($"Player {player.PlayerName} is trying to revote");
         RemovePlayerVote(player.Slot);
         
         _mapVoteContent.VoteUi.OpenMenu(player);
@@ -877,7 +819,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         _mapVoteContent.GetVotingMaps()[voteIndex].AddVoter(player.Slot);
         _mapVoteContent.VoteUi.CloseMenu(player);
 
-        if (AllVotesCount >= _mapVoteContent.GetVoteParticipants().Count)
+        if (AllVotesCount >= _mapVoteContent.GetVoteParticipants().Count && false)
         {
             if (CurrentVoteState == McsMapVoteState.Voting)
             {

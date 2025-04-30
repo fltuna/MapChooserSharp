@@ -5,6 +5,7 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
+using MapChooserSharp.Modules.MapVote;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 
@@ -17,18 +18,29 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
     private IMapConfigProvider _mapConfigProvider = null!;
+    private McsMapVoteController _mcsMapVoteController = null!;
     
     protected override void OnAllPluginsLoaded()
     {
+        _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
+        
         Plugin.AddCommand("mcs_maplist", "", CommandMapList);
         Plugin.AddCommand("mcs_mapinfo", "", CommandMapInfo);
-        _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        Plugin.AddCommand("css_startvote", "test", CommandStartVote);
+        Plugin.AddCommand("css_cancelvote", "test", CommandTestCancelVote);
+        Plugin.AddCommand("css_removevote", "test", CommandTestRemoveVote);
+        Plugin.AddCommand("css_state", "test", CommandTestCurrentState);
     }
 
     protected override void OnUnloadModule()
     {
         Plugin.RemoveCommand("mcs_maplist", CommandMapList);
         Plugin.RemoveCommand("mcs_mapinfo", CommandMapInfo);
+        Plugin.RemoveCommand("css_startvote", CommandStartVote);
+        Plugin.RemoveCommand("css_cancelvote", CommandTestCancelVote);
+        Plugin.RemoveCommand("css_removevote", CommandTestRemoveVote);
+        Plugin.RemoveCommand("css_state", CommandTestCurrentState);
     }
 
     private void CommandMapList(CCSPlayerController? client, CommandInfo info)
@@ -137,5 +149,30 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
         {
             info.ReplyToCommand("None");
         }
+    }
+    
+    
+
+    private void CommandStartVote(CCSPlayerController? player, CommandInfo info)
+    {
+        _mcsMapVoteController.InitiateVote();
+    }
+
+    private void CommandTestCancelVote(CCSPlayerController? player, CommandInfo info)
+    {
+        _mcsMapVoteController.CancelVote(player);
+    }
+
+    private void CommandTestCurrentState(CCSPlayerController? player, CommandInfo info)
+    {
+        info.ReplyToCommand($"{_mcsMapVoteController.CurrentVoteState}");
+    }
+    
+    private void CommandTestRemoveVote(CCSPlayerController? player, CommandInfo info)
+    {
+        if (player == null)
+            return;
+        
+        _mcsMapVoteController.RemovePlayerVote(player.Slot);
     }
 }
