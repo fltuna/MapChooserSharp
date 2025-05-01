@@ -18,25 +18,26 @@ public class McsMapVoteMenuProvider(IServiceProvider serviceProvider) : PluginMo
     
     private readonly Dictionary<int, McsSupportedMenuType> _playerVoteMenuTypes = new();
     private readonly Dictionary<McsSupportedMenuType, IMcsMapVoteUiFactory> _uiFactories = new();
-    
+
+    private const McsSupportedMenuType FallBackMenuType = McsSupportedMenuType.BuiltInHtml;
     
     public IMcsMapVoteUserInterface CreateNewVoteUi(CCSPlayerController player)
     {
         // Fallback if player's menu type is not set
         if (!_playerVoteMenuTypes.TryGetValue(player.Slot, out var playerMenuType))
-            return _uiFactories[McsSupportedMenuType.BuiltInHtml].Create(player);
+            return _uiFactories[FallBackMenuType].Create(player);
 
 
         // Fallback if player's specified menu type is not avaiable in server
         if (!_pluginConfigProvider.PluginConfig.VoteConfig.AvailableMenuTypes.Contains(playerMenuType))
         {
-            return _uiFactories[McsSupportedMenuType.BuiltInHtml].Create(player);
+            return _uiFactories[FallBackMenuType].Create(player);
         }
 
         // Fallback if player's specified menu type is not initialized or avaialbe in provider
         if (!_uiFactories.TryGetValue(playerMenuType, out var uiFactory))
         {
-            return _uiFactories[McsSupportedMenuType.BuiltInHtml].Create(player);
+            return _uiFactories[FallBackMenuType].Create(player);
         }
 
         return uiFactory.Create(player);
