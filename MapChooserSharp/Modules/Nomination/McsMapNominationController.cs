@@ -257,7 +257,8 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         if (_mcsMapVoteController.CurrentVoteState != McsMapVoteState.NoActiveVote)
             return NominationCheck.DisabledAtThisTime;
 
-        if (mapConfig.MapCooldown.CurrentCooldown > 0)
+        
+        if (GetHighestCooldown(mapConfig) > 0)
             return NominationCheck.MapIsInCooldown;
 
         INominationConfig nominationConfig = mapConfig.NominationConfig;
@@ -345,7 +346,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
                 return false;
             
             case NominationCheck.MapIsInCooldown:
-                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.MapIsInCooldown", mapConfig.MapName, mapConfig.MapCooldown.CurrentCooldown));
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.MapIsInCooldown", mapConfig.MapName, GetHighestCooldown(mapConfig)));
                 return false;
             
             case NominationCheck.AlreadyNominated:
@@ -359,7 +360,22 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         
         return false;
     }
+
     
+    private int GetHighestCooldown(IMapConfig mapConfig)
+    {
+        int highestCooldown = mapConfig.MapCooldown.CurrentCooldown;
+        
+        foreach (IMapGroupSettings groupSetting in mapConfig.GroupSettings)
+        {
+            if (groupSetting.GroupCooldown.CurrentCooldown > highestCooldown)
+            {
+                highestCooldown = groupSetting.GroupCooldown.CurrentCooldown;
+            }
+        }
+
+        return highestCooldown;
+    }
     
     private void ResetNominations()
     {
