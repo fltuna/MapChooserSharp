@@ -1,13 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using CounterStrikeSharp.API.Modules.Menu;
 using MapChooserSharp.API.MapConfig;
-using MapChooserSharp.Modules.MapVote.Menus.Interfaces;
+using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 
 namespace MapChooserSharp.Modules.MapVote.Interfaces;
 
 public interface IMapVoteContent
 {
-    public IMcsMapVoteUserInterface VoteUi { get; }
+    public Dictionary<int, IMcsMapVoteUserInterface> VoteUi { get; }
     public bool IsRtvVote { get; }
     
 

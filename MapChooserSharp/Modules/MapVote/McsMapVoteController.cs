@@ -15,9 +15,10 @@ using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote.Countdown;
 using MapChooserSharp.Modules.MapVote.Countdown.Interfaces;
 using MapChooserSharp.Modules.MapVote.Interfaces;
-using MapChooserSharp.Modules.MapVote.Menus.Interfaces;
-using MapChooserSharp.Modules.MapVote.Menus.SimpleHtml;
 using MapChooserSharp.Modules.MapVote.Models;
+using MapChooserSharp.Modules.McsMenu.VoteMenu;
+using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
+using MapChooserSharp.Modules.McsMenu.VoteMenu.SimpleHtml;
 using MapChooserSharp.Modules.Nomination;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,8 +41,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private McsMapCycleController _mapCycleController = null!;
     private McsMapNominationController _mapNominationController = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
-    private IMcsMapVoteUiFactory _voteUiFactory = null!;
-    
+    private IMcsMapVoteMenuProvider _mcsVoteMenuProvider = null!;
     private McsCountdownUiController _countdownUiController = null!;
     
     
@@ -51,7 +51,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         services.AddSingleton(this);
 
         // TODO() Toggle menu type from config
-        services.AddTransient<IMcsMapVoteUiFactory, McsSimpleHtmlVoteUiFactory>();
 
         TrackVoteSettingsConVar();
     }
@@ -60,7 +59,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     {
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
         _mapNominationController = ServiceProvider.GetRequiredService<McsMapNominationController>();
-        _voteUiFactory = ServiceProvider.GetRequiredService<IMcsMapVoteUiFactory>();
+        _mcsVoteMenuProvider = ServiceProvider.GetRequiredService<IMcsMapVoteMenuProvider>();
         _countdownUiController = ServiceProvider.GetRequiredService<McsCountdownUiController>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
@@ -94,7 +93,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
 
     // TODO() These settings should be plugin config
-    public readonly FakeConVar<int> MaxVoteMenuElements = new("mcs_max_vote_menu_elements", "Max Vote Menu Elements", 6, ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 7));
+    public int MaxVoteMenuElements => _mcsPluginConfigProvider.PluginConfig.VoteConfig.MaxMenuElements;
     public readonly FakeConVar<bool> ShouldShuffleVoteMenu = new("mcs_vote_shuffle_menu", "Should vote menu elements is shuffled?", false);
     public readonly FakeConVar<bool> ShouldUseAliasName = new("mcs_vote_use_alias_name", "Should use alias name if available?", false);
     public readonly FakeConVar<float> MapVoteEndTime = new("mcs_vote_end_time", "How long to take vote ends in seconds?", 15.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(5.0F, 120.0F));
@@ -109,7 +108,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
     private void TrackVoteSettingsConVar()
     {
-        TrackConVar(MaxVoteMenuElements);
         TrackConVar(ShouldShuffleVoteMenu);
         TrackConVar(ShouldUseAliasName);
         TrackConVar(MapVoteEndTime);
@@ -165,8 +163,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         DebugLogger.LogTrace("Initializing MapVoteContent");
         
-        // Respect menu's max elements
-        int maxMenuElements = Math.Min(_voteUiFactory.MaxMenuElements, MaxVoteMenuElements.Value);
+        int maxMenuElements = MaxVoteMenuElements;
     
         Dictionary<string, IMapConfig> mapConfigs = _mapConfigProvider.GetMapConfigs();
         Dictionary<string, IMapConfig> unusedMapPool = new(mapConfigs);
@@ -296,10 +293,25 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             }
         }
         
+        DebugLogger.LogTrace("Create vote ui for players");
+        Dictionary<int, IMcsMapVoteUserInterface> voteUi = new();
+        foreach (int voteParticipant in voteParticipants)
+        {
+            var player = Utilities.GetPlayerFromSlot(voteParticipant);
+            
+            if (player == null)
+                continue;
+            
+            voteUi[voteParticipant] = _mcsVoteMenuProvider.CreateNewVoteUi(player);
+        }
+        
         DebugLogger.LogTrace("Setting vote option");
-        var voteUi = _voteUiFactory.Create();
-        voteUi.SetVoteOptions(voteOptions);
-        voteUi.SetRandomShuffle(ShouldShuffleVoteMenu.Value);
+        
+        foreach (var (key, value) in voteUi)
+        {
+            value.SetVoteOptions(voteOptions);
+            value.SetRandomShuffle(ShouldShuffleVoteMenu.Value);
+        }
         
         
         
@@ -345,7 +357,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         var voteParticipants = _mapVoteContent.GetVoteParticipants();
 
-        ShowVoteMenu(voteParticipants);
+        ShowVoteMenu();
 
         _mapVoteTimer = Plugin.AddTimer(MapVoteEndTime.Value, EndVote, TimerFlags.STOP_ON_MAPCHANGE);
 
@@ -366,12 +378,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         CurrentVoteState = McsMapVoteState.Finalizing;
         
-        foreach (CCSPlayerController player in Utilities.GetPlayers())
+        foreach (var (key, voteUi) in _mapVoteContent.VoteUi)
         {
-            if (player.IsBot || player.IsHLTV)
-                continue;
-            
-            _mapVoteContent.VoteUi.CloseMenu(player);
+            voteUi.CloseMenu();
         }
         
         foreach (IMapVoteData voteData in _mapVoteContent.GetVotingMaps())
@@ -485,11 +494,23 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         HashSet<int> voteParticipants = Utilities.GetPlayers().Where(p => p is { IsHLTV: false, IsBot: false }).Select(p => p.Slot).ToHashSet();
         DebugLogger.LogDebug($"Possible participants count: {voteParticipants.Count}");
         
+        DebugLogger.LogTrace("Create vote ui for players");
+        Dictionary<int, IMcsMapVoteUserInterface> voteUi = new();
+        foreach (CCSPlayerController player in Utilities.GetPlayers())
+        {
+            if (player.IsBot || player.IsHLTV)
+                continue;
+
+            voteUi[player.Slot] = _mcsVoteMenuProvider.CreateNewVoteUi(player);
+        }
         
-        DebugLogger.LogDebug("Setting vote option");
-        var voteUi = _voteUiFactory.Create();
-        voteUi.SetVoteOptions(voteOptions);
-        voteUi.SetRandomShuffle(ShouldShuffleVoteMenu.Value);
+        DebugLogger.LogTrace("Setting vote option");
+        
+        foreach (var (key, value) in voteUi)
+        {
+            value.SetVoteOptions(voteOptions);
+            value.SetRandomShuffle(ShouldShuffleVoteMenu.Value);
+        }
         
         var newVoteContent = new MapVoteContent(voteParticipants, mapsToVote, voteUi, _mapVoteContent?.IsRtvVote ?? false);
         _mapVoteContent = newVoteContent;
@@ -534,7 +555,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         DebugLogger.LogDebug($"Runoff vote participants: {voteParticipants.Count}");
         
-        ShowVoteMenu(voteParticipants);
+        ShowVoteMenu();
 
         _mapVoteTimer = Plugin.AddTimer(MapVoteEndTime.Value, EndRunoffVote, TimerFlags.STOP_ON_MAPCHANGE);
 
@@ -555,12 +576,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     
         CurrentVoteState = McsMapVoteState.Finalizing;
     
-        foreach (CCSPlayerController player in Utilities.GetPlayers())
+        foreach (var (key, voteUi) in _mapVoteContent.VoteUi)
         {
-            if (player.IsBot || player.IsHLTV)
-                continue;
-            
-            _mapVoteContent.VoteUi.CloseMenu(player);
+            voteUi.CloseMenu();
         }
     
         foreach (IMapVoteData voteData in _mapVoteContent.GetVotingMaps())
@@ -634,14 +652,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return CurrentVoteState;
         }
 
-        foreach (int participantSlot in _mapVoteContent!.GetVoteParticipants())
+        foreach (var (key, voteUi) in _mapVoteContent!.VoteUi)
         {
-            var target = Utilities.GetPlayerFromSlot(participantSlot);
-            
-            if (target == null)
-                continue;
-            
-            _mapVoteContent.VoteUi.CloseMenu(target);
+            voteUi.CloseMenu();
         }
         
         FireVoteCancelEvent();
@@ -729,7 +742,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     
     
 
-    private void ShowVoteMenu(HashSet<int> voteParticipants)
+    private void ShowVoteMenu()
     {
         if (_mapVoteContent == null)
         {
@@ -737,15 +750,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return;
         }
         
-        foreach (int participantSlot in voteParticipants)
+        foreach (var (key, voteUi) in _mapVoteContent.VoteUi)
         {
-            CCSPlayerController? player = Utilities.GetPlayerFromSlot(participantSlot);
-            
-            if (player == null)
-                continue;
-            
-            DebugLogger.LogTrace($"Showing menu: {player.PlayerName}");
-            _mapVoteContent?.VoteUi.OpenMenu(player);
+            voteUi.OpenMenu();
         }
     }
     
@@ -836,7 +843,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         if (_mapVoteContent == null)
             return;
 
-        if (!_mapVoteContent.IsPlayerInVoteParticipant(player.Slot))
+        if (!_mapVoteContent.IsPlayerInVoteParticipant(player.Slot) || !_mapVoteContent.VoteUi.TryGetValue(player.Slot, out var voteUi))
         {
             DebugLogger.LogDebug($"Player {player.PlayerName} tried to revote the current vote. but they are not a participant of current vote!");
             return;
@@ -845,7 +852,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         DebugLogger.LogDebug($"Player {player.PlayerName} is trying to revote");
         RemovePlayerVote(player.Slot);
         
-        _mapVoteContent.VoteUi.OpenMenu(player);
+        
+        voteUi.OpenMenu();
     }
 
 
@@ -874,7 +882,15 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         DebugLogger.LogDebug($"Player casted a vote! Player: {player.PlayerName}, VoteIndex: {voteIndex}");
         _mapVoteContent.GetVotingMaps()[voteIndex].AddVoter(player.Slot);
-        _mapVoteContent.VoteUi.CloseMenu(player);
+        
+        
+        if(!_mapVoteContent.VoteUi.TryGetValue(player.Slot, out var voteUi))
+        {
+            DebugLogger.LogDebug($"Player {player.PlayerName} casted the vote. but somehow they are not a participant of current vote so vote menu is failed to close!");
+            return;
+        }
+        
+        voteUi.CloseMenu();
 
         if (AllVotesCount >= _mapVoteContent.GetVoteParticipants().Count)
         {

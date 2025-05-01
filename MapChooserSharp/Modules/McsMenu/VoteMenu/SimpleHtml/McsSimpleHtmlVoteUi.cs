@@ -2,19 +2,19 @@
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Menu;
 using MapChooserSharp.API.MapVoteController;
+using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Interfaces;
-using MapChooserSharp.Modules.MapVote.Menus.Interfaces;
-using MapChooserSharp.Modules.MapVote.Models;
+using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation;
 using TNCSSPluginFoundation.Interfaces;
 
-namespace MapChooserSharp.Modules.MapVote.Menus.SimpleHtml;
+namespace MapChooserSharp.Modules.McsMenu.VoteMenu.SimpleHtml;
 
-public class McsSimpleHtmlVoteUi(IServiceProvider provider) : IMcsMapVoteUserInterface
+public class McsSimpleHtmlVoteUi(CCSPlayerController playerController, IServiceProvider provider) : IMcsMapVoteUserInterface
 {
     private List<IMcsVoteOption> _voteOptions = new();
-    
+
     private bool IsMenuShuffleEnabled { get; set; }
 
     private readonly TncssPluginBase _plugin = provider.GetRequiredService<TncssPluginBase>();
@@ -27,30 +27,30 @@ public class McsSimpleHtmlVoteUi(IServiceProvider provider) : IMcsMapVoteUserInt
 
     public int VoteOptionCount => _voteOptions.Count;
 
-    public void OpenMenu(CCSPlayerController player)
+    public void OpenMenu()
     {
         if (_voteController.CurrentVoteState != McsMapVoteState.Voting && _voteController.CurrentVoteState != McsMapVoteState.RunoffVoting)
             return;
 
         // Unused variable, but it required to decide what language should use in menu.
-        using var tempLang = new WithTemporaryCulture(player.GetLanguage());
+        using var tempLang = new WithTemporaryCulture(playerController.GetLanguage());
         
         
-        _debugLogger.LogTrace($"[Player {player.PlayerName}] Creating vote menu");
-        CenterHtmlMenu menu = new(_plugin.LocalizeStringForPlayer(player, "MapVote.Menu.MenuTitle"), _plugin);
+        _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Creating vote menu");
+        CenterHtmlMenu menu = new(_plugin.LocalizeStringForPlayer(playerController, "MapVote.Menu.MenuTitle"), _plugin);
 
         // If menu option is already exists (this is intended for !revote feature)
-        if (_chachedMenuOptions.TryGetValue(player.Slot, out var menuOps))
+        if (_chachedMenuOptions.TryGetValue(playerController.Slot, out var menuOps))
         {
-            _debugLogger.LogTrace($"[Player {player.PlayerName}] vote menu menu is already cached, reusing...");
+            _debugLogger.LogTrace($"[Player {playerController.PlayerName}] vote menu menu is already cached, reusing...");
             menu.MenuOptions.Clear();
             menu.MenuOptions.AddRange(menuOps);
-            MenuManager.OpenCenterHtmlMenu(_plugin, player, menu);
+            MenuManager.OpenCenterHtmlMenu(_plugin, playerController, menu);
             return;
         }
 
 
-        _debugLogger.LogTrace($"[Player {player.PlayerName}] has no cached menu, creating menu...");
+        _debugLogger.LogTrace($"[Player {playerController.PlayerName}] has no cached menu, creating menu...");
         List<ChatMenuOption> options = new();
 
         foreach (var (option, index) in _voteOptions.Select((value, i) => (value, i)))
@@ -58,36 +58,36 @@ public class McsSimpleHtmlVoteUi(IServiceProvider provider) : IMcsMapVoteUserInt
             string optionText = option.OptionText
                 // If string contains Extend placeholder, then replace it.
                 .Replace(_voteController.PlaceHolderExtendMap,
-                    _plugin.LocalizeStringForPlayer(player, "Word.ExtendMap"))
+                    _plugin.LocalizeStringForPlayer(playerController, "Word.ExtendMap"))
                 // If string contains Don't change placeholder, then replace it.
                 .Replace(_voteController.PlaceHolderDontChangeMap,
-                    _plugin.LocalizeStringForPlayer(player, "Word.DontChangeMap"));
+                    _plugin.LocalizeStringForPlayer(playerController, "Word.DontChangeMap"));
             
             options.Add(new ChatMenuOption(optionText, false, (controller, menuOption) =>
             {
-                _voteOptions[(byte)index].VoteCallback.Invoke(player, (byte)index);
+                _voteOptions[(byte)index].VoteCallback.Invoke(playerController, (byte)index);
             }));
         }
 
         if (IsMenuShuffleEnabled)
         {
-            _debugLogger.LogTrace($"[Player {player.PlayerName}] Shuffling enabled... menu");
-            Random random = new Random();
+            _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Shuffling enabled... menu");
+            Random random = Random.Shared;
             options = options.OrderBy(x => random.Next()).ToList();
         }
         
         menu.MenuOptions.Clear();
         menu.MenuOptions.AddRange(options);
-        _chachedMenuOptions.TryAdd(player.Slot, options);
+        _chachedMenuOptions.TryAdd(playerController.Slot, options);
         
         
-        _debugLogger.LogTrace($"[Player {player.PlayerName}] Menu init completed, opening...");
-        MenuManager.OpenCenterHtmlMenu(_plugin, player, menu);
+        _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Menu init completed, opening...");
+        MenuManager.OpenCenterHtmlMenu(_plugin, playerController, menu);
     }
 
-    public void CloseMenu(CCSPlayerController player)
+    public void CloseMenu()
     {
-        MenuManager.CloseActiveMenu(player);
+        MenuManager.CloseActiveMenu(playerController);
     }
 
     public void SetVoteOptions(List<IMcsVoteOption> voteOptions)

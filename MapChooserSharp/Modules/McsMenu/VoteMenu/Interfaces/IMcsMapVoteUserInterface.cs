@@ -1,16 +1,15 @@
 ﻿using CounterStrikeSharp.API.Core;
 using MapChooserSharp.Modules.MapVote.Interfaces;
-using MapChooserSharp.Modules.MapVote.Models;
 
-namespace MapChooserSharp.Modules.MapVote.Menus.Interfaces;
+namespace MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 
 public interface IMcsMapVoteUserInterface
 {
     public int VoteOptionCount { get; }
     
-    public void OpenMenu(CCSPlayerController player);
+    public void OpenMenu();
 
-    public void CloseMenu(CCSPlayerController player);
+    public void CloseMenu();
 
     public void SetVoteOptions(List<IMcsVoteOption> voteOptions);
 

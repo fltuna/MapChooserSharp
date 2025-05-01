@@ -173,12 +173,18 @@ internal class McsPluginConfigParser(string configPath, IServiceProvider provide
             throw new InvalidOperationException("MapVote.MenuType is not found or invalid");
         }
         
+
+        if (!voteTable.TryGetValue("MaxVoteElements", out var maxVoteElementsObj) || maxVoteElementsObj is not long maxVoteElementsLong)
+        {
+            throw new InvalidOperationException("MapVote.MaxVoteElements is not found or invalid");
+        }
+        
         
         var availableMenus =  _avaiableMenuTypes;
         
         var currentMenuType = DecideMenuType(menuTypeStr, availableMenus);
 
-        return new McsVoteConfig(availableMenus, currentMenuType);
+        return new McsVoteConfig(availableMenus, currentMenuType, (int)maxVoteElementsLong);
     }
 
     
@@ -249,6 +255,11 @@ FallbackExtendRoundsPerExtends = 5
 # What menu type should be use?
 # See GitHub readme for more information.
 MenuType = ""BuiltInHtml""
+
+# How many maps should be appeared in map vote?
+# I would recommend to set 5 when you using BuiltInHtml menu
+MaxVoteElements = 5
+
 
 [Nomination]
 # What menu type should be use?
