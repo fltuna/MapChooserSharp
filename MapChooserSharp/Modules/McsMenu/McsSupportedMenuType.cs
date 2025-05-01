@@ -1,4 +1,4 @@
-﻿namespace MapChooserSharp.Models;
+﻿namespace MapChooserSharp.Modules.McsMenu;
 
 public enum McsSupportedMenuType
 {

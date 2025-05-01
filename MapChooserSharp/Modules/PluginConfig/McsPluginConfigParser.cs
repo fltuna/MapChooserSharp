@@ -1,4 +1,5 @@
 ﻿using MapChooserSharp.Models;
+using MapChooserSharp.Modules.McsMenu;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Models;
 using Microsoft.Extensions.Logging;
