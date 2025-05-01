@@ -16,6 +16,7 @@ using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Countdown;
 using MapChooserSharp.Modules.Nomination;
+using MapChooserSharp.Modules.PluginConfig;
 using MapChooserSharp.Modules.RockTheVote;
 using MapChooserSharp.Util;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +28,7 @@ namespace MapChooserSharp;
 public sealed class MapChooserSharp: TncssPluginBase
 {
     public override string ModuleName => "MapChooserSharp";
-    public override string ModuleVersion => "0.0.1";
+    public override string ModuleVersion => PluginConstants.PluginVersion.ToString();
     public override string ModuleAuthor => "faketuna A.K.A fltuna or tuna";
     public override string ModuleDescription => "Provides basic map cycle functionality.";
 
@@ -55,6 +56,7 @@ public sealed class MapChooserSharp: TncssPluginBase
         }
         
         // Plugin core dependencies
+        RegisterModule<McsPluginConfigRepository>();
         RegisterModule<MapConfigRepository>();
         RegisterModule<McsEventManager>();
         RegisterModule<TimeLeftUtil>(hotReload);

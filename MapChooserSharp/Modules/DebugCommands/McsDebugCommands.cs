@@ -6,6 +6,7 @@ using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 
@@ -18,27 +19,31 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
     private IMapConfigProvider _mapConfigProvider = null!;
+    private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private McsMapVoteController _mcsMapVoteController = null!;
     
     protected override void OnAllPluginsLoaded()
     {
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
         _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
+        _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         
         Plugin.AddCommand("mcs_maplist", "", CommandMapList);
         Plugin.AddCommand("mcs_mapinfo", "", CommandMapInfo);
-        Plugin.AddCommand("css_startvote", "test", CommandStartVote);
-        Plugin.AddCommand("css_removevote", "test", CommandTestRemoveVote);
-        Plugin.AddCommand("css_state", "test", CommandTestCurrentState);
+        Plugin.AddCommand("mcs_startvote", "test", CommandStartVote);
+        Plugin.AddCommand("mcs_removevote", "test", CommandTestRemoveVote);
+        Plugin.AddCommand("mcs_state", "test", CommandTestCurrentState);
+        Plugin.AddCommand("mcs_pluginconf", "", CommandTestPluginConfing);
     }
 
     protected override void OnUnloadModule()
     {
         Plugin.RemoveCommand("mcs_maplist", CommandMapList);
         Plugin.RemoveCommand("mcs_mapinfo", CommandMapInfo);
-        Plugin.RemoveCommand("css_startvote", CommandStartVote);
-        Plugin.RemoveCommand("css_removevote", CommandTestRemoveVote);
-        Plugin.RemoveCommand("css_state", CommandTestCurrentState);
+        Plugin.RemoveCommand("mcs_startvote", CommandStartVote);
+        Plugin.RemoveCommand("mcs_removevote", CommandTestRemoveVote);
+        Plugin.RemoveCommand("mcs_state", CommandTestCurrentState);
+        Plugin.RemoveCommand("mcs_pluginconf", CommandTestPluginConfing);
     }
 
     private void CommandMapList(CCSPlayerController? client, CommandInfo info)
@@ -167,5 +172,24 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
             return;
         
         _mcsMapVoteController.RemovePlayerVote(player.Slot);
+    }
+
+
+    private void CommandTestPluginConfing(CCSPlayerController? player, CommandInfo info)
+    {
+        var config = _mcsPluginConfigProvider.PluginConfig;
+        
+        info.ReplyToCommand("=============== MAP CYCLE SETTINGS ===============");
+        info.ReplyToCommand($"Fallback max extends: {config.MapCycleConfig.FallbackDefaultMaxExtends}");
+        info.ReplyToCommand($"Fallback extend time: {config.MapCycleConfig.FallbackExtendTimePerExtends}");
+        info.ReplyToCommand($"Fallback extend rounds: {config.MapCycleConfig.FallbackExtendRoundsPerExtends}");
+        
+        info.ReplyToCommand("=============== NOMINATION SETTINGS ===============");
+        info.ReplyToCommand($"Avaiable menu types: {string.Join(", ", config.VoteConfig.AvailableMenuTypes)}");
+        info.ReplyToCommand($"Server menu type: {config.VoteConfig.CurrentMenuType}");
+        
+        info.ReplyToCommand("=============== VOTE SETTINGS ===============");
+        info.ReplyToCommand($"Avaiable menu types: {string.Join(", ", config.NominationConfig.AvailableMenuTypes)}");
+        info.ReplyToCommand($"Server menu type: {config.NominationConfig.CurrentMenuType}");
     }
 }

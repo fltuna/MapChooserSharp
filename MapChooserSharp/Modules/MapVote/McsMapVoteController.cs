@@ -19,6 +19,7 @@ using MapChooserSharp.Modules.MapVote.Menus.Interfaces;
 using MapChooserSharp.Modules.MapVote.Menus.SimpleHtml;
 using MapChooserSharp.Modules.MapVote.Models;
 using MapChooserSharp.Modules.Nomination;
+using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 using TNCSSPluginFoundation.Utils.Entity;
@@ -35,6 +36,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     
     private IMcsInternalEventManager _mcsEventManager = null!;
     private IMapConfigProvider _mapConfigProvider = null!;
+    private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private McsMapCycleController _mapCycleController = null!;
     private McsMapNominationController _mapNominationController = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
@@ -62,6 +64,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         _countdownUiController = ServiceProvider.GetRequiredService<McsCountdownUiController>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         
         Plugin.RegisterListener<Listeners.OnClientDisconnect>(OnClientDisconnect);
@@ -135,8 +138,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     internal readonly string PlaceHolderExtendMap = "%PLACE_HOLDER_EXTEND_MAP%";
     internal readonly string PlaceHolderDontChangeMap = "%PLACE_HOLDER_DONT_CHANGE_MAP%";
     
-    private const int FallBackDefaultExtendTime = 15;
-    private const int FallBackDefaultExtendRound = 15;
+    private int FallBackDefaultExtendTime => _mcsPluginConfigProvider.PluginConfig.MapCycleConfig.FallbackExtendTimePerExtends;
+    private int FallBackDefaultExtendRound => _mcsPluginConfigProvider.PluginConfig.MapCycleConfig.FallbackExtendRoundsPerExtends;
 
     private readonly Random _random = new();
     

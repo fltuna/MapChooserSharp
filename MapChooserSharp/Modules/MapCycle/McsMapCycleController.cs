@@ -14,6 +14,7 @@ using MapChooserSharp.Modules.EventManager;
 using MapChooserSharp.Modules.MapConfig;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using MapChooserSharp.Modules.RockTheVote;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,6 +33,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
     private IMcsInternalEventManager _mcsEventManager = null!;
     private IMapConfigProvider _mapConfigProvider = null!;
+    private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private McsMapVoteController _mcsMapVoteController = null!;
     private McsRtvController _mcsRtvController = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
@@ -65,7 +67,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     
     public int ExtendsLeft => ExtendLimit - ExtendCount;
 
-    private const int DefaultMapExtends = 3;
+    private int DefaultMapExtends => _mcsPluginConfigProvider.PluginConfig.MapCycleConfig.FallbackDefaultMaxExtends;
 
 
     private bool _isMapStarted = false;
@@ -94,6 +96,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
         _mcsRtvController = ServiceProvider.GetRequiredService<McsRtvController>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         
