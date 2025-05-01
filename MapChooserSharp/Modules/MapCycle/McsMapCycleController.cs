@@ -1,25 +1,21 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Cvars.Validators;
-using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Timers;
 using MapChooserSharp.API.Events.MapVote;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Interfaces;
-using MapChooserSharp.Modules.EventManager;
-using MapChooserSharp.Modules.MapConfig;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.McsDatabase.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using MapChooserSharp.Modules.RockTheVote;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
-using TNCSSPluginFoundation.Utils.Entity;
 using TNCSSPluginFoundation.Utils.Other;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
@@ -36,6 +32,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private McsMapVoteController _mcsMapVoteController = null!;
     private McsRtvController _mcsRtvController = null!;
+    private IMcsDatabaseProvider _mcsDatabaseProvider = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
 
     
@@ -99,6 +96,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
+        _mcsDatabaseProvider = ServiceProvider.GetRequiredService<IMcsDatabaseProvider>();
         
         _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
         _mcsEventManager.RegisterEventHandler<McsMapExtendEvent>(OnMapExtended);
@@ -182,6 +180,37 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private void OnMapStart(string mapName)
     {
         ExtendCount = 0;
+
+        var previousMap = CurrentMap;
+        
+        // Decrement all cooldowns
+        _mcsDatabaseProvider.MapInfoRepository.DecrementAllCooldownsAsync().ConfigureAwait(false);
+        _mcsDatabaseProvider.GroupInfoRepository.DecrementAllCooldownsAsync().ConfigureAwait(false);
+        foreach (var (key, value) in _mapConfigProvider.GetMapConfigs())
+        {
+            foreach (IMapGroupSettings setting in value.GroupSettings)
+            {
+                if (setting.GroupCooldown.CurrentCooldown > 0)
+                    setting.GroupCooldown.CurrentCooldown--;
+            }
+
+            if (value.MapCooldown.CurrentCooldown > 0)
+                value.MapCooldown.CurrentCooldown--;
+        }
+
+        // Set previous map cooldown if defined in config
+        if (previousMap != null)
+        {
+            _mcsDatabaseProvider.MapInfoRepository.UpsertMapCooldownAsync(previousMap.MapName, previousMap.MapCooldown.MapConfigCooldown).ConfigureAwait(false);
+            previousMap.MapCooldown.CurrentCooldown = previousMap.MapCooldown.MapConfigCooldown;
+            
+            foreach (IMapGroupSettings setting in previousMap.GroupSettings)
+            {
+                _mcsDatabaseProvider.GroupInfoRepository.UpsertGroupCooldownAsync(setting.GroupName, setting.GroupCooldown.MapConfigCooldown).ConfigureAwait(false);
+                setting.GroupCooldown.CurrentCooldown = setting.GroupCooldown.MapConfigCooldown;
+            }
+        }
+        
         
         CurrentMap = NextMap;
         NextMap = null;

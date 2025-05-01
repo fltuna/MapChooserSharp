@@ -219,8 +219,15 @@ internal class MapConfigParser(string configPath)
                 config.GroupSettings
             );
         }
+
+        Dictionary<string, IMapGroupSettings> actualGroupSettings = new();
         
-        return new MapConfigProvider(finalMapConfigs);
+        foreach (var (key, value) in groupConfigs)
+        {
+            actualGroupSettings[key] = new MapGroupSettings(key, new MapCooldown(value.Cooldown ?? 0));
+        }
+        
+        return new MapConfigProvider(finalMapConfigs, actualGroupSettings);
     }
     
     private void VerifyRequiredDefaultSettings(NullableMapConfig defaultConfig)

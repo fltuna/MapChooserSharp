@@ -3,8 +3,14 @@ using MapChooserSharp.Modules.MapConfig.Interfaces;
 
 namespace MapChooserSharp.Modules.MapConfig.Models;
 
-public class MapConfigProvider(Dictionary<string, IMapConfig> mapConfigs): IMapConfigProvider
+public class MapConfigProvider(Dictionary<string, IMapConfig> mapConfigs, Dictionary<string, IMapGroupSettings> groupConfigs): IMapConfigProvider
 {
+    
+    public Dictionary<string, IMapGroupSettings> GetGroupSettings()
+    {
+        return groupConfigs;
+    }
+
     public Dictionary<string, IMapConfig> GetMapConfigs()
     {
         return mapConfigs;

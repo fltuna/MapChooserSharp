@@ -45,6 +45,7 @@ jobs:
       - name: Install dependencies
         run: nuget restore
 
+      # TODO! Use publish and pack dependency
       - name: Build
         run: dotnet build -c Release -p:DebugType=None -p:DebugSymbols=false
 
@@ -58,6 +59,12 @@ jobs:
         run:
           Compress-Archive -Path artifacts/* -Destination MapChooserSharp.zip
 
+      # TODO! Create additional taks to pack required dependency assemblies and create with-runtime zip artifact
+      # - Dapper.dll
+      # - MySqlConnector.dll
+      # - Npgsql.dll
+      # - System.Data.SQLite.dll
+      # - runtimes/*/native/SQLite.Interop.dll
       - name: Upload release assets
         uses: actions/upload-artifact@v4
         with:

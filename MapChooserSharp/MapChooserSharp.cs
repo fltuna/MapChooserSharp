@@ -15,6 +15,7 @@ using MapChooserSharp.Modules.MapConfig;
 using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Countdown;
+using MapChooserSharp.Modules.McsDatabase;
 using MapChooserSharp.Modules.McsMenu.VoteMenu;
 using MapChooserSharp.Modules.Nomination;
 using MapChooserSharp.Modules.PluginConfig;
@@ -61,6 +62,8 @@ public sealed class MapChooserSharp: TncssPluginBase
         RegisterModule<MapConfigRepository>();
         RegisterModule<McsEventManager>();
         RegisterModule<TimeLeftUtil>(hotReload);
+        
+        RegisterModule<McsDatabaseProvider>();
         
         // Plugin core modules
         RegisterModule<McsMapNominationController>();
