@@ -43,5 +43,10 @@ public enum McsMapVoteState
     /// <summary>
     /// Next map confirmed and cannot be start vote.
     /// </summary>
-    NextMapConfirmed
+    NextMapConfirmed,
+    
+    /// <summary>
+    /// When map config counts are not enough to start vote.
+    /// </summary>
+    NotEnoughMapsToStartVote,
 }

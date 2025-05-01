@@ -22,6 +22,7 @@ using MapChooserSharp.Modules.McsMenu.VoteMenu.SimpleHtml;
 using MapChooserSharp.Modules.Nomination;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
 using TNCSSPluginFoundation.Utils.Entity;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
@@ -202,10 +203,10 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         if (mapConfigs.Count < maxMenuElements)
         {
-            DebugLogger.LogWarning("There is no enough maps to initiate vote!");
-            CurrentVoteState = McsMapVoteState.NoActiveVote;
-            
+            Logger.LogError("There is no enough maps to initiate vote! cancelling the vote!");
             PrintLocalizedChatToAll("MapVote.Broadcast.NotEnoughMapsToStartVote");
+            
+            CurrentVoteState = McsMapVoteState.NotEnoughMapsToStartVote;
             return McsMapVoteState.Cancelling;
         }
         
@@ -291,6 +292,15 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
                 DebugLogger.LogTrace($"Adding random map: {key}");
                 AddToVotingMaps(key);
             }
+        }
+
+        if (mapsToVote.Count < 2)
+        {
+            Logger.LogError("There is no enough maps to initiate vote! cancelling the vote!");
+            PrintLocalizedChatToAll("MapVote.Broadcast.NotEnoughMapsToStartVote");
+                
+            CurrentVoteState = McsMapVoteState.NotEnoughMapsToStartVote;
+            return McsMapVoteState.Cancelling;
         }
         
         DebugLogger.LogTrace("Create vote ui for players");
