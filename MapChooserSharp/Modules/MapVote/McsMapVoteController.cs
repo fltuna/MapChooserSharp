@@ -50,6 +50,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         // TODO() Toggle menu type from config
         services.AddTransient<IMcsMapVoteUiFactory, McsSimpleHtmlVoteUiFactory>();
+
+        TrackVoteSettingsConVar();
     }
 
     protected override void OnAllPluginsLoaded()
@@ -88,7 +90,30 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     #region Vote Controll Area
 
 
-    public FakeConVar<int> ConVarMaxVoteMenuElements = new("mcs_max_vote_menu_elements", "Max Vote Menu Elements", 6, ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 7));
+    // TODO() These settings should be plugin config
+    public readonly FakeConVar<int> MaxVoteMenuElements = new("mcs_max_vote_menu_elements", "Max Vote Menu Elements", 6, ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 7));
+    public readonly FakeConVar<bool> ShouldShuffleVoteMenu = new("mcs_vote_shuffle_menu", "Should vote menu elements is shuffled?", false);
+    public readonly FakeConVar<bool> ShouldUseAliasName = new("mcs_vote_use_alias_name", "Should use alias name if available?", false);
+    public readonly FakeConVar<float> MapVoteEndTime = new("mcs_vote_end_time", "How long to take vote ends in seconds?", 15.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(5.0F, 120.0F));
+    public readonly FakeConVar<int> VoteStartCountDownTime = new("mcs_vote_countdown_time", "How long to take vote starts in seconds", 13, ConVarFlags.FCVAR_NONE, new RangeValidator<int>(0, 120));
+    
+    
+    // If there is no vote that higher than _mapVoteWinnerPickUpThreshold, then it will pick up maps higher than this percentage for runoff vote
+    public readonly FakeConVar<float> MapVoteRunoffMapPickupThreshold = new("mcs_vote_runoff_map_pickup_threshold", "If there is no vote that higher than _mapVoteWinnerPickUpThreshold, then it will pick up maps higher than this percentage for runoff vote", 0.3F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1.0F));
+    
+    // If vote is higher than this percent, it will picked up as winner.
+    public readonly FakeConVar<float> MapVoteWinnerPickUpThreshold = new("mcs_vote_winner_pickup_threshold", "If vote is higher than this percent, it will picked up as winner.", 0.7F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1.0F));
+
+    private void TrackVoteSettingsConVar()
+    {
+        TrackConVar(MaxVoteMenuElements);
+        TrackConVar(ShouldShuffleVoteMenu);
+        TrackConVar(ShouldUseAliasName);
+        TrackConVar(MapVoteEndTime);
+        TrackConVar(VoteStartCountDownTime);
+        TrackConVar(MapVoteRunoffMapPickupThreshold);
+        TrackConVar(MapVoteWinnerPickUpThreshold);
+    }
     
     
     public McsMapVoteState CurrentVoteState { get; private set; } = McsMapVoteState.NoActiveVote;
@@ -103,17 +128,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return _mapVoteContent.GetVotingMaps().Sum(mapVoteData => mapVoteData.GetVoters().Count);
         }
     }
-    
-    private bool TEMP_SHOULD_VOTE_MENU_SHUFFLE = false;
-    private bool TEMP_SHOW_ALIAS_NAME = true;
-    private float TEMP_MAP_VOTE_END_TIME = 15.0F;
-    private int TEMP_MAP_VOTE_COUNT_DOWN_TIME = 3;
-    
-    // If vote is not higher than TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD, then it will pick up maps, that higher than this percentage.
-    private float TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD_WHEN_NO_WINNERS = 0.3F;
-    
-    // If vote is higher than this percent, it will end the vote.
-    private float TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD = 0.7F;
 
     private const string IdExtendMap = "MapChooserSharp:ExtendMap";
     private const string IdDontChangeMap = "MapChooserSharp:DontChangeMap";
@@ -149,7 +163,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         DebugLogger.LogTrace("Initializing MapVoteContent");
         
         // Respect menu's max elements
-        int maxMenuElements = Math.Min(_voteUiFactory.MaxMenuElements, ConVarMaxVoteMenuElements.Value);
+        int maxMenuElements = Math.Min(_voteUiFactory.MaxMenuElements, MaxVoteMenuElements.Value);
     
         Dictionary<string, IMapConfig> mapConfigs = _mapConfigProvider.GetMapConfigs();
         Dictionary<string, IMapConfig> unusedMapPool = new(mapConfigs);
@@ -167,7 +181,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
             string menuName = mapName;
             
-            if (TEMP_SHOW_ALIAS_NAME && mapConfig.MapNameAlias != string.Empty)
+            if (ShouldUseAliasName.Value && mapConfig.MapNameAlias != string.Empty)
             {
                 menuName = mapConfig.MapNameAlias;
             }
@@ -282,7 +296,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         DebugLogger.LogTrace("Setting vote option");
         var voteUi = _voteUiFactory.Create();
         voteUi.SetVoteOptions(voteOptions);
-        voteUi.SetRandomShuffle(TEMP_SHOULD_VOTE_MENU_SHUFFLE);
+        voteUi.SetRandomShuffle(ShouldShuffleVoteMenu.Value);
         
         
         
@@ -292,7 +306,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         DebugLogger.LogInformation("Initialize successfully");
 
-        int count = TEMP_MAP_VOTE_COUNT_DOWN_TIME;
+        int count = VoteStartCountDownTime.Value;
         _mapVoteTimer = Plugin.AddTimer(1.0F, () =>
         {
             if (count <= 0)
@@ -330,7 +344,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         ShowVoteMenu(voteParticipants);
 
-        _mapVoteTimer = Plugin.AddTimer(TEMP_MAP_VOTE_END_TIME, EndVote, TimerFlags.STOP_ON_MAPCHANGE);
+        _mapVoteTimer = Plugin.AddTimer(MapVoteEndTime.Value, EndVote, TimerFlags.STOP_ON_MAPCHANGE);
 
         FireVoteStartedEvent();
     }
@@ -390,12 +404,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         float votePercentage = (float)_mapVoteContent.GetVoteParticipants().Count / totalVotes;
         PrintLocalizedChatToAll("MapVote.Broadcast.VoteFinished", totalVotes ,_mapVoteContent.GetVoteParticipants().Count , $"{votePercentage * 100:F2}");
         
-        List<IMapVoteData> winners = PickWinningMaps(_mapVoteContent.GetVotingMaps());
+        List<IMapVoteData> winners = PickWinningMaps(_mapVoteContent.GetVotingMaps(), false);
 
         // If winners count is higher than 2, then we'll start run off vote
         if (winners.Count > 1)
         {
-            PrintLocalizedChatToAll("MapVote.Broadcast.StartingRunoffVote", $"{TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD*100:F2}");
+            PrintLocalizedChatToAll("MapVote.Broadcast.StartingRunoffVote", $"{MapVoteWinnerPickUpThreshold.Value*100:F2}");
             
             _mapVoteTimer?.Kill();
             InitializeRunOffVote(winners);
@@ -454,7 +468,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             
             string menuName = vote.MapName;
             
-            if (TEMP_SHOW_ALIAS_NAME && vote.MapConfig.MapNameAlias != string.Empty)
+            if (ShouldUseAliasName.Value && vote.MapConfig.MapNameAlias != string.Empty)
             {
                 menuName = vote.MapConfig.MapNameAlias;
             }
@@ -472,14 +486,14 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         DebugLogger.LogDebug("Setting vote option");
         var voteUi = _voteUiFactory.Create();
         voteUi.SetVoteOptions(voteOptions);
-        voteUi.SetRandomShuffle(TEMP_SHOULD_VOTE_MENU_SHUFFLE);
+        voteUi.SetRandomShuffle(ShouldShuffleVoteMenu.Value);
         
         var newVoteContent = new MapVoteContent(voteParticipants, mapsToVote, voteUi, _mapVoteContent?.IsRtvVote ?? false);
         _mapVoteContent = newVoteContent;
         
         DebugLogger.LogInformation("Initialize successfully");
 
-        int count = TEMP_MAP_VOTE_COUNT_DOWN_TIME;
+        int count = VoteStartCountDownTime.Value;
         _mapVoteTimer = Plugin.AddTimer(1.0F, () =>
         {
             if (count <= 0)
@@ -519,7 +533,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         ShowVoteMenu(voteParticipants);
 
-        _mapVoteTimer = Plugin.AddTimer(TEMP_MAP_VOTE_END_TIME, EndRunoffVote, TimerFlags.STOP_ON_MAPCHANGE);
+        _mapVoteTimer = Plugin.AddTimer(MapVoteEndTime.Value, EndRunoffVote, TimerFlags.STOP_ON_MAPCHANGE);
 
         FireVoteStartedEvent();
     }
@@ -576,7 +590,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return;
         }
 
-        List<IMapVoteData> winners = PickWinningMaps(_mapVoteContent.GetVotingMaps());
+        List<IMapVoteData> winners = PickWinningMaps(_mapVoteContent.GetVotingMaps(), true);
 
         var winMap = winners.First();
 
@@ -733,7 +747,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     }
     
     
-    private List<IMapVoteData> PickWinningMaps(List<IMapVoteData> votingMaps)
+    private List<IMapVoteData> PickWinningMaps(List<IMapVoteData> votingMaps, bool isRunoffVote)
     {
         DebugLogger.LogDebug("Picking winning map(s)");
         if (_mapVoteContent == null)
@@ -764,29 +778,28 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         {
             float votePercentage = (float)map.GetVoters().Count / totalVotes;
             
-            DebugLogger.LogTrace($"{map.MapName} Vote percentage: {votePercentage*100:F1}% > Threshold {TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD*100:F0}%");
-            if (votePercentage >= TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD)
+            DebugLogger.LogTrace($"{map.MapName} Vote percentage: {votePercentage*100:F1}% > Threshold {MapVoteWinnerPickUpThreshold.Value*100:F0}%");
+            if (votePercentage >= MapVoteWinnerPickUpThreshold.Value)
             {
                 winners.Add(map);
             }
         }
         
-        if (!winners.Any())
+        if (!winners.Any() && !isRunoffVote)
         {
-            DebugLogger.LogDebug($"No winning map found! Picking maps with over {TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD_WHEN_NO_WINNERS*100:F0}% of votes");
+            DebugLogger.LogDebug($"No winning map found! Picking maps with over {MapVoteRunoffMapPickupThreshold.Value*100:F0}% of votes");
             foreach (IMapVoteData map in sortedVotingMaps)
             {
                 float votePercentage = (float)map.GetVoters().Count / totalVotes;
             
-                DebugLogger.LogTrace($"{map.MapName} Vote percentage: {votePercentage*100:F1}% > Threshold {TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD_WHEN_NO_WINNERS*100:F0}%");
-                if (votePercentage >= TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD_WHEN_NO_WINNERS)
+                DebugLogger.LogTrace($"{map.MapName} Vote percentage: {votePercentage*100:F1}% > Threshold {MapVoteRunoffMapPickupThreshold.Value*100:F0}%");
+                if (votePercentage >= MapVoteRunoffMapPickupThreshold.Value)
                 {
                     winners.Add(map);
                 }
             }
 
-            // If only 1 map is higher than TEMP_MAP_VOTE_WINNER_PICK_UP_THRESHOLD_WHEN_NO_WINNERS
-            // Then add 1 more maps
+            // add 1 more maps if only 1 map is higher than MapVoteRunoffMapPickupThreshold
             if (winners.Count <= 1)
             {
                 DebugLogger.LogDebug($"Not enough maps for starting vote, we'll pick up one more map for runoff vote.");
@@ -801,6 +814,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
                     winners.Add(map);
                 }
             }
+        }
+
+        if (!winners.Any() && isRunoffVote)
+        {
+            DebugLogger.LogDebug($"No winning map found! But this is runoff vote, so we'll pick up most voted maps for nextmap");
+            return [sortedVotingMaps.First()];
         }
         
         return winners;

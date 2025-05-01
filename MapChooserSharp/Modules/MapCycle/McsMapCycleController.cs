@@ -65,6 +65,8 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     
     public int ExtendsLeft => ExtendLimit - ExtendCount;
 
+    private const int DefaultMapExtends = 3;
+
 
     private bool _isMapStarted = false;
 
@@ -76,12 +78,10 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
     private const float DefaultMapChangeDelay = 10.0F;
 
-    private const int DefaultMapExtends = 3;
-
-    public FakeConVar<int> VoteStartTimingTime = new("mcs_vote_start_timing_time", "When should vote started if map is based on mp_timelimit or mp_roundtime? (minutes)", 3,
+    public readonly FakeConVar<int> VoteStartTimingTime = new("mcs_vote_start_timing_time", "When should vote started if map is based on mp_timelimit or mp_roundtime? (minutes)", 3,
         ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 15));
     
-    public FakeConVar<int> VoteStartTimingRound = new("mcs_vote_start_timing_round", "When should vote started if map is based on mp_maxrounds? (rounds)", 2,
+    public readonly FakeConVar<int> VoteStartTimingRound = new("mcs_vote_start_timing_round", "When should vote started if map is based on mp_maxrounds? (rounds)", 2,
         ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 15));
     
     public override void RegisterServices(IServiceCollection services)

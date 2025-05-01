@@ -25,27 +25,27 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
     protected override bool UseTranslationKeyInModuleChatPrefix => true;
 
 
-    public FakeConVar<float> RtvCommandUnlockTimeNextMapConfirmed =
+    public readonly FakeConVar<float> RtvCommandUnlockTimeNextMapConfirmed =
         new("mcs_rtv_command_unlock_time_next_map_confirmed",
             "Seconds to take unlock RTV command after next map confirmed in vote", 60.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1200.0F));
 
-    public FakeConVar<float> RtvCommandUnlockTimeMapNotChanged =
+    public readonly FakeConVar<float> RtvCommandUnlockTimeMapNotChanged =
         new("mcs_rtv_command_unlock_time_map_dont_change",
             "Seconds to take unlock RTV command after map is not changed in rtv vote", 240.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1200.0F));
 
-    public FakeConVar<float> RtvCommandUnlockTimeMapExtend =
+    public readonly FakeConVar<float> RtvCommandUnlockTimeMapExtend =
         new("mcs_rtv_command_unlock_time_map_extend",
             "Seconds to take unlock RTV command after map is extended in vote", 120.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1200.0F));
 
-    public FakeConVar<float> RtvVoteStartThreshold = 
+    public readonly FakeConVar<float> RtvVoteStartThreshold = 
         new("mcs_rtv_vote_start_threshold", 
             "How many percent to require start rtv vote?", 0.5F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1.0F));
 
-    public FakeConVar<float> MapChangeTimingAfterRtvSuccess =
+    public readonly FakeConVar<float> MapChangeTimingAfterRtvSuccess =
         new("mcs_rtv_map_change_timing", 
             "Seconds to change map after RTV is success. Set 0.0 to change immediately", 3.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 60.0F));
 
-    public FakeConVar<bool> MapChangeTimingShouldRoundEnd =
+    public readonly FakeConVar<bool> MapChangeTimingShouldRoundEnd =
         new("mcs_rtv_map_change_timing_should_round_end",
             "Map change should be round end? If true, ignores mcs_rtv_map_change_timing setting", true);
 
