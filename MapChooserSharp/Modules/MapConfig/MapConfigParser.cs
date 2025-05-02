@@ -369,11 +369,29 @@ internal class MapConfigParser(string configPath)
                     break;
                 case "AllowedSteamIds":
                     if (value is TomlArray allowedArray)
-                        config.AllowedSteamIds = ParseULongArray(allowedArray);
+                    {
+                        if (config.AllowedSteamIds == null)
+                        {
+                            config.AllowedSteamIds = ParseULongArray(allowedArray);
+                        }
+                        else
+                        {
+                            config.AllowedSteamIds.AddRange(ParseULongArray(allowedArray));
+                        }
+                    }
                     break;
                 case "DisallowedSteamIds":
                     if (value is TomlArray disallowedArray)
-                        config.DisallowedSteamIds = ParseULongArray(disallowedArray);
+                    {
+                        if (config.DisallowedSteamIds == null)
+                        {
+                            config.DisallowedSteamIds = ParseULongArray(disallowedArray);
+                        }
+                        else
+                        {
+                            config.DisallowedSteamIds.AddRange(ParseULongArray(disallowedArray));
+                        }
+                    }
                     break;
                 case "MaxPlayers":
                     if (value is long maxPlayersValue)
@@ -408,9 +426,14 @@ internal class MapConfigParser(string configPath)
         List<ulong> result = new List<ulong>();
         foreach (var item in array)
         {
-            if (item is ulong longValue)
+            if (item is long longValue)
             {
-                result.Add(longValue);
+                if (longValue <= 0)
+                    continue;
+                
+                ulong ulongValue = (ulong)longValue;
+                
+                result.Add(ulongValue);
             }
         }
         return result;
