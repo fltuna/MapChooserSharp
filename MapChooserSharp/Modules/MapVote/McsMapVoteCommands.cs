@@ -31,6 +31,7 @@ public class McsMapVoteCommands(IServiceProvider serviceProvider) : PluginModule
     protected override void OnUnloadModule()
     {
         Plugin.RemoveCommand("css_revote", CommandRevote);
+        Plugin.RemoveCommand("css_cancelvote", CommandCancelVote);
     }
 
     private void CommandRevote(CCSPlayerController? player, CommandInfo info)
