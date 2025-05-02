@@ -63,6 +63,27 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private int ExtendLimit { get; set; } = 0;
     
     public int ExtendsLeft => ExtendLimit - ExtendCount;
+    
+    public bool SetNextMap(IMapConfig mapConfig)
+    {
+        NextMap = mapConfig;
+        
+        FireNextMapConfirmedEvent(NextMap);
+        return true;
+    }
+
+    public bool SetNextMap(string mapName)
+    {
+        IMapConfig? mapConfig = _mapConfigProvider.GetMapConfig(mapName);
+
+        if (mapConfig == null)
+            return false;
+
+        NextMap = mapConfig;
+        
+        FireNextMapConfirmedEvent(NextMap);
+        return true;
+    }
 
     private int DefaultMapExtends => _mcsPluginConfigProvider.PluginConfig.MapCycleConfig.FallbackDefaultMaxExtends;
 
@@ -375,5 +396,11 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         _voteStartTimer?.Kill();
         _voteStartTimer = null;
         _mcsMapVoteController.InitiateVote();
+    }
+    
+    private void FireNextMapConfirmedEvent(IMapConfig mapConfig)
+    {
+        var confirmedEvent = new McsNextMapConfirmedEvent(GetTextWithPluginPrefix(""), mapConfig);
+        _mcsEventManager.FireEventNoResult(confirmedEvent);
     }
 }

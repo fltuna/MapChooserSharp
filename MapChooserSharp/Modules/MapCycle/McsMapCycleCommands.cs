@@ -1,9 +1,11 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
+using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities;
+using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
@@ -21,18 +23,22 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
     
     private IMcsMapCycleControllerApi _mapCycleController = null!;
+    private IMapConfigProvider _mapConfigProvider = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
 
 
     protected override void OnAllPluginsLoaded()
     {
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
+        _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         Plugin.AddCommand("css_timeleft", "Show timeleft", CommandTimeLeft);
         Plugin.AddCommand("css_nextmap", "Show next map", CommandNextMap);
+        Plugin.AddCommand("css_setnextmap", "Set next map", CommandSetNextMap);
         Plugin.AddCommand("css_currentmap", "Show current map", CommandCurrentMap);
         Plugin.AddCommand("css_mapinfo", "Show current map's information if available", CommandMapInfo);
         Plugin.AddCommand("css_extends", "Shows remaining extends", CommandExtendsLeft);
+        
         Plugin.AddCommandListener("say", SayCommandListener, HookMode.Pre);
     }
 
@@ -40,9 +46,11 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     {
         Plugin.RemoveCommand("css_timeleft", CommandTimeLeft);
         Plugin.RemoveCommand("css_nextmap", CommandNextMap);
+        Plugin.RemoveCommand("css_setnextmap", CommandSetNextMap);
         Plugin.RemoveCommand("css_currentmap", CommandCurrentMap);
         Plugin.RemoveCommand("css_mapinfo", CommandMapInfo);
         Plugin.RemoveCommand("css_extends", CommandExtendsLeft);
+        
         Plugin.RemoveCommandListener("say", SayCommandListener, HookMode.Pre);
     }
 
@@ -121,6 +129,72 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
             {
                 player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", LocalizeStringForPlayer(player, "Word.VotePending")));
             }
+        }
+    }
+
+    [RequiresPermissions(@"css/root")]
+    private void CommandSetNextMap(CCSPlayerController? player, CommandInfo info)
+    {
+        if (info.ArgCount < 2)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetNextMap.Usage"));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetNextMap.Usage"));
+            }
+            
+            return;
+        }
+        
+        string mapName = info.ArgByIndex(1);
+        
+        IMapConfig? newNextMap = _mapConfigProvider.GetMapConfig(mapName);
+
+        if (newNextMap == null)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetNextMap.MapNotFound", mapName));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetNextMap.MapNotFound", mapName));
+            }
+            
+            return;
+        }
+        
+        
+        var previousNextMapConfig = _mapCycleController.NextMap;
+
+        string executorName = PlayerUtil.GetPlayerName(player);
+        
+        
+        if (!_mapCycleController.SetNextMap(newNextMap!))
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetNextMap.Failed", newNextMap.MapName));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetNextMap.Failed", newNextMap.MapName));
+            }
+            
+            return;
+        }
+        
+        
+        if (previousNextMapConfig != null)
+        {
+            PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.ChangedNextMap", executorName, newNextMap.MapName);
+        }
+        else
+        {
+            PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.SetNextMap", executorName, newNextMap.MapName);
         }
     }
     

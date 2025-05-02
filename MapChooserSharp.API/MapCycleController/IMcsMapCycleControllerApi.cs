@@ -28,4 +28,18 @@ public interface IMcsMapCycleControllerApi
     /// Returns remaining extend count
     /// </summary>
     public int ExtendsLeft { get; }
+    
+    /// <summary>
+    /// Set next map to specified map config
+    /// </summary>
+    /// <param name="mapConfig">Map Config</param>
+    /// <returns>True if map is valid and next map successfully changed, otherwise false</returns>
+    public bool SetNextMap(IMapConfig mapConfig);
+
+    /// <summary>
+    /// Set next map to specified map name.
+    /// </summary>
+    /// <param name="mapName">Map Name</param>
+    /// <returns>True if map is found by name and next map successfully changed, otherwise false</returns>
+    public bool SetNextMap(string mapName);
 }
