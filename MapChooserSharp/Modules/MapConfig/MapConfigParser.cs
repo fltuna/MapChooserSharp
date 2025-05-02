@@ -739,7 +739,7 @@ Cooldown = 30
 
 OnlyNomination = true
 DaysAllowed = [""saturday"", ""sunday""]
-AllowedTimeRanges = [""18:00-24:00""]
+AllowedTimeRanges = [""18:00-00:00""]
 
 # Yes! you can still define extra configuration for external plugin even if in group settings!
 [MapChooserSharpSettings.Groups.HardZeMap.extra.shop]
@@ -766,7 +766,7 @@ Cooldown = 60
 
 [MapChooserSharpSettings.Groups.Group1]
 RequiredPermissions = [""css/root""]
-AllowedTimeRanges = [""18:00-24:00""]
+AllowedTimeRanges = [""18:00-00:00""]
 MaxPlayers = 1000
 AllowedSteamIds = [987654321]
 DisallowedSteamIds = [987654321]
