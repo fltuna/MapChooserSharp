@@ -5,6 +5,7 @@ using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Cvars.Validators;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Timers;
+using MapChooserSharp.API.Events.MapCycle;
 using MapChooserSharp.API.Events.MapVote;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapVoteController;
@@ -74,6 +75,16 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         {
             CurrentVoteState = McsMapVoteState.NoActiveVote;
         });
+        
+        
+        _mcsEventManager.RegisterEventHandler<McsNextMapRemovedEvent>((_) =>
+        {
+            CurrentVoteState = McsMapVoteState.NoActiveVote;
+        });
+        _mcsEventManager.RegisterEventHandler<McsNextMapChangedEvent>((_) =>
+        {
+            CurrentVoteState = McsMapVoteState.NextMapConfirmed;
+        });
     }
 
 
@@ -118,7 +129,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     }
     
     
-    public McsMapVoteState CurrentVoteState { get; internal set; } = McsMapVoteState.NoActiveVote;
+    public McsMapVoteState CurrentVoteState { get; private set; } = McsMapVoteState.NoActiveVote;
 
     
     private int AllVotesCount {

@@ -69,7 +69,6 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     {
         NextMap = mapConfig;
 
-        _mcsMapVoteController.CurrentVoteState = McsMapVoteState.NextMapConfirmed;
         FireNextMapChangedEvent(NextMap);
         return true;
     }
@@ -83,7 +82,6 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
         NextMap = mapConfig;
 
-        _mcsMapVoteController.CurrentVoteState = McsMapVoteState.NextMapConfirmed;
         FireNextMapChangedEvent(NextMap);
         return true;
     }
