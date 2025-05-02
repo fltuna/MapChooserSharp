@@ -704,6 +704,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         else
         {
             PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.Extend", mapVotePercentage, AllVotesCount);
+            
+            // Ensure extend type for just in case
+            _timeLeftUtil.ReDetermineExtendType();
             McsMapExtendType extendType = _timeLeftUtil.ExtendType;
             DebugLogger.LogTrace($"Determined extend type to extend {extendType}");
             ExtendCurrentMap(extendType);
