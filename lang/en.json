@@ -68,6 +68,8 @@
     "MapCycle.Command.Admin.Notification.SetNextMap.Usage": "Usage: !setnextmap <MapName>",
     "MapCycle.Command.Admin.Notification.SetNextMap.Failed": "Failed to set next map to {lime}{0}{default}!",
     "MapCycle.Command.Admin.Notification.SetNextMap.MapNotFound": "Specified map {lime}{0}{default} is not found!",
+    "MapCycle.Command.Admin.Notification.RemoveNextmap.NextMapIsNotSet": "Next map is not set!",
+    "MapCycle.Command.Admin.Broadcast.RemoveNextmap.Removed": "Admin {lime}{0}{default} removed {lime}{1}{default} from next map!",
     "MapCycle.Command.Notification.NextMap": "Next map: {lime}{0}{default}",
     "MapCycle.Command.Notification.CurrentMap": "Current map: {lime}{0}{default}",
     "MapCycle.Command.Notification.MapInfo": "Map info: {0}",

@@ -35,6 +35,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         Plugin.AddCommand("css_timeleft", "Show timeleft", CommandTimeLeft);
         Plugin.AddCommand("css_nextmap", "Show next map", CommandNextMap);
         Plugin.AddCommand("css_setnextmap", "Set next map", CommandSetNextMap);
+        Plugin.AddCommand("css_removenextmap", "Remove next map", CommandRemoveNextMap);
         Plugin.AddCommand("css_currentmap", "Show current map", CommandCurrentMap);
         Plugin.AddCommand("css_mapinfo", "Show current map's information if available", CommandMapInfo);
         Plugin.AddCommand("css_extends", "Shows remaining extends", CommandExtendsLeft);
@@ -47,6 +48,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         Plugin.RemoveCommand("css_timeleft", CommandTimeLeft);
         Plugin.RemoveCommand("css_nextmap", CommandNextMap);
         Plugin.RemoveCommand("css_setnextmap", CommandSetNextMap);
+        Plugin.RemoveCommand("css_removenextmap", CommandRemoveNextMap);
         Plugin.RemoveCommand("css_currentmap", CommandCurrentMap);
         Plugin.RemoveCommand("css_mapinfo", CommandMapInfo);
         Plugin.RemoveCommand("css_extends", CommandExtendsLeft);
@@ -195,6 +197,33 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         else
         {
             PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.SetNextMap", executorName, newNextMap.MapName);
+        }
+    }
+    
+    [RequiresPermissions(@"css/root")]
+    private void CommandRemoveNextMap(CCSPlayerController? player, CommandInfo info)
+    {
+        if (_mapCycleController.NextMap == null)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.RemoveNextmap.NextMapIsNotSet"));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.RemoveNextmap.NextMapIsNotSet"));
+            }
+        }
+        else
+        {
+            // Ignore method's return. because we are already checked _mapCycleController.NextMap is null
+            string nextMapName = _mapCycleController.NextMap.MapName;
+            
+            _mapCycleController.RemoveNextMap();
+            
+            string executorName = PlayerUtil.GetPlayerName(player);
+            
+            PrintLocalizedChatToAll("MapCycle.Command.Admin.Broadcast.RemoveNextmap.Removed", executorName, nextMapName);
         }
     }
     

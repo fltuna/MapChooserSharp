@@ -68,6 +68,8 @@
     "MapCycle.Command.Admin.Notification.SetNextMap.Usage": "使い方: !setnextmap <マップ名>",
     "MapCycle.Command.AdminNotification.SetNextMapFailed": "次のマップを {lime}{0}{default} にセットできませんでした!",
     "MapCycle.Command.Admin.Notification.SetNextMap.MapNotFound": "指定されたマップ {lime}{0}{default} が見つかりませんでした!",
+    "MapCycle.Command.Admin.Notification.RemoveNextmap.NextMapIsNotSet": "次のマップはまだ設定されていません!",
+    "MapCycle.Command.Admin.Broadcast.RemoveNextmap.Removed": "管理者 {lime}{0}{default} が次のマップ {lime}{1}{default} を削除しました",
     "MapCycle.Command.Notification.NextMap": "次のマップ: {lime}{0}{default}",
     "MapCycle.Command.Notification.CurrentMap": "現在のマップ: {lime}{0}{default}",
     "MapCycle.Command.Notification.MapInfo": "マップ情報: {0}",

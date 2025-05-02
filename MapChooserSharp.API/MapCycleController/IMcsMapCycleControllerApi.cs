@@ -42,4 +42,10 @@ public interface IMcsMapCycleControllerApi
     /// <param name="mapName">Map Name</param>
     /// <returns>True if map is found by name and next map successfully changed, otherwise false</returns>
     public bool SetNextMap(string mapName);
+    
+    /// <summary>
+    /// Removes next map
+    /// </summary>
+    /// <returns></returns>
+    public bool RemoveNextMap();
 }

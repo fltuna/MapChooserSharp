@@ -3,6 +3,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Cvars.Validators;
 using CounterStrikeSharp.API.Modules.Timers;
+using MapChooserSharp.API.Events.MapCycle;
 using MapChooserSharp.API.Events.MapVote;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapCycleController;
@@ -69,7 +70,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         NextMap = mapConfig;
 
         _mcsMapVoteController.CurrentVoteState = McsMapVoteState.NextMapConfirmed;
-        FireNextMapConfirmedEvent(NextMap);
+        FireNextMapChangedEvent(NextMap);
         return true;
     }
 
@@ -83,10 +84,20 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         NextMap = mapConfig;
 
         _mcsMapVoteController.CurrentVoteState = McsMapVoteState.NextMapConfirmed;
-        FireNextMapConfirmedEvent(NextMap);
+        FireNextMapChangedEvent(NextMap);
         return true;
     }
 
+    public bool RemoveNextMap()
+    {
+        if (NextMap == null)
+            return false;
+        
+        FireNextMapRemovedEvent(NextMap);
+        return true;
+    }
+
+    
     private int DefaultMapExtends => _mcsPluginConfigProvider.PluginConfig.MapCycleConfig.FallbackDefaultMaxExtends;
 
 
@@ -400,9 +411,15 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         _mcsMapVoteController.InitiateVote();
     }
     
-    private void FireNextMapConfirmedEvent(IMapConfig mapConfig)
+    private void FireNextMapChangedEvent(IMapConfig newConfig)
     {
-        var confirmedEvent = new McsNextMapConfirmedEvent(GetTextWithPluginPrefix(""), mapConfig);
+        var confirmedEvent = new McsNextMapChangedEvent(GetTextWithPluginPrefix(""), newConfig);
         _mcsEventManager.FireEventNoResult(confirmedEvent);
+    }
+    
+    private void FireNextMapRemovedEvent(IMapConfig newConfig)
+    {
+        var nextMapRemovedEvent = new McsNextMapRemovedEvent(GetTextWithPluginPrefix(""), newConfig);
+        _mcsEventManager.FireEventNoResult(nextMapRemovedEvent);
     }
 }
