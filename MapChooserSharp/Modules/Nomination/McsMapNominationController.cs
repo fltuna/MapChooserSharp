@@ -115,6 +115,13 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             if (value.NominationParticipants.Contains(player.Slot))
             {
                 value.NominationParticipants.Remove(player.Slot);
+
+                // If there is no nomination participants left, remove the nomination
+                if (value.NominationParticipants.Count == 0)
+                {
+                    NominatedMaps.Remove(key);
+                }
+                
                 isFirstNomination = false;
                 // break because player should be in 1 nomination, not multiple nomination.
                 break;
