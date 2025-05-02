@@ -92,6 +92,11 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
             return false;
         
         FireNextMapRemovedEvent(NextMap);
+        
+        _mapChangeTimer?.Kill();
+        ChangeMapOnNextRoundEnd = false;
+        NextMap = null;
+        RecreateVoteTimer();
         return true;
     }
 
@@ -102,6 +107,8 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private bool _isMapStarted = false;
 
     private Timer? _voteStartTimer = null;
+
+    private Timer? _mapChangeTimer = null;
 
     private const float VoteStartCheckInterval = 1.0F;
     
@@ -181,7 +188,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         if (seconds <= 0)
             seconds = DefaultMapChangeDelay;
         
-        Plugin.AddTimer(seconds, ChangeToNextMapInternal, TimerFlags.STOP_ON_MAPCHANGE);
+        _mapChangeTimer = Plugin.AddTimer(seconds, ChangeToNextMapInternal, TimerFlags.STOP_ON_MAPCHANGE);
     }
 
     private void ChangeToNextMapInternal()
