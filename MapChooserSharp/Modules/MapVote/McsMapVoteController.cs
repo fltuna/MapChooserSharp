@@ -118,7 +118,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     }
     
     
-    public McsMapVoteState CurrentVoteState { get; private set; } = McsMapVoteState.NoActiveVote;
+    public McsMapVoteState CurrentVoteState { get; internal set; } = McsMapVoteState.NoActiveVote;
 
     
     private int AllVotesCount {
