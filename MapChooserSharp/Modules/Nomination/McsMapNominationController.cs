@@ -36,7 +36,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     private IMapConfigProvider _mapConfigProvider = null!;
     private IMcsNominationMenuProvider _mcsNominationMenuProvider = null!;
     
-    private Dictionary<int, IMcsNominationUserInterface> _mcsActiveNominationUserInterfaces = new();
+    private Dictionary<int, IMcsNominationUserInterface> _mcsActiveUserNominationMenu = new();
     
     
     internal Dictionary<string, IMcsNominationData> NominatedMaps { get; } = new();
@@ -53,7 +53,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
         _mcsNominationMenuProvider = ServiceProvider.GetRequiredService<IMcsNominationMenuProvider>();
         
-        
+        _mcsEventManager.RegisterEventHandler<McsMapVoteInitiatedEvent>(OnVoteInitialized);
         _mcsEventManager.RegisterEventHandler<McsMapVoteFinishedEvent>(OnVoteFinished);
         _mcsEventManager.RegisterEventHandler<McsMapVoteCancelledEvent>(OnVoteCancelled);
         
@@ -66,6 +66,14 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         _mcsEventManager.UnregisterEventHandler<McsMapVoteCancelledEvent>(OnVoteCancelled);
     }
 
+    private void OnVoteInitialized(McsMapVoteInitiatedEvent @event)
+    {
+        foreach (var (key, menu) in _mcsActiveUserNominationMenu)
+        {
+            menu.CloseMenu();
+            _mcsActiveUserNominationMenu.Remove(key);
+        }
+    }
 
     private void OnVoteFinished(McsMapVoteFinishedEvent @event)
     {
@@ -222,7 +230,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         ui.SetNominationOption(menuOptions);
         ui.SetMenuOption(new McsGeneralMenuOption("Nomination.Menu.MenuTitle", true));
         ui.OpenMenu();
-        _mcsActiveNominationUserInterfaces[player.Slot] = ui;
+        _mcsActiveUserNominationMenu[player.Slot] = ui;
     }
 
     /// <summary>
@@ -246,10 +254,10 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             client.ExecuteClientCommandFromServer($"css_nominate {option.MapConfig.MapName}");
         }
 
-        if (_mcsActiveNominationUserInterfaces.TryGetValue(client.Slot, out var ui))
+        if (_mcsActiveUserNominationMenu.TryGetValue(client.Slot, out var ui))
         {
             ui.CloseMenu();
-            _mcsActiveNominationUserInterfaces.Remove(client.Slot);
+            _mcsActiveUserNominationMenu.Remove(client.Slot);
         }
     }
     
@@ -273,7 +281,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         ui.SetNominationOption(menuOptions);
         ui.SetMenuOption(new McsGeneralMenuOption("NominationRemoveMap.Menu.MenuTitle", true));
         ui.OpenMenu();
-        _mcsActiveNominationUserInterfaces[player.Slot] = ui;
+        _mcsActiveUserNominationMenu[player.Slot] = ui;
     }
     
     internal void ShowRemoveNominationMenu(CCSPlayerController player)
@@ -285,10 +293,10 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     {
         client.ExecuteClientCommandFromServer($"css_nominate_removemap {option.MapConfig.MapName}");
 
-        if (_mcsActiveNominationUserInterfaces.TryGetValue(client.Slot, out var ui))
+        if (_mcsActiveUserNominationMenu.TryGetValue(client.Slot, out var ui))
         {
             ui.CloseMenu();
-            _mcsActiveNominationUserInterfaces.Remove(client.Slot);
+            _mcsActiveUserNominationMenu.Remove(client.Slot);
         }
     }
 
