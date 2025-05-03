@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core;
 using MapChooserSharp.Modules.MapVote.Interfaces;
+using MapChooserSharp.Modules.McsMenu.Interfaces;
 
 namespace MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 
@@ -12,6 +13,8 @@ public interface IMcsMapVoteUserInterface
     public void CloseMenu();
 
     public void SetVoteOptions(List<IMcsVoteOption> voteOptions);
+    
+    public void SetMenuOption(IMcsGeneralMenuOption option);
 
     public void SetRandomShuffle(bool enableShuffle);
 }

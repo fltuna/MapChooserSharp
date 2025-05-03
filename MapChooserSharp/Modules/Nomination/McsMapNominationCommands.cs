@@ -10,6 +10,7 @@ using MapChooserSharp.API.Nomination.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 
@@ -66,6 +67,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         if (info.ArgCount < 2)
         {
             player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.Usage"));
+            _mapNominationController.ShowNominationMenu(player);
 
             return;
         }
@@ -87,7 +89,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         {
             player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.MultipleResult", matchedMaps.Count, mapName));
 
-            _mapNominationController.ShowNominationMenu(player, matchedMaps);
+            _mapNominationController.ShowNominationMenu(player, matchedMaps.Select(kv => kv.Value).ToList());
             return;
         }
         
@@ -119,6 +121,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             else
             {
                 player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "NominationAddMap.Command.Notification.Usage"));
+                _mapNominationController.ShowNominationMenu(player, true);
             }
             return;
         }
@@ -133,13 +136,12 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             if (player == null)
             {
                 Server.PrintToConsole(LocalizeString("Nomination.Command.Notification.NotMapsFound", mapName));
-
             }
             else
             {
                 player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.NotMapsFound", mapName));
 
-                _mapNominationController.ShowAdminNominationMenu(player);
+                _mapNominationController.ShowNominationMenu(player, true);
             }
             return;
         }
@@ -154,7 +156,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             {
                 player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.MultipleResult", matchedMaps.Count, mapName));
 
-                _mapNominationController.ShowNominationMenu(player, matchedMaps);
+                _mapNominationController.ShowNominationMenu(player, matchedMaps.Select(kv => kv.Value).ToList(), true);
             }
             return;
         }
@@ -187,6 +189,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             else
             {
                 player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "NominationRemoveMap.Command.Notification.Usage"));
+                _mapNominationController.ShowRemoveNominationMenu(player);
             }
             return;
         }
@@ -207,7 +210,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             {
                 player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.NotMapsFound", mapName));
 
-                _mapNominationController.ShowAdminNominationMenu(player);
+                _mapNominationController.ShowRemoveNominationMenu(player);
             }
             return;
         }
@@ -222,12 +225,11 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             {
                 player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.MultipleResult", matchedMaps.Count, mapName));
 
-                _mapNominationController.ShowRemoveNominationMenu(player);
+                _mapNominationController.ShowRemoveNominationMenu(player, matchedMaps.Select(kv => kv.Value).ToList());
             }
             return;
         }
 
-        // TODO() Remove map
         _mapNominationController.RemoveNomination(player, matchedMaps.First().Key);
     }
 

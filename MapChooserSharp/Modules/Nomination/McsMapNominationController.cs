@@ -15,6 +15,9 @@ using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.EventManager;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.McsMenu;
+using MapChooserSharp.Modules.McsMenu.NominationMenu;
+using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
 using MapChooserSharp.Modules.Nomination.Models;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -31,6 +34,9 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     private IMcsInternalEventManager _mcsEventManager = null!;
     private McsMapVoteController _mcsMapVoteController = null!;
     private IMapConfigProvider _mapConfigProvider = null!;
+    private IMcsNominationMenuProvider _mcsNominationMenuProvider = null!;
+    
+    private Dictionary<int, IMcsNominationUserInterface> _mcsActiveNominationUserInterfaces = new();
     
     
     internal Dictionary<string, IMcsNominationData> NominatedMaps { get; } = new();
@@ -45,6 +51,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        _mcsNominationMenuProvider = ServiceProvider.GetRequiredService<IMcsNominationMenuProvider>();
         
         
         _mcsEventManager.RegisterEventHandler<McsMapVoteFinishedEvent>(OnVoteFinished);
@@ -188,29 +195,101 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         }
         
     }
-    
-    
-    internal void ShowNominationMenu(CCSPlayerController player, Dictionary<string, IMapConfig>? mapCfgArg = null)
-    {
-        // TODO() Implement later
-        player.PrintToChat("TODO_MENU| Nomination menu");
 
-        // If mapCfgArg is null, it will get all map configs for listing
-        Dictionary<string, IMapConfig> mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
+    /// <summary>
+    /// Show nomination menu to player, this method is show maps in given config list
+    /// </summary>
+    /// <param name="player">Player controller</param>
+    /// <param name="configs">Map configs to show</param>
+    /// <param name="isAdminNomination">This nomination menu is should be admin nomination menu?</param>
+    internal void ShowNominationMenu(CCSPlayerController player, List<IMapConfig> configs, bool isAdminNomination = false)
+    {
+        if(configs.Count == 0)
+            return;
+        
+        var ui = _mcsNominationMenuProvider.CreateNewNominationUi(player);
+
+        List<IMcsNominationMenuOption> menuOptions = new();
+        
+        foreach (IMapConfig config in configs)
+        {
+            // TODO() More menu disablation check
+            bool isMenuDisabled = config.IsDisabled;
+            
+            menuOptions.Add(new McsNominationMenuOption(new McsNominationOption(config, isAdminNomination), OnPlayerCastNominationMenu, isMenuDisabled));
+        }
+        
+        ui.SetNominationOption(menuOptions);
+        ui.SetMenuOption(new McsGeneralMenuOption("Nomination.Menu.MenuTitle", true));
+        ui.OpenMenu();
+        _mcsActiveNominationUserInterfaces[player.Slot] = ui;
+    }
+
+    /// <summary>
+    /// Show nomination menu to player, this method is shows everything in map config
+    /// </summary>
+    /// <param name="player">Player controller</param>
+    /// <param name="isAdminNomination">This nomination menu is should be admin nomination menu?</param>
+    internal void ShowNominationMenu(CCSPlayerController player, bool isAdminNomination = false)
+    {
+        ShowNominationMenu(player, _mapConfigProvider.GetMapConfigs().Select(kv => kv.Value).ToList(), isAdminNomination);
     }
     
-    internal void ShowAdminNominationMenu(CCSPlayerController player, Dictionary<string, IMapConfig>? mapCfgArg = null)
+    private void OnPlayerCastNominationMenu(CCSPlayerController client, IMcsNominationOption option)
     {
-        // TODO() Implement later
-        player.PrintToChat("TODO_MENU| Admin nomination menu");
+        if (option.IsAdminNomination)
+        {
+            client.ExecuteClientCommandFromServer($"css_nominate_addmap {option.MapConfig.MapName}");
+        }
+        else
+        {
+            client.ExecuteClientCommandFromServer($"css_nominate {option.MapConfig.MapName}");
+        }
 
-        // If mapCfgArg is null, it will get all map configs for listing
-        Dictionary<string, IMapConfig> mapConfigs = mapCfgArg ?? _mapConfigProvider.GetMapConfigs();
+        if (_mcsActiveNominationUserInterfaces.TryGetValue(client.Slot, out var ui))
+        {
+            ui.CloseMenu();
+            _mcsActiveNominationUserInterfaces.Remove(client.Slot);
+        }
     }
+    
+    
+    
+    internal void ShowRemoveNominationMenu(CCSPlayerController player, List<IMcsNominationData> nominationData)
+    {
+        if (nominationData.Count == 0)
+            return;
+        
+        var ui = _mcsNominationMenuProvider.CreateNewNominationUi(player);
 
+        List<IMcsNominationMenuOption> menuOptions = new();
+        
+        foreach (IMcsNominationData data in nominationData)
+        {
+            // TODO() More menu disablation check
+            menuOptions.Add(new McsNominationMenuOption(new McsNominationOption(data.MapConfig), OnPlayerCastRemoveNominationMenu, false));
+        }
+        
+        ui.SetNominationOption(menuOptions);
+        ui.SetMenuOption(new McsGeneralMenuOption("NominationRemoveMap.Menu.MenuTitle", true));
+        ui.OpenMenu();
+        _mcsActiveNominationUserInterfaces[player.Slot] = ui;
+    }
+    
     internal void ShowRemoveNominationMenu(CCSPlayerController player)
     {
-        player.PrintToChat("TODO_MENU| Admin remove nomination menu");
+        ShowRemoveNominationMenu(player, NominatedMaps.Select(kv => kv.Value).ToList());
+    }
+    
+    private void OnPlayerCastRemoveNominationMenu(CCSPlayerController client, IMcsNominationOption option)
+    {
+        client.ExecuteClientCommandFromServer($"css_nominate_removemap {option.MapConfig.MapName}");
+
+        if (_mcsActiveNominationUserInterfaces.TryGetValue(client.Slot, out var ui))
+        {
+            ui.CloseMenu();
+            _mcsActiveNominationUserInterfaces.Remove(client.Slot);
+        }
     }
 
 
@@ -247,7 +326,6 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
                 PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.NominationChanged", executorName, mapConfig.MapName);
             }
         }
-        
     }
 
     private NominationCheck PlayerCanNominateMap(CCSPlayerController player, IMapConfig mapConfig)

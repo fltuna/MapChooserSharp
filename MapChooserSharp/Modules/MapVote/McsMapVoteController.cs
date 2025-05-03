@@ -17,6 +17,7 @@ using MapChooserSharp.Modules.MapVote.Countdown;
 using MapChooserSharp.Modules.MapVote.Countdown.Interfaces;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.MapVote.Models;
+using MapChooserSharp.Modules.McsMenu;
 using MapChooserSharp.Modules.McsMenu.VoteMenu;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.SimpleHtml;
@@ -332,6 +333,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         foreach (var (key, value) in voteUi)
         {
             value.SetVoteOptions(voteOptions);
+            value.SetMenuOption(new McsGeneralMenuOption("MapVote.Menu.MenuTitle", true));
             value.SetRandomShuffle(ShouldShuffleVoteMenu.Value);
         }
         

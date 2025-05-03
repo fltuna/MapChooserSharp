@@ -1,9 +1,11 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using System.Text;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Menu;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Interfaces;
+using MapChooserSharp.Modules.McsMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation;
@@ -13,6 +15,8 @@ namespace MapChooserSharp.Modules.McsMenu.VoteMenu.SimpleHtml;
 
 public class McsSimpleHtmlVoteUi(CCSPlayerController playerController, IServiceProvider provider) : IMcsMapVoteUserInterface
 {
+    private IMcsGeneralMenuOption? _mcsGeneralMenuOption;
+    
     private List<IMcsVoteOption> _voteOptions = new();
 
     private bool IsMenuShuffleEnabled { get; set; }
@@ -35,9 +39,20 @@ public class McsSimpleHtmlVoteUi(CCSPlayerController playerController, IServiceP
         // Unused variable, but it required to decide what language should use in menu.
         using var tempLang = new WithTemporaryCulture(playerController.GetLanguage());
         
+        StringBuilder menuTitle = new();
+
+        if (_mcsGeneralMenuOption != null && _mcsGeneralMenuOption.MenuTitle != string.Empty)
+        {
+            // TODO() If map countdown setting is verbose, then use verbose title.
+            menuTitle.Append(_plugin.LocalizeStringForPlayer(playerController, _mcsGeneralMenuOption.MenuTitle + ".Html"));
+        }
+        else
+        {
+            menuTitle.Append(_plugin.LocalizeStringForPlayer(playerController,"General.Menu.Title" + ".Html"));
+        }
         
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Creating vote menu");
-        CenterHtmlMenu menu = new(_plugin.LocalizeStringForPlayer(playerController, "MapVote.Menu.MenuTitle"), _plugin);
+        CenterHtmlMenu menu = new(menuTitle.ToString(), _plugin);
 
         // If menu option is already exists (this is intended for !revote feature)
         if (_chachedMenuOptions.TryGetValue(playerController.Slot, out var menuOps))
@@ -93,6 +108,11 @@ public class McsSimpleHtmlVoteUi(CCSPlayerController playerController, IServiceP
     public void SetVoteOptions(List<IMcsVoteOption> voteOptions)
     {
         _voteOptions = voteOptions;
+    }
+
+    public void SetMenuOption(IMcsGeneralMenuOption option)
+    {
+        _mcsGeneralMenuOption = option;
     }
 
     public void SetRandomShuffle(bool enableShuffle)
