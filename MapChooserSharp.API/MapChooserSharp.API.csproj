@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>MapChooserSharp.API</PackageId>
+    <Title>MapChooserSharpAPI</Title>
+    <Description>
+      API for MapChooserSharp.
+    </Description>
+    <Authors>faketuna A.K.A fltuna or tuna</Authors>
+    <PackageVersion>0.0.1</PackageVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/fltuna/MapChooserSharp</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <Target Name="CopyPlugin" AfterTargets="Build" Condition="'$(CS2_SERVER_DIR)' != ''">
+    <Message Text="Copying the plugin files to CounterStrikeSharp plugins directory" Importance="High" />
+    <Copy SourceFiles="$(TargetDir)$(ProjectName).deps.json;$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb" DestinationFolder="$(CS2_SERVER_DIR)\game\csgo\addons\counterstrikesharp\shared\$(ProjectName)" />
+    <Message Text="Successfully copied the plugin files" Importance="High" />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="CounterStrikeSharp.API" Version="1.0.316" />
+    <None Include="..\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+
+</Project>

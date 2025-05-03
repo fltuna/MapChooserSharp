@@ -1,14 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <Target Name="CopyPlugin" AfterTargets="Build" Condition="'$(CS2_SERVER_DIR)' != ''">
+    <Message Text="Copying the plugin files to CounterStrikeSharp plugins directory" Importance="High" />
+    <Copy SourceFiles="$(TargetDir)$(ProjectName).deps.json;$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb" DestinationFolder="$(CS2_SERVER_DIR)\game\csgo\addons\counterstrikesharp\plugins\$(ProjectName)" />
+    <Message Text="Successfully copied the plugin files" Importance="High" />
+  </Target>
+  
   <ItemGroup>
-    <PackageReference Include="CounterStrikeSharp.API" Version="1.0.314" />
-    <PackageReference Include="NativeVoteAPI-CS2" Version="0.2.3" />
+    <PackageReference Include="CounterStrikeSharp.API" Version="1.0.316" />
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="MySqlConnector" Version="2.4.0" />
+    <PackageReference Include="Npgsql" Version="9.0.3" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" />
+    <PackageReference Include="TNCSSPluginFoundation" Version="0.3.0" />
+    <PackageReference Include="Tomlyn" Version="0.19.0" />
+    <ProjectReference Include="..\MapChooserSharp.API\MapChooserSharp.API.csproj" />
   </ItemGroup>
 
 </Project>
