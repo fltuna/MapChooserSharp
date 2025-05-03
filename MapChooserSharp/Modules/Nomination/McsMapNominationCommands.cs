@@ -252,7 +252,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
 
         if (info.ArgCount > 1)
         {
-            if (info.ArgByIndex(1).Equals("full"))
+            if (info.ArgByIndex(1).Equals("full") && AdminManager.PlayerHasPermissions(player, "css/map"))
             {
                 isVerbose = true;
             }
