@@ -332,13 +332,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
 
     private IMapConfig? FindConfigByExactName(string mapName)
     {
-        try
-        {
-            return _mapConfigProvider.GetMapConfigs()[mapName];
-        }
-        catch (Exception)
-        {
-            return null;
-        }
+        _mapConfigProvider.GetMapConfigs().TryGetValue(mapName, out var mapConfig);
+        return mapConfig;
     }
 }
