@@ -53,8 +53,8 @@ public class MapChooserSharpApiExample: BasePlugin
 
     private void CommandTestMapNomination(CCSPlayerController? playerController, CommandInfo info)
     {
-        // IMcsNominationApi::NominateMap() API is not allow console player to nominate
-        // Use IMcsNominationApi::AdminNominateMap can nominate map from console
+        // IMcsNominationApi::NominateMap() API is not allow nomination from console
+        // Use IMcsNominationApi::AdminNominateMap instead to nominate map from console
         if (playerController == null)
             return;
 
@@ -64,12 +64,25 @@ public class MapChooserSharpApiExample: BasePlugin
             return;
         }
         
+        string mapName = info.ArgByIndex(1);
         
-        // TODO: Expose map config api and implement sample program
+        var mapConfigs = _mcsApi.McsMapConfigProviderApi.GetMapConfigs();
+
+        var matchedMap = mapConfigs.Where(kv => kv.Key.Contains(mapName)).ToDictionary();
+
+        if (!matchedMap.Any())
+        {
+            playerController.PrintToChat($"{mapName} is not found in map config list");
+            return;
+        }
         
-        // _mcsApi.MapConfig
+        if (matchedMap.Count > 1)
+        {
+            playerController.PrintToChat($"Multiple map found with {mapName}");
+            return;
+        }
         
-        // _mcsApi.McsNominationApi.NominateMap(playerController, );
+        _mcsApi.McsNominationApi.NominateMap(playerController, matchedMap.First().Value);
     }
     
 
