@@ -9,6 +9,7 @@ using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
+using MapChooserSharp.Modules.MapCycle.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -22,14 +23,14 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     public override string ModuleChatPrefix => "unused";
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
     
-    private IMcsMapCycleControllerApi _mapCycleController = null!;
+    private IMcsInternalMapCycleControllerApi _mapCycleController = null!;
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
 
 
     protected override void OnAllPluginsLoaded()
     {
-        _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
+        _mapCycleController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleControllerApi>();
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         Plugin.AddCommand("css_timeleft", "Show timeleft", CommandTimeLeft);

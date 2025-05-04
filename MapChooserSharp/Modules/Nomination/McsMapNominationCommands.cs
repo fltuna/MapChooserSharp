@@ -10,6 +10,7 @@ using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.API.Nomination;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
+using MapChooserSharp.Modules.MapCycle.Interfaces;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
@@ -28,7 +29,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
     private IMcsInternalNominationApi _mapNominationController = null!;
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
-    private McsMapCycleController _mapCycleController = null!;
+    private IMcsInternalMapCycleControllerApi _mapCycleController = null!;
 
 
     protected override void OnAllPluginsLoaded()
@@ -36,7 +37,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         _mapNominationController = ServiceProvider.GetRequiredService<IMcsInternalNominationApi>();
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
-        _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
+        _mapCycleController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleControllerApi>();
         
         Plugin.AddCommand("css_nominate", "Nominate a map", CommandNominateMap);
         Plugin.AddCommand("css_nomlist", "Shows nomination list", CommandNomList);
