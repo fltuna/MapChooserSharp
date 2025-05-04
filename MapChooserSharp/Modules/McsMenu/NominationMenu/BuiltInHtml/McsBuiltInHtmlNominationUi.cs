@@ -3,6 +3,8 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Menu;
 using MapChooserSharp.API.MapVoteController;
+using MapChooserSharp.Modules.MapConfig.Interfaces;
+using MapChooserSharp.Modules.MapConfig.Models;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.McsMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
@@ -22,7 +24,7 @@ public class McsBuiltInHtmlNominationUi(CCSPlayerController playerController, IS
 
     private readonly TncssPluginBase _plugin = provider.GetRequiredService<TncssPluginBase>();
     
-    private readonly IMcsPluginConfigProvider _mcsPluginConfigProvider = provider.GetRequiredService<IMcsPluginConfigProvider>();
+    private readonly IMapConfigProvider _mapConfigProvider = provider.GetRequiredService<IMapConfigProvider>();
     
     private readonly IDebugLogger _debugLogger = provider.GetRequiredService<IDebugLogger>();
     
@@ -62,7 +64,7 @@ public class McsBuiltInHtmlNominationUi(CCSPlayerController playerController, IS
             
             // TODO() Use Alias name if enabled and available
             // TODO() Truncate MapName if too long
-            builder.Append(option.NominationOption.MapConfig.MapName);
+            builder.Append(_mapConfigProvider.GetMapName(option.NominationOption.MapConfig));
             
             chatMenuOptions.Add(new ChatMenuOption(builder.ToString(), option.MenuDisabled, (_, _) =>
             {

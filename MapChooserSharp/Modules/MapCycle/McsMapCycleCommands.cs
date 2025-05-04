@@ -114,7 +114,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (nextMap != null)
             {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.NextMap", nextMap.MapName));
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.NextMap", _mapConfigProvider.GetMapName(nextMap)));
             }
             else
             {
@@ -125,7 +125,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (nextMap != null)
             {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", nextMap.MapName));
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mapConfigProvider.GetMapName(nextMap)));
             }
             else
             {
@@ -179,11 +179,11 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (player == null)
             {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetNextMap.Failed", newNextMap.MapName));
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetNextMap.Failed", _mapConfigProvider.GetMapName(newNextMap)));
             }
             else
             {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetNextMap.Failed", newNextMap.MapName));
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetNextMap.Failed", _mapConfigProvider.GetMapName(newNextMap)));
             }
             
             return;
@@ -192,11 +192,11 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         
         if (previousNextMapConfig != null)
         {
-            PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.ChangedNextMap", executorName, newNextMap.MapName);
+            PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.ChangedNextMap", executorName, _mapConfigProvider.GetMapName(newNextMap));
         }
         else
         {
-            PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.SetNextMap", executorName, newNextMap.MapName);
+            PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.SetNextMap", executorName, _mapConfigProvider.GetMapName(newNextMap));
         }
     }
     
@@ -216,8 +216,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         }
         else
         {
-            // Ignore method's return. because we are already checked _mapCycleController.NextMap is null
-            string nextMapName = _mapCycleController.NextMap.MapName;
+            string nextMapName = _mapConfigProvider.GetMapName(_mapCycleController.NextMap);
             
             _mapCycleController.RemoveNextMap();
             
@@ -234,7 +233,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (currentMap != null)
             {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.CurrentMap", currentMap.MapName));
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.CurrentMap", _mapConfigProvider.GetMapName(currentMap)));
             }
             else
             {
@@ -246,7 +245,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
             if (currentMap != null)
             {
                 // TODO() Use alias name if available 
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.CurrentMap", currentMap.MapName));
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.CurrentMap", _mapConfigProvider.GetMapName(currentMap)));
             }
             else
             {
