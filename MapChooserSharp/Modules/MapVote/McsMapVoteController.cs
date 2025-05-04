@@ -42,7 +42,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     
     
     private IMcsInternalEventManager _mcsEventManager = null!;
-    private IMapConfigProvider _mapConfigProvider = null!;
+    private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private McsMapCycleController _mapCycleController = null!;
     private IMcsInternalNominationApi _mapNominationController = null!;
@@ -68,7 +68,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         _mcsVoteMenuProvider = ServiceProvider.GetRequiredService<IMcsMapVoteMenuProvider>();
         _countdownUiController = ServiceProvider.GetRequiredService<McsCountdownUiController>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
-        _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         
@@ -181,7 +181,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         int maxMenuElements = MaxVoteMenuElements;
     
-        Dictionary<string, IMapConfig> mapConfigs = _mapConfigProvider.GetMapConfigs();
+        IReadOnlyDictionary<string, IMapConfig> mapConfigs = _mcsInternalMapConfigProviderApi.GetMapConfigs();
         Dictionary<string, IMapConfig> unusedMapPool = new(mapConfigs);
         
         List<IMapVoteData> mapsToVote = new();
@@ -195,7 +195,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             if (!unusedMapPool.TryGetValue(mapName, out var mapConfig))
                 return;
 
-            string menuName = _mapConfigProvider.GetMapName(mapConfig);
+            string menuName = _mcsInternalMapConfigProviderApi.GetMapName(mapConfig);
 
             IMcsVoteOption voteOption = new McsVoteOption(menuName, CastPlayerVote);
             voteOptions.Add(voteOption);
@@ -965,7 +965,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         }
         else
         {
-            mapName.Append(_mapConfigProvider.GetMapName(votedMap.MapConfig));
+            mapName.Append(_mcsInternalMapConfigProviderApi.GetMapName(votedMap.MapConfig));
         }
         
         return mapName;

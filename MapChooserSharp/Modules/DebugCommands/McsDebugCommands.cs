@@ -18,13 +18,13 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
     public override string ModuleChatPrefix => $" {ChatColors.Purple}[MCS DEBUG]{ChatColors.Default}";
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
-    private IMapConfigProvider _mapConfigProvider = null!;
+    private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private McsMapVoteController _mcsMapVoteController = null!;
     
     protected override void OnAllPluginsLoaded()
     {
-        _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
         _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         
@@ -50,7 +50,7 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
     {
         info.ReplyToCommand("======= maps =======");
 
-        foreach (var (key, value) in _mapConfigProvider.GetMapConfigs())
+        foreach (var (key, value) in _mcsInternalMapConfigProviderApi.GetMapConfigs())
         {
             info.ReplyToCommand($"Name: {value.MapName} | Alias: {value.MapNameAlias} ");
         }
@@ -66,7 +66,7 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
             return;
         }
 
-        var mapCfg = _mapConfigProvider.GetMapConfig(info.ArgByIndex(1));
+        var mapCfg = _mcsInternalMapConfigProviderApi.GetMapConfig(info.ArgByIndex(1));
 
         if (mapCfg == null)
         {

@@ -12,7 +12,7 @@ internal class MapConfigParser(string configPath)
 {
     private string ConfigPath { get; } = configPath;
 
-    public IMapConfigProvider Load()
+    public IMcsInternalMapConfigProviderApi Load()
     {
         string directory = Path.GetDirectoryName(ConfigPath)!;
         if (!Directory.Exists(directory))
@@ -34,7 +34,7 @@ internal class MapConfigParser(string configPath)
         return LoadConfigFromFile();
     }
 
-    private IMapConfigProvider LoadConfigFromFile()
+    private IMcsInternalMapConfigProviderApi LoadConfigFromFile()
     {
         string configText;
 
@@ -227,7 +227,7 @@ internal class MapConfigParser(string configPath)
             actualGroupSettings[key] = new MapGroupSettings(key, new MapCooldown(value.Cooldown ?? 0));
         }
         
-        return new MapConfigProvider(finalMapConfigs, actualGroupSettings);
+        return new McsMapConfigProvider(finalMapConfigs, actualGroupSettings);
     }
     
     private void VerifyRequiredDefaultSettings(NullableMapConfig defaultConfig)
