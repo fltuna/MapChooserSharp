@@ -86,7 +86,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         _mcsEventManager.RegisterEventHandler<McsMapVoteCancelledEvent>(OnVoteCancelled);
         
         
-        Plugin.RegisterListener<Listeners.OnMapStart>((mapName) =>
+        Plugin.RegisterListener<Listeners.OnMapStart>((_) =>
         {
             RtvCommandStatus = RtvStatus.Enabled;
             ResetRtvStatus();
@@ -132,15 +132,8 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
 
     internal PlayerRtvResult AddPlayerToRtv(CCSPlayerController player)
     {
-        var rtvCastEvent = new McsPlayerRtvCastEvent(player, GetTextWithModulePrefix(""));
-        var result = _mcsEventManager.FireEvent(rtvCastEvent);
-        
-        if (result > McsEventResult.Handled)
-        {
-            DebugLogger.LogInformation("Rtv cast event is cancelled by a another plugin.");
-            return PlayerRtvResult.NotAllowed;
-        }
-        
+        if (RtvCommandStatus == RtvStatus.Triggered)
+            return PlayerRtvResult.RtvTriggeredAlready;
         
         if (RtvCommandStatus == RtvStatus.AnotherVoteOngoing)
             return PlayerRtvResult.AnotherVoteOngoing;
@@ -153,9 +146,18 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         
         if (!_rtvVoteParticipants.Add(player.Slot))
             return PlayerRtvResult.AlreadyInRtv;
+        
+        var rtvCastEvent = new McsPlayerRtvCastEvent(player, GetTextWithModulePrefix(""));
+        var result = _mcsEventManager.FireEvent(rtvCastEvent);
+        
+        if (result > McsEventResult.Handled)
+        {
+            DebugLogger.LogInformation("Rtv cast event is cancelled by a another plugin.");
+            return PlayerRtvResult.NotAllowed;
+        }
 
 
-        // CountsRequiredToInitiateRtv is possibly 0, so if 0 visual required is set to 1, otherwise actual count.
+        // CountsRequiredToInitiateRtv is possibly 0, so if 0 visual required count is set to 1, otherwise actual count.
         int visualRequiredCount = CountsRequiredToInitiateRtv > 0 ? CountsRequiredToInitiateRtv : 1;
         
         PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.PlayerCastRtv", player.PlayerName, _rtvVoteParticipants.Count, visualRequiredCount);
@@ -178,6 +180,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
 
     internal void InitiateRtvVote()
     {
+        RtvCommandStatus = RtvStatus.Triggered;
         _mcsMapVoteController.InitiateVote(true);
     }
 
@@ -228,6 +231,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
 
     internal void ChangeToNextMap()
     {
+        RtvCommandStatus = RtvStatus.Triggered;
         _mcsMapCycleController.ChangeMapOnNextRoundEnd = MapChangeTimingShouldRoundEnd.Value;
 
         if (MapChangeTimingShouldRoundEnd.Value)
@@ -248,7 +252,8 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         CommandInCooldown,
         CommandDisabled,
         AnotherVoteOngoing,
-        NotAllowed
+        NotAllowed,
+        RtvTriggeredAlready,
     }
 
     internal enum RtvStatus
@@ -257,6 +262,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         Disabled,
         InCooldown,
         AnotherVoteOngoing,
+        Triggered,
     }
 
     #endregion

@@ -82,6 +82,10 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
             case McsRtvController.PlayerRtvResult.NotAllowed:
                 // Do nothing, because this only happen when cancelled through API, so APIs responsibility
                 break;
+            
+            case McsRtvController.PlayerRtvResult.RtvTriggeredAlready:
+                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.AlreadyTriggered"));
+                break;
         }
     }
 
@@ -89,16 +93,15 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
     [RequiresPermissions(@"css/map")]
     private void CommandEnableRtv(CCSPlayerController? client, CommandInfo info)
     {
-        if (_mcsRtvController.RtvCommandStatus == McsRtvController.RtvStatus.AnotherVoteOngoing)
+        if (IsAnotherVOteOngoing())
         {
-            if (client == null)
-            {
-                Server.PrintToConsole(LocalizeString("RTV.Notification.Admin.AnotherVoteInProgress"));
-            }
-            else
-            {
-                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.Admin.AnotherVoteInProgress"));
-            }
+            NotifyAnotherVoteOnGoing(client);
+            return;
+        }
+
+        if (CheckRtvAlreadyTriggered())
+        {
+            NotifyRtvAlreadyTriggered(client);
             return;
         }
         
@@ -108,16 +111,15 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
     [RequiresPermissions(@"css/map")]
     private void CommandDisableRtv(CCSPlayerController? client, CommandInfo info)
     {
-        if (_mcsRtvController.RtvCommandStatus == McsRtvController.RtvStatus.AnotherVoteOngoing)
+        if (IsAnotherVOteOngoing())
         {
-            if (client == null)
-            {
-                Server.PrintToConsole(LocalizeString("RTV.Notification.Admin.AnotherVoteInProgress"));
-            }
-            else
-            {
-                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.Admin.AnotherVoteInProgress"));
-            }
+            NotifyAnotherVoteOnGoing(client);
+            return;
+        }
+
+        if (CheckRtvAlreadyTriggered())
+        {
+            NotifyRtvAlreadyTriggered(client);
             return;
         }
         
@@ -127,20 +129,61 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
     [RequiresPermissions(@"css/map")]
     private void CommandForceRtv(CCSPlayerController? client, CommandInfo info)
     {
-        if (_mcsRtvController.RtvCommandStatus == McsRtvController.RtvStatus.AnotherVoteOngoing)
+        if (IsAnotherVOteOngoing())
         {
-            if (client == null)
-            {
-                Server.PrintToConsole(LocalizeString("RTV.Notification.Admin.AnotherVoteInProgress"));
-            }
-            else
-            {
-                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.Admin.AnotherVoteInProgress"));
-            }
+            NotifyAnotherVoteOnGoing(client);
+            return;
+        }
+
+        if (CheckRtvAlreadyTriggered())
+        {
+            NotifyRtvAlreadyTriggered(client);
             return;
         }
 
         _mcsRtvController.InitiateForceRtvVote(client);
+    }
+
+    
+    private void NotifyAnotherVoteOnGoing(CCSPlayerController? client)
+    {
+        if (client == null)
+        {
+            Server.PrintToConsole(LocalizeString("RTV.Notification.Admin.AnotherVoteInProgress"));
+        }
+        else
+        {
+            client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.Admin.AnotherVoteInProgress"));
+        }
+    }
+    
+    private bool IsAnotherVOteOngoing()
+    {
+        if (_mcsRtvController.RtvCommandStatus == McsRtvController.RtvStatus.AnotherVoteOngoing)
+            return true;
+        
+        return false;
+    }
+
+
+    private void NotifyRtvAlreadyTriggered(CCSPlayerController? client)
+    {
+        if (client == null)
+        {
+            Server.PrintToConsole(LocalizeString("RTV.Notification.Admin.AlreadyTriggered"));
+        }
+        else
+        {
+            client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.Admin.AlreadyTriggered"));
+        }
+    }
+    
+    private bool CheckRtvAlreadyTriggered()
+    {
+        if (_mcsRtvController.RtvCommandStatus == McsRtvController.RtvStatus.Triggered)
+            return true;
+        
+        return false;
     }
 
     private HookResult SayCommandListener(CCSPlayerController? player, CommandInfo info)
