@@ -65,6 +65,7 @@
     "MapVote.Command.Notification.Revote.NoActiveVote": "現在投票は行われていません!",
     "MapVote.Broadcast.NotEnoughMapsToStartVote": "マップ投票を開始するために十分なマップが存在しません! サーバー管理者にお問い合わせください!",
     "MapVote.Broadcast.VoteFinished": "投票が完了しました! {1}/{0} ({2}%)",
+    "MapVote.Broadcast.VoteCast": "{lime}{0}{default} が {lime}{1}{default} に投票しました",
     "MapVote.Broadcast.StartingRunoffVote": "どのマップの投票率も {0}% を超えませんでした! 最終投票を開始します!",
     "MapVote.Broadcast.Admin.CancelVote": "管理者 {lime}{0}{default} が投票をキャンセルしました!",
     "MapVote.Broadcast.VoteResult.NoVotes": "投票がなかったため次のマップは {lime}{0}{default} になります",

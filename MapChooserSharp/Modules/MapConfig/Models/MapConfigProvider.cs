@@ -10,8 +10,8 @@ public class MapConfigProvider: IMapConfigProvider
     
     public MapConfigProvider(Dictionary<string, IMapConfig> mapConfigs, Dictionary<string, IMapGroupSettings> groupConfigs)
     {
-        this._mapConfigs = mapConfigs;
-        this._groupConfigs = groupConfigs;
+        _mapConfigs = mapConfigs;
+        _groupConfigs = groupConfigs;
 
 
         _mapConfigs = mapConfigs
@@ -49,5 +49,13 @@ public class MapConfigProvider: IMapConfigProvider
         }
 
         return null;
+    }
+
+    public string GetMapName(IMapConfig mapConfig)
+    {
+        if (mapConfig.MapNameAlias != string.Empty)
+            return mapConfig.MapNameAlias;
+        
+        return mapConfig.MapName;
     }
 }

@@ -56,8 +56,9 @@ internal class McsPluginConfigParser(string configPath, IServiceProvider provide
         var mapCycleConfig = ParseMapCycleConfig(tomlModel);
         var nominationConfig = ParseNominationConfig(tomlModel);
         var voteConfig = ParseVoteConfig(tomlModel);
+        var generalConfig = ParseGeneralConfig(tomlModel);
         
-        var pluginConfig = new McsPluginConfig(voteConfig, nominationConfig, mapCycleConfig);
+        var pluginConfig = new McsPluginConfig(voteConfig, nominationConfig, mapCycleConfig, generalConfig);
         
         return new McsPluginConfigProvider(pluginConfig);
     }
@@ -140,6 +141,8 @@ internal class McsPluginConfigParser(string configPath, IServiceProvider provide
         
         int fallbackExtendRoundsPerExtends = (int)defaultExtendsRoundLong;
         
+        
+        
         return new McsMapCycleConfig(defaultMaxExtends, fallbackExtendTimePerExtends, fallbackExtendRoundsPerExtends);
     }
 
@@ -188,6 +191,21 @@ internal class McsPluginConfigParser(string configPath, IServiceProvider provide
         return new McsVoteConfig(availableMenus, currentMenuType, (int)maxVoteElementsLong);
     }
 
+
+    private IMcsGeneralConfig ParseGeneralConfig(TomlTable tomlModel)
+    {
+        if (!tomlModel.TryGetValue("General", out var generalObj) || generalObj is not TomlTable generalTable)
+        {
+            throw new InvalidOperationException("General section is not found");
+        }
+        
+        if (!generalTable.TryGetValue("ShouldUseAliasMapNameIfAvailable", out var aliasNameSettingObj) || aliasNameSettingObj is not bool aliasNameSetting)
+        {
+            throw new InvalidOperationException("General.ShouldUseAliasMapNameIfAvailable is not found or invalid");
+        }
+        
+        return new McsGeneralConfig(aliasNameSetting);
+    }
     
     
     private McsSupportedMenuType DecideMenuType(string menuTypeStr, List<McsSupportedMenuType> availableMenus)
@@ -237,6 +255,10 @@ internal class McsPluginConfigParser(string configPath, IServiceProvider provide
         Directory.CreateDirectory(Path.GetDirectoryName(ConfigPath)!);
 
         string defaultConfig = @$"# MapChooserSharp Plugin Configuration
+
+[General]
+# Should use alias map name if available? (This will take effect to all things that prints a map name)
+ShouldUseAliasMapNameIfAvailable = true
 
 [MapCycle]
 # Fallback settings for maps with no config

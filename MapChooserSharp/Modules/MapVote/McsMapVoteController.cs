@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API;
+﻿using System.Text;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
@@ -25,6 +26,7 @@ using MapChooserSharp.Modules.Nomination;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using TNCSSPluginFoundation.Models.Plugin;
 using TNCSSPluginFoundation.Utils.Entity;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
@@ -108,7 +110,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     // TODO() These settings should be plugin config
     public int MaxVoteMenuElements => _mcsPluginConfigProvider.PluginConfig.VoteConfig.MaxMenuElements;
     public readonly FakeConVar<bool> ShouldShuffleVoteMenu = new("mcs_vote_shuffle_menu", "Should vote menu elements is shuffled?", false);
-    public readonly FakeConVar<bool> ShouldUseAliasName = new("mcs_vote_use_alias_name", "Should use alias name if available?", false);
     public readonly FakeConVar<float> MapVoteEndTime = new("mcs_vote_end_time", "How long to take vote ends in seconds?", 15.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(5.0F, 120.0F));
     public readonly FakeConVar<int> VoteStartCountDownTime = new("mcs_vote_countdown_time", "How long to take vote starts in seconds", 13, ConVarFlags.FCVAR_NONE, new RangeValidator<int>(0, 120));
     
@@ -122,7 +123,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private void TrackVoteSettingsConVar()
     {
         TrackConVar(ShouldShuffleVoteMenu);
-        TrackConVar(ShouldUseAliasName);
         TrackConVar(MapVoteEndTime);
         TrackConVar(VoteStartCountDownTime);
         TrackConVar(MapVoteRunoffMapPickupThreshold);
@@ -151,6 +151,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     
     private int FallBackDefaultExtendTime => _mcsPluginConfigProvider.PluginConfig.MapCycleConfig.FallbackExtendTimePerExtends;
     private int FallBackDefaultExtendRound => _mcsPluginConfigProvider.PluginConfig.MapCycleConfig.FallbackExtendRoundsPerExtends;
+
+    private bool ShouldUseAliasMapNameIfAvailable => _mcsPluginConfigProvider.PluginConfig.GeneralConfig.ShouldUseAliasMapNameIfAvailable;
 
     private readonly Random _random = new();
     
@@ -192,12 +194,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             if (!unusedMapPool.TryGetValue(mapName, out var mapConfig))
                 return;
 
-            string menuName = mapName;
-            
-            if (ShouldUseAliasName.Value && mapConfig.MapNameAlias != string.Empty)
-            {
-                menuName = mapConfig.MapNameAlias;
-            }
+            string menuName = _mapConfigProvider.GetMapName(mapConfig);
 
             IMcsVoteOption voteOption = new McsVoteOption(menuName, CastPlayerVote);
             voteOptions.Add(voteOption);
@@ -463,7 +460,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         float mapVotePercentage = (float)winMap.GetVoters().Count / totalVotes * 100.0F;
 
-        PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NextMapConfirmed", winMap.MapConfig.MapName, $"{mapVotePercentage:F2}", totalVotes);
+        PrintEndVoteResult(winMap, mapVotePercentage, totalVotes);
 
         FireVoteFinishedEvent();
         FireNextMapConfirmedEvent(winMap.MapConfig);
@@ -504,7 +501,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             
             string menuName = vote.MapName;
             
-            if (ShouldUseAliasName.Value && vote.MapConfig.MapNameAlias != string.Empty)
+            if (ShouldUseAliasMapNameIfAvailable && vote.MapConfig.MapNameAlias != string.Empty)
             {
                 menuName = vote.MapConfig.MapNameAlias;
             }
@@ -653,7 +650,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         float mapVotePercentage = (float)winMap.GetVoters().Count / totalVotes * 100.0F;
 
-        PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NextMapConfirmed", winMap.MapConfig.MapName, $"{mapVotePercentage:F2}", totalVotes);
+        PrintEndVoteResult(winMap, mapVotePercentage, totalVotes);
         
         FireVoteFinishedEvent();
         FireNextMapConfirmedEvent(winMap.MapConfig);
@@ -917,6 +914,10 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return;
         }
         
+        IMapVoteData votedMap = _mapVoteContent.GetVotingMaps()[voteIndex];
+        
+        PrintLocalizedChatToAll("MapVote.Broadcast.VoteCast", player.PlayerName, GetMapName(votedMap, player).ToString());
+        
         voteUi.CloseMenu();
 
         if (AllVotesCount >= _mapVoteContent.GetVoteParticipants().Count)
@@ -941,6 +942,41 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         DebugLogger.LogDebug($"Trying to remove player vote for slot: {slot}");
         var mapVoteData = GetPlayerVotedMap(slot);
         mapVoteData?.RemoveVoter(slot);
+    }
+
+
+    private StringBuilder GetMapName(IMapVoteData votedMap, CCSPlayerController player)
+    {
+        StringBuilder mapName = new();
+        if (votedMap.MapConfig == null)
+        {
+            mapName.Append(votedMap.MapName
+                // If string contains Extend placeholder, then replace it.
+                .Replace(IdExtendMap,
+                    LocalizeStringForPlayer(player, "Word.ExtendMap"))
+                // If string contains Don't change placeholder, then replace it.
+                .Replace(IdDontChangeMap,
+                    LocalizeStringForPlayer(player, "Word.DontChangeMap")));
+        }
+        else
+        {
+            mapName.Append(_mapConfigProvider.GetMapName(votedMap.MapConfig));
+        }
+        
+        return mapName;
+    }
+
+    private void PrintEndVoteResult(IMapVoteData winMap, float mapVotePercentage, int totalVotes)
+    {
+        foreach (CCSPlayerController controller in Utilities.GetPlayers())
+        {
+            if (controller.IsBot || controller.IsHLTV)
+                continue;
+            
+            controller.PrintToChat(
+                LocalizeStringForPlayer(controller, "MapVote.Broadcast.VoteResult.NextMapConfirmed", 
+                    GetMapName(winMap, controller).ToString(), $"{mapVotePercentage:F2}", totalVotes));
+        }
     }
 
     private IMapVoteData? GetPlayerVotedMap(int slot)

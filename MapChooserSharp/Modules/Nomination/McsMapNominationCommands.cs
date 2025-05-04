@@ -194,7 +194,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             }
             else
             {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mapConfigProvider.GetMapName(_mapCycleController.NextMap!)));
             }
             return;
         }
@@ -249,7 +249,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             return;
         }
 
-        _mapNominationController.RemoveNomination(player, matchedMaps.First().Key);
+        _mapNominationController.RemoveNomination(player, _mapConfigProvider.GetMapName(matchedMaps.First().Value.MapConfig));
     }
 
 
@@ -280,12 +280,12 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         int index = 1;
         foreach (var (key, value) in _mapNominationController.NominatedMaps)
         {
-            PrintNominatedMap(player, key, index, value, isVerbose);
+            PrintNominatedMap(player, index, value, isVerbose);
             index++;
         }
     }
 
-    private void PrintNominatedMap(CCSPlayerController player, string mapName, int index, IMcsNominationData nominationData, bool isVerbose = false)
+    private void PrintNominatedMap(CCSPlayerController player, int index, IMcsNominationData nominationData, bool isVerbose = false)
     {
         StringBuilder nominatedText = new StringBuilder();
 
@@ -313,17 +313,17 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             
                 
                 
-            nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Verbose", index, mapName, nominators.ToString()));
+            nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Verbose", index, _mapConfigProvider.GetMapName(nominationData.MapConfig), nominators.ToString()));
         }
         else
         {
             if (nominationData.IsForceNominated)
             {
-                nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Verbose", index, mapName, LocalizeStringForPlayer(player, "NominationList.Command.Notification.AdminNomination")));
+                nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Verbose", index, _mapConfigProvider.GetMapName(nominationData.MapConfig), LocalizeStringForPlayer(player, "NominationList.Command.Notification.AdminNomination")));
             }
             else
             {
-                nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Content", index, mapName, nominationData.NominationParticipants.Count));
+                nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Content", index, _mapConfigProvider.GetMapName(nominationData.MapConfig), nominationData.NominationParticipants.Count));
             }
         }
         
