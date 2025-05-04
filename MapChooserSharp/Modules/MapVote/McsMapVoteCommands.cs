@@ -70,8 +70,9 @@ public class McsMapVoteCommands(IServiceProvider serviceProvider) : PluginModule
             return;
         }
 
-        if (_mcsMapVoteController.CurrentVoteState != McsMapVoteState.Voting && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.RunoffVoting)
+        if (_mcsMapVoteController.CurrentVoteState != McsMapVoteState.Voting && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.RunoffVoting && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.Initializing)
         {
+            Server.PrintToChatAll($"AA {_mcsMapVoteController.CurrentVoteState}");
             if (player == null)
             {
                 Server.PrintToConsole(LocalizeString("MapVote.Command.Notification.Revote.NoActiveVote"));
