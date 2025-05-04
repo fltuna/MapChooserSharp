@@ -11,6 +11,8 @@ using MapChooserSharp.API.RtvController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.MapVote.Interfaces;
+using MapChooserSharp.Modules.RockTheVote.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 using TNCSSPluginFoundation.Utils.Entity;
@@ -18,7 +20,7 @@ using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace MapChooserSharp.Modules.RockTheVote;
 
-internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), IMcsRtvControllerApi
+internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), IMcsInternalRtvControllerApi
 {
     public override string PluginModuleName => "McsRtvController";
     public override string ModuleChatPrefix => "Prefix.RTV";
@@ -51,14 +53,14 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
 
     
     
-    internal RtvStatus RtvCommandStatus { get; private set; } = RtvStatus.Enabled;
+    public RtvStatus RtvCommandStatus { get; private set; } = RtvStatus.Enabled;
 
-    internal float RtvCommandUnlockTime { get; private set; } = 0.0F;
+    public float RtvCommandUnlockTime { get; private set; } = 0.0F;
     
     private Timer? RtvCommandUnlockTimer { get; set; }
     
     private IMcsInternalEventManager _mcsEventManager = null!;
-    private McsMapVoteController _mcsMapVoteController = null!;
+    private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
     private McsMapCycleController _mcsMapCycleController = null!;
 
 
@@ -69,13 +71,13 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
     
     public override void RegisterServices(IServiceCollection services)
     {
-        services.AddSingleton(this);
+        services.AddSingleton<IMcsInternalRtvControllerApi>(this);
     }
 
     protected override void OnAllPluginsLoaded()
     {
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
-        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
+        _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
         _mcsMapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
         
         _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
@@ -127,10 +129,10 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
     }
     
     
-    #region Internal API
+    #region API
     
 
-    internal PlayerRtvResult AddPlayerToRtv(CCSPlayerController player)
+    public PlayerRtvResult AddPlayerToRtv(CCSPlayerController player)
     {
         if (RtvCommandStatus == RtvStatus.Triggered)
             return PlayerRtvResult.RtvTriggeredAlready;
@@ -184,7 +186,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         _mcsMapVoteController.InitiateVote(true);
     }
 
-    internal void InitiateForceRtvVote(CCSPlayerController? client)
+    public void InitiateForceRtvVote(CCSPlayerController? client)
     {
         var forceRtvEvent = new McsAdminForceRtvEvent(client, GetTextWithModulePrefix(""));
         var result = _mcsEventManager.FireEvent(forceRtvEvent);
@@ -208,7 +210,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         InitiateRtvVote();
     }
 
-    internal void EnableRtvCommand(CCSPlayerController? client, bool silently = false)
+    public void EnableRtvCommand(CCSPlayerController? client, bool silently = false)
     {
         RtvCommandStatus = RtvStatus.Enabled;
         RtvCommandUnlockTimer?.Kill();
@@ -220,16 +222,19 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.EnabledRtv", executorName);
     }
 
-    internal void DisableRtvCommand(CCSPlayerController? client = null)
+    public void DisableRtvCommand(CCSPlayerController? client = null, bool silently = false)
     {
         RtvCommandStatus = RtvStatus.Disabled;
         RtvCommandUnlockTimer?.Kill();
+        
+        if (silently)
+            return;
 
         string executorName = PlayerUtil.GetPlayerName(client);
         PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.DisableRtv", executorName);
     }
 
-    internal void ChangeToNextMap()
+    private void ChangeToNextMap()
     {
         RtvCommandStatus = RtvStatus.Triggered;
         _mcsMapCycleController.ChangeMapOnNextRoundEnd = MapChangeTimingShouldRoundEnd.Value;
@@ -243,26 +248,6 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
             PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.ChangeToNextMapImmediately", MapChangeTimingAfterRtvSuccess.Value);
             _mcsMapCycleController.ChangeToNextMap(MapChangeTimingAfterRtvSuccess.Value);
         }
-    }
-
-    internal enum PlayerRtvResult
-    {
-        Success = 0,
-        AlreadyInRtv,
-        CommandInCooldown,
-        CommandDisabled,
-        AnotherVoteOngoing,
-        NotAllowed,
-        RtvTriggeredAlready,
-    }
-
-    internal enum RtvStatus
-    {
-        Enabled = 0,
-        Disabled,
-        InCooldown,
-        AnotherVoteOngoing,
-        Triggered,
     }
 
     #endregion

@@ -6,9 +6,11 @@ using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.Events;
 using MapChooserSharp.API.Events.RockTheVote;
 using MapChooserSharp.API.MapVoteController;
+using MapChooserSharp.API.RtvController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.RockTheVote.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 using TNCSSPluginFoundation.Utils.Entity;
@@ -21,13 +23,11 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
     public override string ModuleChatPrefix => _mcsRtvController.ModuleChatPrefix;
     protected override bool UseTranslationKeyInModuleChatPrefix => true;
     
-    private McsRtvController _mcsRtvController = null!;
-    private McsMapCycleController _mcsMapCycleController = null!;
+    private IMcsInternalRtvControllerApi _mcsRtvController = null!;
     
     protected override void OnAllPluginsLoaded()
     {
-        _mcsRtvController = ServiceProvider.GetRequiredService<McsRtvController>();
-        _mcsMapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
+        _mcsRtvController = ServiceProvider.GetRequiredService<IMcsInternalRtvControllerApi>();
         
         Plugin.AddCommand("css_rtv", "Rock The Vote", CommandRtv);
         Plugin.AddCommand("css_enablertv", "Enable RTV", CommandEnableRtv);
@@ -59,31 +59,31 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
 
         switch (status)
         {
-            case McsRtvController.PlayerRtvResult.Success:
+            case PlayerRtvResult.Success:
                 break;
             
-            case McsRtvController.PlayerRtvResult.AlreadyInRtv:
+            case PlayerRtvResult.AlreadyInRtv:
                 client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.AlreadyVoted"));
                 break;
             
-            case McsRtvController.PlayerRtvResult.CommandInCooldown:
+            case PlayerRtvResult.CommandInCooldown:
                 // TODO() Toggle verbose option in plugin config
                 client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.IsInCooldown.Verbose", $"{_mcsRtvController.RtvCommandUnlockTime - Server.CurrentTime:F0}"));
                 break;
             
-            case McsRtvController.PlayerRtvResult.CommandDisabled:
+            case PlayerRtvResult.CommandDisabled:
                 client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.Disabled"));
                 break;
             
-            case McsRtvController.PlayerRtvResult.AnotherVoteOngoing:
+            case PlayerRtvResult.AnotherVoteOngoing:
                 client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.YouCantRtvWhileVote"));
                 break;
             
-            case McsRtvController.PlayerRtvResult.NotAllowed:
+            case PlayerRtvResult.NotAllowed:
                 // Do nothing, because this only happen when cancelled through API, so APIs responsibility
                 break;
             
-            case McsRtvController.PlayerRtvResult.RtvTriggeredAlready:
+            case PlayerRtvResult.RtvTriggeredAlready:
                 client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.AlreadyTriggered"));
                 break;
         }
@@ -159,7 +159,7 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
     
     private bool IsAnotherVOteOngoing()
     {
-        if (_mcsRtvController.RtvCommandStatus == McsRtvController.RtvStatus.AnotherVoteOngoing)
+        if (_mcsRtvController.RtvCommandStatus == RtvStatus.AnotherVoteOngoing)
             return true;
         
         return false;
@@ -180,7 +180,7 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
     
     private bool CheckRtvAlreadyTriggered()
     {
-        if (_mcsRtvController.RtvCommandStatus == McsRtvController.RtvStatus.Triggered)
+        if (_mcsRtvController.RtvCommandStatus == RtvStatus.Triggered)
             return true;
         
         return false;
