@@ -147,8 +147,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private const string IdExtendMap = "MapChooserSharp:ExtendMap";
     private const string IdDontChangeMap = "MapChooserSharp:DontChangeMap";
 
-    internal readonly string PlaceHolderExtendMap = "%PLACE_HOLDER_EXTEND_MAP%";
-    internal readonly string PlaceHolderDontChangeMap = "%PLACE_HOLDER_DONT_CHANGE_MAP%";
+    public string PlaceHolderExtendMap { get; } = "%PLACE_HOLDER_EXTEND_MAP%";
+    public string PlaceHolderDontChangeMap { get; } = "%PLACE_HOLDER_DONT_CHANGE_MAP%";
     
     private int FallBackDefaultExtendTime => _mcsPluginConfigProvider.PluginConfig.MapCycleConfig.FallbackExtendTimePerExtends;
     private int FallBackDefaultExtendRound => _mcsPluginConfigProvider.PluginConfig.MapCycleConfig.FallbackExtendRoundsPerExtends;

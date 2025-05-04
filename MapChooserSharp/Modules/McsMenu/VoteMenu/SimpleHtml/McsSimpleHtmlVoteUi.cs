@@ -25,7 +25,7 @@ public class McsSimpleHtmlVoteUi(CCSPlayerController playerController, IServiceP
     
     private readonly IDebugLogger _debugLogger = provider.GetRequiredService<IDebugLogger>();
     
-    private readonly McsMapVoteController _voteController = provider.GetRequiredService<McsMapVoteController>();
+    private readonly IMcsInternalMapVoteControllerApi _voteController = provider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
     
     private readonly Dictionary<int, List<ChatMenuOption>> _chachedMenuOptions = new();
 
