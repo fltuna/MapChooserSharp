@@ -1,6 +1,6 @@
 ﻿using MapChooserSharp.API.MapConfig;
 
-namespace MapChooserSharp.API.Nomination.Interfaces;
+namespace MapChooserSharp.API.Nomination;
 
 
 /// <summary>

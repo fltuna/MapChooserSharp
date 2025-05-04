@@ -7,11 +7,12 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapVoteController;
-using MapChooserSharp.API.Nomination.Interfaces;
+using MapChooserSharp.API.Nomination;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
+using MapChooserSharp.Modules.Nomination.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 
@@ -23,7 +24,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
     public override string ModuleChatPrefix => _mapNominationController.ModuleChatPrefix;
     protected override bool UseTranslationKeyInModuleChatPrefix => true;
     
-    private McsMapNominationController _mapNominationController = null!;
+    private IMcsInternalNominationApi _mapNominationController = null!;
     private IMapConfigProvider _mapConfigProvider = null!;
     private McsMapVoteController _mcsMapVoteController = null!;
     private McsMapCycleController _mapCycleController = null!;
@@ -31,7 +32,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
 
     protected override void OnAllPluginsLoaded()
     {
-        _mapNominationController = ServiceProvider.GetRequiredService<McsMapNominationController>();
+        _mapNominationController = ServiceProvider.GetRequiredService<IMcsInternalNominationApi>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
         _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
@@ -79,7 +80,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
 
         if (exactMatchedConfig != null)
         {
-            _mapNominationController.AdminNominateMap(player, exactMatchedConfig);
+            _mapNominationController.NominateMap(player, exactMatchedConfig);
             return;
         }
 
@@ -249,7 +250,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             return;
         }
 
-        _mapNominationController.RemoveNomination(player, _mapConfigProvider.GetMapName(matchedMaps.First().Value.MapConfig));
+        _mapNominationController.RemoveNomination(player, matchedMaps.First().Value.MapConfig);
     }
 
 

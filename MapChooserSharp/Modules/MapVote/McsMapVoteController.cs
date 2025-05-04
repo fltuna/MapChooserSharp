@@ -10,7 +10,7 @@ using MapChooserSharp.API.Events.MapCycle;
 using MapChooserSharp.API.Events.MapVote;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapVoteController;
-using MapChooserSharp.API.Nomination.Interfaces;
+using MapChooserSharp.API.Nomination;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
@@ -23,6 +23,7 @@ using MapChooserSharp.Modules.McsMenu.VoteMenu;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.SimpleHtml;
 using MapChooserSharp.Modules.Nomination;
+using MapChooserSharp.Modules.Nomination.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -44,7 +45,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private IMapConfigProvider _mapConfigProvider = null!;
     private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private McsMapCycleController _mapCycleController = null!;
-    private McsMapNominationController _mapNominationController = null!;
+    private IMcsInternalNominationApi _mapNominationController = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
     private IMcsMapVoteMenuProvider _mcsVoteMenuProvider = null!;
     private McsCountdownUiController _countdownUiController = null!;
@@ -63,7 +64,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     protected override void OnAllPluginsLoaded()
     {
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
-        _mapNominationController = ServiceProvider.GetRequiredService<McsMapNominationController>();
+        _mapNominationController = ServiceProvider.GetRequiredService<IMcsInternalNominationApi>();
         _mcsVoteMenuProvider = ServiceProvider.GetRequiredService<IMcsMapVoteMenuProvider>();
         _countdownUiController = ServiceProvider.GetRequiredService<McsCountdownUiController>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();

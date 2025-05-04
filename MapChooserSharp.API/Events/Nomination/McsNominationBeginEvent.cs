@@ -1,6 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core;
 using MapChooserSharp.API.MapConfig;
-using MapChooserSharp.API.Nomination.Interfaces;
+using MapChooserSharp.API.Nomination;
 
 namespace MapChooserSharp.API.Events.Nomination;
 

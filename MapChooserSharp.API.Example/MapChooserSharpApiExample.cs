@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Capabilities;
+using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.Events;
 using MapChooserSharp.API.Events.Nomination;
@@ -29,6 +30,8 @@ public class MapChooserSharpApiExample: BasePlugin
         }
 
         
+        AddCommand("mcsapi_test_nomination", "Test nomination with API", CommandTestMapNomination);
+        
         
         _mcsApi.EventSystem.RegisterEventHandler<McsNominationBeginEvent>(OnMapNominationBegin);
         _mcsApi.EventSystem.RegisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
@@ -38,14 +41,36 @@ public class MapChooserSharpApiExample: BasePlugin
 
     public override void Unload(bool hotReload)
     {
+        RemoveCommand("mcsapi_test_nomination", CommandTestMapNomination);
+        
+        
         _mcsApi.EventSystem.UnregisterEventHandler<McsNominationBeginEvent>(OnMapNominationBegin);
         _mcsApi.EventSystem.UnregisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
         _mcsApi.EventSystem.UnregisterEventHandler<McsPlayerRtvCastEvent>(OnPlayerRtv);
         _mcsApi.EventSystem.UnregisterEventHandler<McsAdminForceRtvEvent>(OnForceRtv);
     }
-    
-    
-    
+
+
+    private void CommandTestMapNomination(CCSPlayerController? playerController, CommandInfo info)
+    {
+        // IMcsNominationApi::NominateMap() API is not allow console player to nominate
+        // Use IMcsNominationApi::AdminNominateMap can nominate map from console
+        if (playerController == null)
+            return;
+
+        if (info.ArgCount < 2)
+        {
+            playerController.PrintToChat("Usage: mcsapi_test_nomination <MapName>");
+            return;
+        }
+        
+        
+        // TODO: Expose map config api and implement sample program
+        
+        // _mcsApi.MapConfig
+        
+        // _mcsApi.McsNominationApi.NominateMap(playerController, );
+    }
     
 
     private McsEventResultWithCallback OnMapNominationBegin(McsNominationBeginEvent @event)

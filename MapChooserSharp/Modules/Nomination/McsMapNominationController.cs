@@ -10,7 +10,6 @@ using MapChooserSharp.API.Events.Nomination;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.API.Nomination;
-using MapChooserSharp.API.Nomination.Interfaces;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.EventManager;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
@@ -18,6 +17,7 @@ using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.McsMenu;
 using MapChooserSharp.Modules.McsMenu.NominationMenu;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
+using MapChooserSharp.Modules.Nomination.Interfaces;
 using MapChooserSharp.Modules.Nomination.Models;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -25,7 +25,7 @@ using TNCSSPluginFoundation.Utils.Entity;
 
 namespace MapChooserSharp.Modules.Nomination;
 
-internal sealed class McsMapNominationController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsNominationApi
+internal sealed class McsMapNominationController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsInternalNominationApi
 {
     public override string PluginModuleName => "McsMapNominationController";
     public override string ModuleChatPrefix => "Prefix.Nomination";
@@ -36,14 +36,16 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     private IMapConfigProvider _mapConfigProvider = null!;
     private IMcsNominationMenuProvider _mcsNominationMenuProvider = null!;
     
-    private Dictionary<int, IMcsNominationUserInterface> _mcsActiveUserNominationMenu = new();
+    private readonly Dictionary<int, IMcsNominationUserInterface> _mcsActiveUserNominationMenu = new();
     
     
-    internal Dictionary<string, IMcsNominationData> NominatedMaps { get; } = new();
+    public Dictionary<string, IMcsNominationData> NominatedMaps { get; } = new();
+
+    public IReadOnlyDictionary<string, IMcsNominationData> GetNominatedMaps() => NominatedMaps;
 
     public override void RegisterServices(IServiceCollection services)
     {
-        services.AddSingleton(this);
+        services.AddSingleton<IMcsInternalNominationApi>(this);
     }
 
     protected override void OnAllPluginsLoaded()
@@ -91,14 +93,9 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     }
     
 
-    internal void NominateMap(CCSPlayerController? player, IMapConfig mapConfig)
+    public void NominateMap(CCSPlayerController player, IMapConfig mapConfig)
     {
-        if (player == null)
-        {
-            Server.PrintToConsole("Please use css_nominate_addmap instead.");
-            return;
-        }
-
+        Server.PrintToChatAll("Nominate!");
         NominationCheck check = PlayerCanNominateMap(player, mapConfig);
 
         bool processed = ProcessNominationCheckResult(player, mapConfig, check);
@@ -159,7 +156,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         }
     }
 
-    internal void AdminNominateMap(CCSPlayerController? player, IMapConfig mapConfig)
+    public void AdminNominateMap(CCSPlayerController? player, IMapConfig mapConfig)
     {
         if (mapConfig.NominationConfig.ProhibitAdminNomination)
         {
@@ -210,7 +207,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     /// <param name="player">Player controller</param>
     /// <param name="configs">Map configs to show</param>
     /// <param name="isAdminNomination">This nomination menu is should be admin nomination menu?</param>
-    internal void ShowNominationMenu(CCSPlayerController player, List<IMapConfig> configs, bool isAdminNomination = false)
+    public void ShowNominationMenu(CCSPlayerController player, List<IMapConfig> configs, bool isAdminNomination = false)
     {
         if(configs.Count == 0)
             return;
@@ -234,11 +231,11 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     }
 
     /// <summary>
-    /// Show nomination menu to player, this method is shows everything in map config
+    /// Show nomination menu to player, this method is shows all maps in map config provider
     /// </summary>
     /// <param name="player">Player controller</param>
     /// <param name="isAdminNomination">This nomination menu is should be admin nomination menu?</param>
-    internal void ShowNominationMenu(CCSPlayerController player, bool isAdminNomination = false)
+    public void ShowNominationMenu(CCSPlayerController player, bool isAdminNomination = false)
     {
         ShowNominationMenu(player, _mapConfigProvider.GetMapConfigs().Select(kv => kv.Value).ToList(), isAdminNomination);
     }
@@ -263,7 +260,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     
     
     
-    internal void ShowRemoveNominationMenu(CCSPlayerController player, List<IMcsNominationData> nominationData)
+    public void ShowRemoveNominationMenu(CCSPlayerController player, List<IMcsNominationData> nominationData)
     {
         if (nominationData.Count == 0)
             return;
@@ -274,7 +271,6 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         
         foreach (IMcsNominationData data in nominationData)
         {
-            // TODO() More menu disablation check
             menuOptions.Add(new McsNominationMenuOption(new McsNominationOption(data.MapConfig), OnPlayerCastRemoveNominationMenu, false));
         }
         
@@ -284,7 +280,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         _mcsActiveUserNominationMenu[player.Slot] = ui;
     }
     
-    internal void ShowRemoveNominationMenu(CCSPlayerController player)
+    public void ShowRemoveNominationMenu(CCSPlayerController player)
     {
         ShowRemoveNominationMenu(player, NominatedMaps.Select(kv => kv.Value).ToList());
     }
@@ -301,11 +297,13 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     }
 
 
-    internal void RemoveNomination(CCSPlayerController? player, string key)
+    public void RemoveNomination(CCSPlayerController? player, IMapConfig mapConfig)
     {
+        if (!NominatedMaps.Remove(mapConfig.MapName))
+            return;
+        
         string executorName = PlayerUtil.GetPlayerName(player);
-        PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.Admin.RemovedNomiantion", executorName, key);
-        NominatedMaps.Remove(key);
+        PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.Admin.RemovedNomiantion", executorName, _mapConfigProvider.GetMapName(mapConfig));
     }
 
     private void PrintNominationResult(CCSPlayerController player, IMapConfig mapConfig, bool isFirstNomination)
