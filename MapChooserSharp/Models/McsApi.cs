@@ -1,5 +1,6 @@
 ﻿using MapChooserSharp.API;
 using MapChooserSharp.API.Events;
+using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.API.Nomination;
@@ -12,11 +13,13 @@ public sealed class McsApi(
     IMcsMapCycleControllerApi mcsMapCycleController,
     IMcsNominationApi mcsNominationApi,
     IMcsMapVoteControllerApi mcsMapVoteControllerApi,
-    IMcsRtvControllerApi mcsRtvControllerApi): IMapChooserSharpApi
+    IMcsRtvControllerApi mcsRtvControllerApi,
+    IMcsMapConfigProviderApi mcsMapConfigProviderApi): IMapChooserSharpApi
 {
     public IMcsEventSystem EventSystem { get; } = eventSystem;
     public IMcsMapCycleControllerApi McsMapCycleController { get; } = mcsMapCycleController;
     public IMcsNominationApi McsNominationApi { get; } = mcsNominationApi;
     public IMcsMapVoteControllerApi McsMapVoteControllerApi { get; } = mcsMapVoteControllerApi;
     public IMcsRtvControllerApi McsRtvControllerApi { get; } = mcsRtvControllerApi;
+    public IMcsMapConfigProviderApi McsMapConfigProviderApi { get; } = mcsMapConfigProviderApi;
 }

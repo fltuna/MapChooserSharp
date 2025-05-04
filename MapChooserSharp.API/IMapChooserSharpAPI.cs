@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core.Capabilities;
 using MapChooserSharp.API.Events;
+using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.API.Nomination;
@@ -41,4 +42,9 @@ public interface IMapChooserSharpApi
     /// RTVController API, You can manipulate RTV system
     /// </summary>
     public IMcsRtvControllerApi McsRtvControllerApi { get; }
+    
+    /// <summary>
+    /// MapConfigProvider API, You can manipulate map config
+    /// </summary>
+    public IMcsMapConfigProviderApi McsMapConfigProviderApi { get; }
 }
