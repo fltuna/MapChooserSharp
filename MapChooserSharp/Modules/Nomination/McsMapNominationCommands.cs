@@ -336,7 +336,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         {
             return _mapConfigProvider.GetMapConfigs()[mapName];
         }
-        catch (Exception _)
+        catch (Exception)
         {
             return null;
         }
