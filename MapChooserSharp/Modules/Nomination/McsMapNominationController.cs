@@ -14,6 +14,7 @@ using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.EventManager;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsMenu;
 using MapChooserSharp.Modules.McsMenu.NominationMenu;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
@@ -32,7 +33,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     protected override bool UseTranslationKeyInModuleChatPrefix => true;
 
     private IMcsInternalEventManager _mcsEventManager = null!;
-    private McsMapVoteController _mcsMapVoteController = null!;
+    private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private IMcsNominationMenuProvider _mcsNominationMenuProvider = null!;
     
@@ -50,7 +51,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
 
     protected override void OnAllPluginsLoaded()
     {
-        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
+        _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mcsNominationMenuProvider = ServiceProvider.GetRequiredService<IMcsNominationMenuProvider>();

@@ -11,6 +11,7 @@ using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsDatabase.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using MapChooserSharp.Modules.RockTheVote;
@@ -31,7 +32,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private IMcsInternalEventManager _mcsEventManager = null!;
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
-    private McsMapVoteController _mcsMapVoteController = null!;
+    private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
     private McsRtvController _mcsRtvController = null!;
     private IMcsDatabaseProvider _mcsDatabaseProvider = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
@@ -129,7 +130,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
     protected override void OnAllPluginsLoaded()
     {
-        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
+        _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
         _mcsRtvController = ServiceProvider.GetRequiredService<McsRtvController>();
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();

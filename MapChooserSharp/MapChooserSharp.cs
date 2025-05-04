@@ -15,6 +15,7 @@ using MapChooserSharp.Modules.MapConfig;
 using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Countdown;
+using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsDatabase;
 using MapChooserSharp.Modules.McsMenu.NominationMenu;
 using MapChooserSharp.Modules.McsMenu.VoteMenu;
@@ -96,7 +97,7 @@ public sealed class MapChooserSharp: TncssPluginBase
     private void RegisterMcsApi(ServiceProvider provider)
     {
         var nominationApi = provider.GetRequiredService<IMcsInternalNominationApi>();
-        var mapVoteApi = provider.GetRequiredService<McsMapVoteController>();
+        var mapVoteApi = provider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
         var rtvApi = provider.GetRequiredService<McsRtvController>();
         var eventManager = provider.GetRequiredService<IMcsInternalEventManager>();
         var mcsMapCycle = provider.GetRequiredService<McsMapCycleController>();
