@@ -915,8 +915,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         }
         
         IMapVoteData votedMap = _mapVoteContent.GetVotingMaps()[voteIndex];
+
+        if (_mcsPluginConfigProvider.PluginConfig.VoteConfig.ShouldPrintVoteToChat)
+        {
+            PrintLocalizedChatToAll("MapVote.Broadcast.VoteCast", player.PlayerName, GetMapName(votedMap, player).ToString());
+        }
         
-        PrintLocalizedChatToAll("MapVote.Broadcast.VoteCast", player.PlayerName, GetMapName(votedMap, player).ToString());
         
         voteUi.CloseMenu();
 
