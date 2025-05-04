@@ -25,7 +25,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
     protected override bool UseTranslationKeyInModuleChatPrefix => true;
     
     private IMcsInternalNominationApi _mapNominationController = null!;
-    private IMapConfigProvider _mapConfigProvider = null!;
+    private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private McsMapVoteController _mcsMapVoteController = null!;
     private McsMapCycleController _mapCycleController = null!;
 
@@ -33,7 +33,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
     protected override void OnAllPluginsLoaded()
     {
         _mapNominationController = ServiceProvider.GetRequiredService<IMcsInternalNominationApi>();
-        _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
         
@@ -84,7 +84,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             return;
         }
 
-        var mapConfigs = _mapConfigProvider.GetMapConfigs();
+        var mapConfigs = _mcsInternalMapConfigProviderApi.GetMapConfigs();
 
         var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).ToDictionary();
         
@@ -147,7 +147,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             return;
         }
         
-        var mapConfigs = _mapConfigProvider.GetMapConfigs();
+        var mapConfigs = _mcsInternalMapConfigProviderApi.GetMapConfigs();
 
         var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).ToDictionary();
         
@@ -195,7 +195,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             }
             else
             {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mapConfigProvider.GetMapName(_mapCycleController.NextMap!)));
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mcsInternalMapConfigProviderApi.GetMapName(_mapCycleController.NextMap!)));
             }
             return;
         }
@@ -314,17 +314,17 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             
                 
                 
-            nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Verbose", index, _mapConfigProvider.GetMapName(nominationData.MapConfig), nominators.ToString()));
+            nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Verbose", index, _mcsInternalMapConfigProviderApi.GetMapName(nominationData.MapConfig), nominators.ToString()));
         }
         else
         {
             if (nominationData.IsForceNominated)
             {
-                nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Verbose", index, _mapConfigProvider.GetMapName(nominationData.MapConfig), LocalizeStringForPlayer(player, "NominationList.Command.Notification.AdminNomination")));
+                nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Verbose", index, _mcsInternalMapConfigProviderApi.GetMapName(nominationData.MapConfig), LocalizeStringForPlayer(player, "NominationList.Command.Notification.AdminNomination")));
             }
             else
             {
-                nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Content", index, _mapConfigProvider.GetMapName(nominationData.MapConfig), nominationData.NominationParticipants.Count));
+                nominatedText.AppendLine(LocalizeStringForPlayer(player, "NominationList.Command.Notification.Content", index, _mcsInternalMapConfigProviderApi.GetMapName(nominationData.MapConfig), nominationData.NominationParticipants.Count));
             }
         }
         
@@ -333,7 +333,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
 
     private IMapConfig? FindConfigByExactName(string mapName)
     {
-        _mapConfigProvider.GetMapConfigs().TryGetValue(mapName, out var mapConfig);
+        _mcsInternalMapConfigProviderApi.GetMapConfigs().TryGetValue(mapName, out var mapConfig);
         return mapConfig;
     }
 }

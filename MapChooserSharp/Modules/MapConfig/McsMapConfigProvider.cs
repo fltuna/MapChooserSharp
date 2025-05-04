@@ -1,14 +1,14 @@
 ﻿using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 
-namespace MapChooserSharp.Modules.MapConfig.Models;
+namespace MapChooserSharp.Modules.MapConfig;
 
-public class MapConfigProvider: IMapConfigProvider
+public class McsMapConfigProvider: IMcsInternalMapConfigProviderApi
 {
     private readonly Dictionary<string, IMapConfig> _mapConfigs;
     private readonly Dictionary<string, IMapGroupSettings> _groupConfigs;
     
-    public MapConfigProvider(Dictionary<string, IMapConfig> mapConfigs, Dictionary<string, IMapGroupSettings> groupConfigs)
+    public McsMapConfigProvider(Dictionary<string, IMapConfig> mapConfigs, Dictionary<string, IMapGroupSettings> groupConfigs)
     {
         _mapConfigs = mapConfigs;
         _groupConfigs = groupConfigs;
@@ -19,12 +19,12 @@ public class MapConfigProvider: IMapConfigProvider
             .ToDictionary();
     }
     
-    public Dictionary<string, IMapGroupSettings> GetGroupSettings()
+    public IReadOnlyDictionary<string, IMapGroupSettings> GetGroupSettings()
     {
         return _groupConfigs;
     }
 
-    public Dictionary<string, IMapConfig> GetMapConfigs()
+    public IReadOnlyDictionary<string, IMapConfig> GetMapConfigs()
     {
         return _mapConfigs;
     }
@@ -42,6 +42,9 @@ public class MapConfigProvider: IMapConfigProvider
 
     public IMapConfig? GetMapConfig(long workshopId)
     {
+        if (workshopId <= 0)
+            return null;
+        
         foreach (var (key, value) in _mapConfigs)
         {
             if (value.WorkshopId == workshopId)

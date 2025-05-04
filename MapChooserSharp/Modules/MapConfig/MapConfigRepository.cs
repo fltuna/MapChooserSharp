@@ -10,7 +10,7 @@ internal sealed class MapConfigRepository(IServiceProvider serviceProvider): Plu
     public override string ModuleChatPrefix => "unused";
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
-    private IMapConfigProvider _mapConfigProvider = null!;
+    private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     
     private string _mapConfigLocation = null!;
     
@@ -26,12 +26,12 @@ internal sealed class MapConfigRepository(IServiceProvider serviceProvider): Plu
 
     public override void RegisterServices(IServiceCollection services)
     {
-        services.AddSingleton(_mapConfigProvider);
+        services.AddSingleton(_mcsInternalMapConfigProviderApi);
     }
 
     private void ReloadMapConfiguration()
     {
         _mapConfigLocation = Path.Combine(Plugin.ModuleDirectory, "config", "maps.toml");
-        _mapConfigProvider = new MapConfigParser(_mapConfigLocation).Load();
+        _mcsInternalMapConfigProviderApi = new MapConfigParser(_mapConfigLocation).Load();
     }
 }

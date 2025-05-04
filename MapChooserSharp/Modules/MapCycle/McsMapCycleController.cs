@@ -29,7 +29,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
     private IMcsInternalEventManager _mcsEventManager = null!;
-    private IMapConfigProvider _mapConfigProvider = null!;
+    private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private McsMapVoteController _mcsMapVoteController = null!;
     private McsRtvController _mcsRtvController = null!;
@@ -55,7 +55,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     {
         get
         {
-            return _currentMap ??= _mapConfigProvider.GetMapConfig(Server.MapName);
+            return _currentMap ??= _mcsInternalMapConfigProviderApi.GetMapConfig(Server.MapName);
         }
         private set => _currentMap = value;
     }
@@ -75,7 +75,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
     public bool SetNextMap(string mapName)
     {
-        IMapConfig? mapConfig = _mapConfigProvider.GetMapConfig(mapName);
+        IMapConfig? mapConfig = _mcsInternalMapConfigProviderApi.GetMapConfig(mapName);
 
         if (mapConfig == null)
             return false;
@@ -131,7 +131,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     {
         _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
         _mcsRtvController = ServiceProvider.GetRequiredService<McsRtvController>();
-        _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
@@ -225,7 +225,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         // Decrement all cooldowns
         _mcsDatabaseProvider.MapInfoRepository.DecrementAllCooldownsAsync().ConfigureAwait(false);
         _mcsDatabaseProvider.GroupInfoRepository.DecrementAllCooldownsAsync().ConfigureAwait(false);
-        foreach (var (key, value) in _mapConfigProvider.GetMapConfigs())
+        foreach (var (key, value) in _mcsInternalMapConfigProviderApi.GetMapConfigs())
         {
             foreach (IMapGroupSettings setting in value.GroupSettings)
             {
@@ -267,7 +267,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         // This is extra check for server startup
         if (CurrentMap == null)
         {
-            CurrentMap = _mapConfigProvider.GetMapConfig(mapName);
+            CurrentMap = _mcsInternalMapConfigProviderApi.GetMapConfig(mapName);
             
             // If map name isn't match with config then find with workshop ID
             if (CurrentMap == null)
@@ -276,7 +276,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
                 {
                     // Find map config my workshopId
                     // But if not find with this way, CurrentMap become null.
-                    CurrentMap = _mapConfigProvider.GetMapConfig(workshopId);
+                    CurrentMap = _mcsInternalMapConfigProviderApi.GetMapConfig(workshopId);
                 }
             }
         }

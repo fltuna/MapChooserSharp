@@ -23,14 +23,14 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
     
     private IMcsMapCycleControllerApi _mapCycleController = null!;
-    private IMapConfigProvider _mapConfigProvider = null!;
+    private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
 
 
     protected override void OnAllPluginsLoaded()
     {
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
-        _mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+        _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         Plugin.AddCommand("css_timeleft", "Show timeleft", CommandTimeLeft);
         Plugin.AddCommand("css_nextmap", "Show next map", CommandNextMap);
@@ -114,7 +114,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (nextMap != null)
             {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.NextMap", _mapConfigProvider.GetMapName(nextMap)));
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.NextMap", _mcsInternalMapConfigProviderApi.GetMapName(nextMap)));
             }
             else
             {
@@ -125,7 +125,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (nextMap != null)
             {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mapConfigProvider.GetMapName(nextMap)));
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mcsInternalMapConfigProviderApi.GetMapName(nextMap)));
             }
             else
             {
@@ -153,7 +153,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         
         string mapName = info.ArgByIndex(1);
         
-        IMapConfig? newNextMap = _mapConfigProvider.GetMapConfig(mapName);
+        IMapConfig? newNextMap = _mcsInternalMapConfigProviderApi.GetMapConfig(mapName);
 
         if (newNextMap == null)
         {
@@ -179,11 +179,11 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (player == null)
             {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetNextMap.Failed", _mapConfigProvider.GetMapName(newNextMap)));
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetNextMap.Failed", _mcsInternalMapConfigProviderApi.GetMapName(newNextMap)));
             }
             else
             {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetNextMap.Failed", _mapConfigProvider.GetMapName(newNextMap)));
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetNextMap.Failed", _mcsInternalMapConfigProviderApi.GetMapName(newNextMap)));
             }
             
             return;
@@ -192,11 +192,11 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         
         if (previousNextMapConfig != null)
         {
-            PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.ChangedNextMap", executorName, _mapConfigProvider.GetMapName(newNextMap));
+            PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.ChangedNextMap", executorName, _mcsInternalMapConfigProviderApi.GetMapName(newNextMap));
         }
         else
         {
-            PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.SetNextMap", executorName, _mapConfigProvider.GetMapName(newNextMap));
+            PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.SetNextMap", executorName, _mcsInternalMapConfigProviderApi.GetMapName(newNextMap));
         }
     }
     
@@ -216,7 +216,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         }
         else
         {
-            string nextMapName = _mapConfigProvider.GetMapName(_mapCycleController.NextMap);
+            string nextMapName = _mcsInternalMapConfigProviderApi.GetMapName(_mapCycleController.NextMap);
             
             _mapCycleController.RemoveNextMap();
             
@@ -233,7 +233,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (currentMap != null)
             {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.CurrentMap", _mapConfigProvider.GetMapName(currentMap)));
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.CurrentMap", _mcsInternalMapConfigProviderApi.GetMapName(currentMap)));
             }
             else
             {
@@ -245,7 +245,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
             if (currentMap != null)
             {
                 // TODO() Use alias name if available 
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.CurrentMap", _mapConfigProvider.GetMapName(currentMap)));
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.CurrentMap", _mcsInternalMapConfigProviderApi.GetMapName(currentMap)));
             }
             else
             {

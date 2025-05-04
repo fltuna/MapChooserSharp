@@ -14,13 +14,13 @@ public class McsMapInformationRepository
     
     private readonly IMcsSqlQueryProvider _sqlQueryProvider;
     
-    private readonly IMapConfigProvider _mapConfigProvider;
+    private readonly IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi;
 
     private readonly string _connectionString;
 
     public McsMapInformationRepository(string connectionString, string providerName, IServiceProvider provider): base(provider)
     {
-        _mapConfigProvider = provider.GetRequiredService<IMapConfigProvider>();
+        _mcsInternalMapConfigProviderApi = provider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _sqlQueryProvider = CreateSqlProvider(providerName);
         _connectionString = connectionString;
         
@@ -86,7 +86,7 @@ public class McsMapInformationRepository
     {
         Plugin.Logger.LogInformation("Start creating missing map information");
         
-        var mapConfigs = _mapConfigProvider.GetMapConfigs();
+        var mapConfigs = _mcsInternalMapConfigProviderApi.GetMapConfigs();
         int newMapsCount = 0;
         
         try
@@ -151,7 +151,7 @@ public class McsMapInformationRepository
                 _sqlQueryProvider.MapInfoSqlQueries().GetAllMapInfosSql()
             );
             
-            var mapConfigProvider = ServiceProvider.GetRequiredService<IMapConfigProvider>();
+            var mapConfigProvider = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
             var mapConfigs = mapConfigProvider.GetMapConfigs();
             
             foreach (var (mapName, mapConfig) in mapConfigs)

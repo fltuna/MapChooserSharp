@@ -24,7 +24,7 @@ public class McsBuiltInHtmlNominationUi(CCSPlayerController playerController, IS
 
     private readonly TncssPluginBase _plugin = provider.GetRequiredService<TncssPluginBase>();
     
-    private readonly IMapConfigProvider _mapConfigProvider = provider.GetRequiredService<IMapConfigProvider>();
+    private readonly IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = provider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
     
     private readonly IDebugLogger _debugLogger = provider.GetRequiredService<IDebugLogger>();
     
@@ -64,7 +64,7 @@ public class McsBuiltInHtmlNominationUi(CCSPlayerController playerController, IS
             
             // TODO() Use Alias name if enabled and available
             // TODO() Truncate MapName if too long
-            builder.Append(_mapConfigProvider.GetMapName(option.NominationOption.MapConfig));
+            builder.Append(_mcsInternalMapConfigProviderApi.GetMapName(option.NominationOption.MapConfig));
             
             chatMenuOptions.Add(new ChatMenuOption(builder.ToString(), option.MenuDisabled, (_, _) =>
             {

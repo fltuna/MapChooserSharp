@@ -14,13 +14,13 @@ public class McsGroupInformationRepository
     
     private readonly IMcsSqlQueryProvider _sqlQueryProvider;
     
-    private readonly IMapConfigProvider _mapConfigProvider;
+    private readonly IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi;
 
     private readonly string _connectionString;
 
     public McsGroupInformationRepository(string connectionString, string providerName, IServiceProvider provider): base(provider)
     {
-        _mapConfigProvider = provider.GetRequiredService<IMapConfigProvider>();
+        _mcsInternalMapConfigProviderApi = provider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _sqlQueryProvider = CreateSqlProvider(providerName);
         _connectionString = connectionString;
         
@@ -101,7 +101,7 @@ public class McsGroupInformationRepository
     {
         Plugin.Logger.LogInformation("Start creating missing group information");
         
-        var mapConfigProvider = _mapConfigProvider;
+        var mapConfigProvider = _mcsInternalMapConfigProviderApi;
         var groupSettings = mapConfigProvider.GetGroupSettings();
         int newGroupsCount = 0;
         
@@ -175,7 +175,7 @@ public class McsGroupInformationRepository
             );
             
             // Get the group configuration provider
-            var groupConfigs = _mapConfigProvider.GetGroupSettings();
+            var groupConfigs = _mcsInternalMapConfigProviderApi.GetGroupSettings();
             
             // Update in-memory group cooldowns from the database
             foreach (var (groupName, groupConfig) in groupConfigs)
