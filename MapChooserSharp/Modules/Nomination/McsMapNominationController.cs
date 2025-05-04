@@ -96,7 +96,6 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
 
     public void NominateMap(CCSPlayerController player, IMapConfig mapConfig)
     {
-        Server.PrintToChatAll("Nominate!");
         NominationCheck check = PlayerCanNominateMap(player, mapConfig);
 
         bool processed = ProcessNominationCheckResult(player, mapConfig, check);
