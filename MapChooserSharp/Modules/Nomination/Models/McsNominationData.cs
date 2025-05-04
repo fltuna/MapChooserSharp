@@ -1,5 +1,5 @@
 ﻿using MapChooserSharp.API.MapConfig;
-using MapChooserSharp.API.Nomination.Interfaces;
+using MapChooserSharp.API.Nomination;
 
 namespace MapChooserSharp.Modules.Nomination.Models;
 
