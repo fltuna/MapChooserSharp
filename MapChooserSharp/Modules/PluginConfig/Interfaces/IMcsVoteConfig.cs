@@ -10,4 +10,6 @@ internal interface IMcsVoteConfig
     internal McsSupportedMenuType CurrentMenuType { get; }
     
     internal int MaxMenuElements { get; }
+    
+    internal bool ShouldPrintVoteToChat { get; }
 }

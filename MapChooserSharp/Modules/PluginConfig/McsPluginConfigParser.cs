@@ -1,4 +1,5 @@
-﻿using MapChooserSharp.Models;
+﻿using CounterStrikeSharp.API;
+using MapChooserSharp.Models;
 using MapChooserSharp.Modules.McsMenu;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Models;
@@ -182,13 +183,17 @@ internal class McsPluginConfigParser(string configPath, IServiceProvider provide
         {
             throw new InvalidOperationException("MapVote.MaxVoteElements is not found or invalid");
         }
-        
+
+        if (!voteTable.TryGetValue("ShouldPrintVoteToChat", out var shouldPrintVoteToChatObj) || shouldPrintVoteToChatObj is not bool shouldPrintVoteToChatBool)
+        {
+            throw new InvalidOperationException("MapVote.ShouldPrintVoteToChat is not found or invalid");
+        }
         
         var availableMenus =  _avaiableMenuTypes;
-        
+
         var currentMenuType = DecideMenuType(menuTypeStr, availableMenus);
 
-        return new McsVoteConfig(availableMenus, currentMenuType, (int)maxVoteElementsLong);
+        return new McsVoteConfig(availableMenus, currentMenuType, (int)maxVoteElementsLong, shouldPrintVoteToChatBool);
     }
 
 
@@ -282,6 +287,9 @@ MenuType = ""BuiltInHtml""
 # How many maps should be appeared in map vote?
 # I would recommend to set 5 when you using BuiltInHtml menu
 MaxVoteElements = 5
+
+# Should print vote text to everyone?
+ShouldPrintVoteToChat = true
 
 
 [Nomination]
