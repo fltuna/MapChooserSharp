@@ -10,6 +10,7 @@ using MapChooserSharp.API.Events.RockTheVote;
 using MapChooserSharp.API.RtvController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
+using MapChooserSharp.Modules.MapCycle.Interfaces;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.RockTheVote.Interfaces;
@@ -61,7 +62,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
     
     private IMcsInternalEventManager _mcsEventManager = null!;
     private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
-    private McsMapCycleController _mcsMapCycleController = null!;
+    private IMcsInternalMapCycleControllerApi _mcsMapCycleController = null!;
 
 
     private readonly HashSet<int> _rtvVoteParticipants = new();
@@ -78,7 +79,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
     {
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
-        _mcsMapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
+        _mcsMapCycleController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleControllerApi>();
         
         _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
         _mcsEventManager.RegisterEventHandler<McsMapNotChangedEvent>(OnMapNotChanged);

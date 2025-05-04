@@ -20,6 +20,16 @@ public interface IMcsMapCycleControllerApi
     public IMapConfig? CurrentMap { get; }
     
     /// <summary>
+    /// True if next map confirmed
+    /// </summary>
+    public bool IsNextMapConfirmed { get; }
+
+    /// <summary>
+    /// If true, map will be transit to next map when round end.
+    /// </summary>
+    public bool ChangeMapOnNextRoundEnd { get; set; }
+    
+    /// <summary>
     /// Extend count of current map
     /// </summary>
     public int ExtendCount { get; }
@@ -48,4 +58,12 @@ public interface IMcsMapCycleControllerApi
     /// </summary>
     /// <returns></returns>
     public bool RemoveNextMap();
+
+
+    /// <summary>
+    /// Change to next map <br/>
+    /// If next map is null, this method will fail and do nothing.
+    /// </summary>
+    /// <param name="seconds">Seconds to change map</param>
+    public void ChangeToNextMap(float seconds);
 }

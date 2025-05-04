@@ -10,6 +10,7 @@ using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
+using MapChooserSharp.Modules.MapCycle.Interfaces;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsDatabase.Interfaces;
@@ -24,7 +25,7 @@ using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace MapChooserSharp.Modules.MapCycle;
 
-internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), IMcsMapCycleControllerApi
+internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), IMcsInternalMapCycleControllerApi
 {
     public override string PluginModuleName => "McsMapCycleController";
     public override string ModuleChatPrefix => "unused";
@@ -49,7 +50,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     
     public bool IsNextMapConfirmed => _nextMap != null;
 
-    internal bool ChangeMapOnNextRoundEnd { get; set; } = false;
+    public bool ChangeMapOnNextRoundEnd { get; set; } = false;
 
     private IMapConfig? _currentMap = null;
 
@@ -126,7 +127,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     
     public override void RegisterServices(IServiceCollection services)
     {
-        services.AddSingleton(this);
+        services.AddSingleton<IMcsInternalMapCycleControllerApi>(this);
     }
 
     protected override void OnAllPluginsLoaded()
