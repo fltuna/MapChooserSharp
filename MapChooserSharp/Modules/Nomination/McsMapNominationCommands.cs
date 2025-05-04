@@ -5,6 +5,7 @@ using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
+using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.API.Nomination.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
@@ -73,6 +74,15 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         }
 
         string mapName = info.ArgByIndex(1);
+        
+        IMapConfig? exactMatchedConfig = FindConfigByExactName(mapName);
+
+        if (exactMatchedConfig != null)
+        {
+            _mapNominationController.AdminNominateMap(player, exactMatchedConfig);
+            return;
+        }
+
         var mapConfigs = _mapConfigProvider.GetMapConfigs();
 
         var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).ToDictionary();
@@ -127,6 +137,15 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         }
 
         string mapName = info.ArgByIndex(1);
+        
+        IMapConfig? exactMatchedConfig = FindConfigByExactName(mapName);
+
+        if (exactMatchedConfig != null)
+        {
+            _mapNominationController.AdminNominateMap(player, exactMatchedConfig);
+            return;
+        }
+        
         var mapConfigs = _mapConfigProvider.GetMapConfigs();
 
         var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).ToDictionary();
@@ -309,5 +328,17 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         }
         
         player.PrintToChat(GetTextWithModulePrefixForPlayer(player, nominatedText.ToString()));
+    }
+
+    private IMapConfig? FindConfigByExactName(string mapName)
+    {
+        try
+        {
+            return _mapConfigProvider.GetMapConfigs()[mapName];
+        }
+        catch (Exception _)
+        {
+            return null;
+        }
     }
 }
