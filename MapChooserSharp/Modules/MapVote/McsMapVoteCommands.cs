@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Modules.MapCycle;
+using MapChooserSharp.Modules.MapVote.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 
@@ -15,13 +16,13 @@ public class McsMapVoteCommands(IServiceProvider serviceProvider) : PluginModule
     public override string ModuleChatPrefix => "unused";
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
     
-    private McsMapVoteController _mcsMapVoteController = null!;
+    private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
     private McsMapCycleController _mapCycleController = null!;
 
 
     protected override void OnAllPluginsLoaded()
     {
-        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
+        _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
         _mapCycleController = ServiceProvider.GetRequiredService<McsMapCycleController>();
         
         Plugin.AddCommand("css_revote", "Revote command", CommandRevote);

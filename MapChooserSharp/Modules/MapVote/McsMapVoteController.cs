@@ -34,7 +34,7 @@ using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace MapChooserSharp.Modules.MapVote;
 
-internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsMapVoteControllerApi
+internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsInternalMapVoteControllerApi
 {
     public override string PluginModuleName => "McsMapVoteController";
     public override string ModuleChatPrefix => "unused";
@@ -54,7 +54,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
     public override void RegisterServices(IServiceCollection services)
     {
-        services.AddSingleton(this);
+        services.AddSingleton<IMcsInternalMapVoteControllerApi>(this);
 
         // TODO() Toggle menu type from config
 
@@ -937,6 +937,11 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
                 EndRunoffVote();
             }
         }
+    }
+
+    public void RemovePlayerVote(CCSPlayerController client)
+    {
+        RemovePlayerVote(client.Slot);
     }
 
     public void RemovePlayerVote(int slot)

@@ -6,6 +6,7 @@ using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -20,12 +21,12 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
 
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
-    private McsMapVoteController _mcsMapVoteController = null!;
+    private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
     
     protected override void OnAllPluginsLoaded()
     {
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
-        _mcsMapVoteController = ServiceProvider.GetRequiredService<McsMapVoteController>();
+        _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
         _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         
         Plugin.AddCommand("mcs_maplist", "", CommandMapList);
