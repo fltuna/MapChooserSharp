@@ -40,6 +40,10 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         new("mcs_rtv_command_unlock_time_map_extend",
             "Seconds to take unlock RTV command after map is extended in vote", 120.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1200.0F));
 
+    public readonly FakeConVar<float> RtvCommandUnlockTimeMapStart =
+        new("mcs_rtv_command_unlock_time_map_start",
+            "Seconds to take unlock RTV command after map started", 300.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1200.0F));
+
     public readonly FakeConVar<float> RtvVoteStartThreshold = 
         new("mcs_rtv_vote_start_threshold", 
             "How many percent to require start rtv vote?", 0.5F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1.0F));
@@ -89,11 +93,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         _mcsEventManager.RegisterEventHandler<McsMapVoteCancelledEvent>(OnVoteCancelled);
         
         
-        Plugin.RegisterListener<Listeners.OnMapStart>((_) =>
-        {
-            RtvCommandStatus = RtvStatus.Enabled;
-            ResetRtvStatus();
-        });
+        Plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);
         
 
         Plugin.RegisterListener<Listeners.OnClientPutInServer>((slot) =>
@@ -282,6 +282,13 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
         RtvCommandStatus = RtvStatus.AnotherVoteOngoing;
     }
 
+    private void OnMapStart(string _)
+    {
+        RtvCommandStatus = RtvStatus.Enabled;
+        ResetRtvStatus();
+        CreateRtvCommandUnlockTimer(RtvCommandUnlockTimeOverride.MapStart);
+    }
+
     private void CreateRtvCommandUnlockTimer(RtvCommandUnlockTimeOverride timeOverride)
     {
         RtvCommandStatus = RtvStatus.InCooldown;
@@ -298,6 +305,10 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
             
             case RtvCommandUnlockTimeOverride.MapNotChanged:
                 CreateRtvCommandUnlockTimer(RtvCommandUnlockTimeMapNotChanged.Value);
+                break;
+            
+            case RtvCommandUnlockTimeOverride.MapStart:
+                CreateRtvCommandUnlockTimer(RtvCommandUnlockTimeMapStart.Value);
                 break;
         }
         
@@ -329,7 +340,8 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
     {
         NextMapConfirm = 0,
         MapExtended,
-        MapNotChanged
+        MapNotChanged,
+        MapStart,
     }
 }
 
