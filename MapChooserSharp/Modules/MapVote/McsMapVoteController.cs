@@ -436,8 +436,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return;
         }
         
-        float votePercentage = (float)_mapVoteContent.GetVoteParticipants().Count / totalVotes;
-        PrintLocalizedChatToAll("MapVote.Broadcast.VoteFinished", totalVotes ,_mapVoteContent.GetVoteParticipants().Count , $"{votePercentage * 100:F2}");
+        PrintVoteFinish(totalVotes, _mapVoteContent.GetVoteParticipants().Count);
         
         List<IMapVoteData> winners = PickWinningMaps(_mapVoteContent.GetVotingMaps(), false);
 
@@ -459,10 +458,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             ProcessNonMapWinner(_mapVoteContent, winMap);
             return;
         }
-        
-        float mapVotePercentage = (float)winMap.GetVoters().Count / totalVotes * 100.0F;
 
-        PrintEndVoteResult(winMap, mapVotePercentage, totalVotes);
+        PrintEndVoteResult(winMap, totalVotes);
 
         FireVoteFinishedEvent();
         FireNextMapConfirmedEvent(winMap.MapConfig);
@@ -638,10 +635,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         var winMap = winners.First();
 
-        float votePercentage = (float)_mapVoteContent.GetVoteParticipants().Count / totalVotes;
-        
-        
-        PrintLocalizedChatToAll("MapVote.Broadcast.VoteFinished", totalVotes ,_mapVoteContent.GetVoteParticipants().Count , $"{votePercentage * 100:F2}");
+        PrintVoteFinish(totalVotes, _mapVoteContent.GetVoteParticipants().Count);
         
         // If MapConfig is null, then this is "extend map" or "don't change"
         if (winMap.MapConfig == null)
@@ -650,9 +644,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             return;
         }
         
-        float mapVotePercentage = (float)winMap.GetVoters().Count / totalVotes * 100.0F;
-
-        PrintEndVoteResult(winMap, mapVotePercentage, totalVotes);
+        PrintEndVoteResult(winMap, totalVotes);
         
         FireVoteFinishedEvent();
         FireNextMapConfirmedEvent(winMap.MapConfig);
@@ -977,8 +969,17 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         return mapName;
     }
 
-    private void PrintEndVoteResult(IMapVoteData winMap, float mapVotePercentage, int totalVotes)
+    private void PrintVoteFinish(int totalVotes, int voteParticipantsCount)
     {
+        float votePercentage = (float)totalVotes / voteParticipantsCount;
+        
+        PrintLocalizedChatToAll("MapVote.Broadcast.VoteFinished", voteParticipantsCount ,totalVotes , $"{votePercentage * 100:F2}");
+    }
+
+    private void PrintEndVoteResult(IMapVoteData winMap, int totalVotes)
+    {
+        float mapVotePercentage = (float)winMap.GetVoters().Count / totalVotes * 100.0F;
+        
         foreach (CCSPlayerController controller in Utilities.GetPlayers())
         {
             if (controller.IsBot || controller.IsHLTV)
