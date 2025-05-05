@@ -48,6 +48,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         Plugin.AddCommand("css_extends", "Shows remaining extends", CommandExtendsLeft);
         
         Plugin.AddCommand("css_setmapcooldown", "Set specified map's cooldown", CommandSetMapCooldown);
+        Plugin.AddCommand("css_setgroupcooldown", "Set specified group's cooldown", CommandSetGroupCooldown);
         
         Plugin.AddCommandListener("say", SayCommandListener, HookMode.Pre);
     }
@@ -65,6 +66,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         Plugin.RemoveCommand("css_extends", CommandExtendsLeft);
         
         Plugin.RemoveCommand("css_setmapcooldown", CommandSetMapCooldown);
+        Plugin.RemoveCommand("css_setgroupcooldown", CommandSetGroupCooldown);
         
         Plugin.RemoveCommandListener("say", SayCommandListener, HookMode.Pre);
     }
@@ -292,6 +294,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.ExtendsLeft", _mapCycleController.ExtendsLeft));
     }
 
+    [RequiresPermissions(@"css/root")]
     private void CommandSetMapCooldown(CCSPlayerController? player, CommandInfo info)
     {
         if (info.ArgCount < 3)
@@ -317,7 +320,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
             }
             else
             {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.MapNotFound"));
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.MapNotFound"));
             }
             return;
         }
@@ -367,6 +370,91 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
                     else
                     {
                         player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetMapCooldown.Failed.NoDatabaseConnection"));
+                    }
+                }
+            });
+        });
+    }
+
+    [RequiresPermissions(@"css/root")]
+    private void CommandSetGroupCooldown(CCSPlayerController? player, CommandInfo info)
+    {
+        if (info.ArgCount < 3)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetGroupCooldown.Usage"));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetGroupCooldown.Usage"));
+            }
+            return;
+        }
+
+        var groupSettings = _mcsInternalMapConfigProviderApi.GetGroupSettings();
+
+        var setting = groupSettings.Where(gs => gs.Value.GroupName == info.ArgByIndex(1)).ToDictionary();
+
+        if (setting.Count == 0)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("General.Notification.GroupNotFound"));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.GroupNotFound"));
+            }
+            return;
+        }
+
+        if (!int.TryParse(info.ArgByIndex(2), out int cooldown))
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("General.Notification.InvalidArgument.WithParam", info.ArgByIndex(2)));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.InvalidArgument.WithParam", info.ArgByIndex(2)));
+            }
+            return;
+        }
+        
+        IMapGroupSettings groupSetting = setting.Values.First();
+        
+        string executorName = PlayerUtil.GetPlayerName(player);
+
+        Task.Run(async () =>
+        {
+            bool isOperationSucceeded = false;
+            try
+            {
+                await _mcsDatabaseProvider.GroupInfoRepository.UpsertGroupCooldownAsync(groupSetting.GroupName, cooldown);
+                isOperationSucceeded = true;
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+            
+            
+            await Server.NextFrameAsync(() =>
+            {
+                if (isOperationSucceeded)
+                {
+                    PrintLocalizedChatToAll("MapCycle.Command.Admin.Broadcast.SetGroupCooldown.Updated", executorName, groupSetting.GroupName, cooldown);
+                }
+                else
+                {
+                    if (player == null)
+                    {
+                        Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetGroupCooldown.Failed.NoDatabaseConnection"));
+                    }
+                    else
+                    {
+                        player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetGroupCooldown.Failed.NoDatabaseConnection"));
                     }
                 }
             });
