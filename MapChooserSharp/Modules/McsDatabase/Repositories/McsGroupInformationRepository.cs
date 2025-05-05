@@ -25,6 +25,7 @@ public class McsGroupInformationRepository
         _connectionString = connectionString;
         
         EnsureTableExists();
+        CollectAllGroupCooldownsAsync().ConfigureAwait(false);
     }
 
     private void EnsureTableExists()
@@ -164,6 +165,7 @@ public class McsGroupInformationRepository
     /// </summary>
     public async Task CollectAllGroupCooldownsAsync()
     {
+        Plugin.Logger.LogInformation($"Start collecting all group cooldowns");
         try
         {
             using var connection = _sqlQueryProvider.CreateConnection(_connectionString);
@@ -178,6 +180,7 @@ public class McsGroupInformationRepository
             var groupConfigs = _mcsInternalMapConfigProviderApi.GetGroupSettings();
             
             // Update in-memory group cooldowns from the database
+            int groupsCount = 0;
             foreach (var (groupName, groupConfig) in groupConfigs)
             {
                 var groupInfo = groupInfos.FirstOrDefault(g => g.GroupName == groupName);
@@ -192,9 +195,10 @@ public class McsGroupInformationRepository
                     groupConfig.GroupCooldown.CurrentCooldown = 0;
                     Plugin.Logger.LogDebug($"Group {groupName} not found in database, setting cooldown to 0");
                 }
+                groupsCount++;
             }
             
-            Plugin.Logger.LogInformation("Successfully collected all group cooldowns from database");
+            Plugin.Logger.LogInformation($"Successfully collected cooldowns from database for {groupsCount} groups");
         }
         catch (Exception ex)
         {
