@@ -118,12 +118,19 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private const float DefaultRoundRestartDelay = 7.0F;
 
     private const float DefaultMapChangeDelay = 10.0F;
+    
+    
+    // Those variables are used for avoid unexpected cooldown reduction when server startup
+    private bool IsFirstMapEnded { get; set; }
+    private bool IsSecondMapIsPassed { get; set; }
 
     public readonly FakeConVar<int> VoteStartTimingTime = new("mcs_vote_start_timing_time", "When should vote started if map is based on mp_timelimit or mp_roundtime? (minutes)", 3,
         ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 15));
     
     public readonly FakeConVar<int> VoteStartTimingRound = new("mcs_vote_start_timing_round", "When should vote started if map is based on mp_maxrounds? (rounds)", 2,
         ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 15));
+    
+    
     
     public override void RegisterServices(IServiceCollection services)
     {
@@ -145,10 +152,12 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         _mcsEventManager.RegisterEventHandler<McsMapNotChangedEvent>(OnMapNotChanged);
         
         Plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);
+        Plugin.RegisterListener<Listeners.OnClientPutInServer>(OnClientPutInServer);
         Plugin.RegisterListener<Listeners.OnMapEnd>(() =>
         {
             _isMapStarted = false;
             ChangeMapOnNextRoundEnd = false;
+            IsFirstMapEnded = true;
         });
         Plugin.RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
         
@@ -172,6 +181,8 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
             _timeLeftUtil.ReDetermineExtendType();
             _isMapStarted = true;
             RecreateVoteTimer();
+            IsFirstMapEnded = true;
+            IsSecondMapIsPassed = true;
         }
     }
 
@@ -218,41 +229,20 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         MapUtil.ChangeToWorkshopMap(workshopId);
     }
 
+    private void OnClientPutInServer(int slot)
+    {
+        // TODO if current map is official maps, then set IsSecondMapIsPassed to true.
+        if (IsSecondMapIsPassed || !IsFirstMapEnded)
+            return;
+        
+        IsSecondMapIsPassed = true;
+    }
 
     private void OnMapStart(string mapName)
     {
         ExtendCount = 0;
 
-        var previousMap = CurrentMap;
-        
-        // Decrement all cooldowns
-        _mcsDatabaseProvider.MapInfoRepository.DecrementAllCooldownsAsync().ConfigureAwait(false);
-        _mcsDatabaseProvider.GroupInfoRepository.DecrementAllCooldownsAsync().ConfigureAwait(false);
-        foreach (var (key, value) in _mcsInternalMapConfigProviderApi.GetMapConfigs())
-        {
-            foreach (IMapGroupSettings setting in value.GroupSettings)
-            {
-                if (setting.GroupCooldown.CurrentCooldown > 0)
-                    setting.GroupCooldown.CurrentCooldown--;
-            }
-
-            if (value.MapCooldown.CurrentCooldown > 0)
-                value.MapCooldown.CurrentCooldown--;
-        }
-
-        // Set previous map cooldown if defined in config
-        if (previousMap != null)
-        {
-            _mcsDatabaseProvider.MapInfoRepository.UpsertMapCooldownAsync(previousMap.MapName, previousMap.MapCooldown.MapConfigCooldown).ConfigureAwait(false);
-            previousMap.MapCooldown.CurrentCooldown = previousMap.MapCooldown.MapConfigCooldown;
-            
-            foreach (IMapGroupSettings setting in previousMap.GroupSettings)
-            {
-                _mcsDatabaseProvider.GroupInfoRepository.UpsertGroupCooldownAsync(setting.GroupName, setting.GroupCooldown.MapConfigCooldown).ConfigureAwait(false);
-                setting.GroupCooldown.CurrentCooldown = setting.GroupCooldown.MapConfigCooldown;
-            }
-        }
-        
+        DecrementAllMapCooldown(CurrentMap);
         
         CurrentMap = NextMap;
         NextMap = null;
@@ -287,6 +277,42 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         ExtendLimit = CurrentMap?.MaxExtends ?? DefaultMapExtends;
     }
 
+    private void DecrementAllMapCooldown(IMapConfig? previousMap)
+    {
+        // To prevent unxpected cooldown reduction
+        if (!IsFirstMapEnded || !IsSecondMapIsPassed)
+            return;
+        
+        // Decrement all cooldowns
+        _mcsDatabaseProvider.MapInfoRepository.DecrementAllCooldownsAsync().ConfigureAwait(false);
+        _mcsDatabaseProvider.GroupInfoRepository.DecrementAllCooldownsAsync().ConfigureAwait(false);
+        foreach (var (key, value) in _mcsInternalMapConfigProviderApi.GetMapConfigs())
+        {
+            foreach (IMapGroupSettings setting in value.GroupSettings)
+            {
+                if (setting.GroupCooldown.CurrentCooldown > 0)
+                    setting.GroupCooldown.CurrentCooldown--;
+            }
+
+            if (value.MapCooldown.CurrentCooldown > 0)
+                value.MapCooldown.CurrentCooldown--;
+        }
+
+        // Set previous map cooldown if defined in config
+        if (previousMap != null)
+        {
+            _mcsDatabaseProvider.MapInfoRepository.UpsertMapCooldownAsync(previousMap.MapName, previousMap.MapCooldown.MapConfigCooldown).ConfigureAwait(false);
+            previousMap.MapCooldown.CurrentCooldown = previousMap.MapCooldown.MapConfigCooldown;
+            
+            foreach (IMapGroupSettings setting in previousMap.GroupSettings)
+            {
+                _mcsDatabaseProvider.GroupInfoRepository.UpsertGroupCooldownAsync(setting.GroupName, setting.GroupCooldown.MapConfigCooldown).ConfigureAwait(false);
+                setting.GroupCooldown.CurrentCooldown = setting.GroupCooldown.MapConfigCooldown;
+            }
+        }
+    }
+
+        
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
     {
         if (!_isMapStarted)
