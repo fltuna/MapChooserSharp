@@ -274,6 +274,7 @@ internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload
     private void OnVoteCancelled(McsMapVoteCancelledEvent @event)
     {
         ResetRtvStatus();
+        CreateRtvCommandUnlockTimer(RtvCommandUnlockTimeOverride.MapNotChanged);
     }
 
     private void OnMapVoteInitialization(McsMapVoteInitiatedEvent @event)
