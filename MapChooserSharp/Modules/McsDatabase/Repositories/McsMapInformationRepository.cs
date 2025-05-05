@@ -25,6 +25,7 @@ public class McsMapInformationRepository
         _connectionString = connectionString;
         
         EnsureTableExists();
+        CollectAllCooldownsAsync().ConfigureAwait(false);
     }
 
     private void EnsureTableExists()
