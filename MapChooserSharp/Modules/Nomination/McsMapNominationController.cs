@@ -13,6 +13,7 @@ using MapChooserSharp.API.Nomination;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.EventManager;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
+using MapChooserSharp.Modules.MapCycle.Interfaces;
 using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsMenu;
@@ -36,6 +37,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private IMcsNominationMenuProvider _mcsNominationMenuProvider = null!;
+    private IMcsInternalMapCycleControllerApi _mcsMapCycleController = null!;
     
     private readonly Dictionary<int, IMcsNominationUserInterface> _mcsActiveUserNominationMenu = new();
     
@@ -55,6 +57,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mcsNominationMenuProvider = ServiceProvider.GetRequiredService<IMcsNominationMenuProvider>();
+        _mcsMapCycleController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleControllerApi>();
         
         _mcsEventManager.RegisterEventHandler<McsMapVoteInitiatedEvent>(OnVoteInitialized);
         _mcsEventManager.RegisterEventHandler<McsMapVoteFinishedEvent>(OnVoteFinished);
@@ -322,6 +325,9 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
 
     private NominationCheck PlayerCanNominateMap(CCSPlayerController player, IMapConfig mapConfig)
     {
+        if (_mcsMapCycleController.CurrentMap?.MapName == mapConfig.MapName)
+            return NominationCheck.SameMap;
+        
         if (NominatedMaps.TryGetValue(mapConfig.MapName, out var nominated))
         {
             if (nominated.NominationParticipants.Contains(player.Slot))
@@ -433,6 +439,10 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             case NominationCheck.NominatedByAdmin:
                 player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.AlreadyNominatedByAdmin", _mcsInternalMapConfigProviderApi.GetMapName(mapConfig)));
                 return false;
+            
+            case NominationCheck.SameMap:
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.SameMap"));
+                return false;
         }
         
         return false;
@@ -473,5 +483,6 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         MapIsInCooldown,
         AlreadyNominated,
         NominatedByAdmin,
+        SameMap,
     }
 }
