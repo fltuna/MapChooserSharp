@@ -30,6 +30,7 @@
     "Nomination.Broadcast.Admin.ChangedToAdminNomination": "管理者 {0} が {lime}{1}{default} を管理者ノミネーションに変更しました",
     "Nomination.Broadcast.Admin.RemovedNomiantion": "管理者 {0} が {lime}{1}{default} をノミネーションから削除しました",
     "Nomination.Notification.Failure.Generic": "マップのノミネートに失敗しました。",
+    "Nomination.Notification.Failure.SameMap": "現在プレイ中のマップをノミネートすることはできません!",
     "Nomination.Notification.Failure.Generic.WithMapName": "{lime}{0}{default} のノミネートに失敗しました",
     "Nomination.Notification.Failure.NotEnoughPermission": "{lime}{0}{default} をノミネートするための権限が足りません",
     "Nomination.Notification.Failure.TooMuchPlayers": "{lime}{0}{default} をノミネートするには人数が多すぎます! ({1} > {2})",
