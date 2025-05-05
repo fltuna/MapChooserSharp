@@ -10,6 +10,7 @@ using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle.Interfaces;
+using MapChooserSharp.Modules.McsDatabase.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -26,6 +27,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     private IMcsInternalMapCycleControllerApi _mapCycleController = null!;
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
+    private IMcsDatabaseProvider _mcsDatabaseProvider = null!;
 
 
     protected override void OnAllPluginsLoaded()
@@ -33,13 +35,19 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         _mapCycleController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleControllerApi>();
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
+        _mcsDatabaseProvider = ServiceProvider.GetRequiredService<IMcsDatabaseProvider>();
+        
         Plugin.AddCommand("css_timeleft", "Show timeleft", CommandTimeLeft);
         Plugin.AddCommand("css_nextmap", "Show next map", CommandNextMap);
+        Plugin.AddCommand("css_currentmap", "Show current map", CommandCurrentMap);
+        
         Plugin.AddCommand("css_setnextmap", "Set next map", CommandSetNextMap);
         Plugin.AddCommand("css_removenextmap", "Remove next map", CommandRemoveNextMap);
-        Plugin.AddCommand("css_currentmap", "Show current map", CommandCurrentMap);
+        
         Plugin.AddCommand("css_mapinfo", "Show current map's information if available", CommandMapInfo);
         Plugin.AddCommand("css_extends", "Shows remaining extends", CommandExtendsLeft);
+        
+        Plugin.AddCommand("css_setmapcooldown", "Set specified map's cooldown", CommandSetMapCooldown);
         
         Plugin.AddCommandListener("say", SayCommandListener, HookMode.Pre);
     }
@@ -48,11 +56,15 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     {
         Plugin.RemoveCommand("css_timeleft", CommandTimeLeft);
         Plugin.RemoveCommand("css_nextmap", CommandNextMap);
+        Plugin.RemoveCommand("css_currentmap", CommandCurrentMap);
+        
         Plugin.RemoveCommand("css_setnextmap", CommandSetNextMap);
         Plugin.RemoveCommand("css_removenextmap", CommandRemoveNextMap);
-        Plugin.RemoveCommand("css_currentmap", CommandCurrentMap);
+        
         Plugin.RemoveCommand("css_mapinfo", CommandMapInfo);
         Plugin.RemoveCommand("css_extends", CommandExtendsLeft);
+        
+        Plugin.RemoveCommand("css_setmapcooldown", CommandSetMapCooldown);
         
         Plugin.RemoveCommandListener("say", SayCommandListener, HookMode.Pre);
     }
@@ -160,11 +172,11 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (player == null)
             {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetNextMap.MapNotFound", mapName));
+                Server.PrintToConsole(LocalizeString("General.Notification.MapNotFound", mapName));
             }
             else
             {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetNextMap.MapNotFound", mapName));
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.MapNotFound", mapName));
             }
             
             return;
@@ -278,5 +290,86 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
             return;
         
         player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.ExtendsLeft", _mapCycleController.ExtendsLeft));
+    }
+
+    private void CommandSetMapCooldown(CCSPlayerController? player, CommandInfo info)
+    {
+        if (info.ArgCount < 3)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetMapCooldown.Usage"));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetMapCooldown.Usage"));
+            }
+            return;
+        }
+
+        var mapConfig = _mcsInternalMapConfigProviderApi.GetMapConfig(info.ArgByIndex(1));
+
+        if (mapConfig == null)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("General.Notification.MapNotFound"));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.MapNotFound"));
+            }
+            return;
+        }
+
+        if (!int.TryParse(info.ArgByIndex(2), out int cooldown))
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("General.Notification.InvalidArgument.WithParam", info.ArgByIndex(2)));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.InvalidArgument.WithParam", info.ArgByIndex(2)));
+            }
+            return;
+        }
+        
+        string executorName = PlayerUtil.GetPlayerName(player);
+
+        Task.Run(async () =>
+        {
+            bool isOperationSucceeded = false;
+            try
+            {
+                await _mcsDatabaseProvider.MapInfoRepository.UpsertMapCooldownAsync(mapConfig.MapName, cooldown);
+                mapConfig.MapCooldown.CurrentCooldown = cooldown;
+                isOperationSucceeded = true;
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+            
+            
+            await Server.NextFrameAsync(() =>
+            {
+                if (isOperationSucceeded)
+                {
+                    PrintLocalizedChatToAll("MapCycle.Command.Admin.Broadcast.SetMapCooldown.Updated", executorName, mapConfig.MapName, cooldown);
+                }
+                else
+                {
+                    if (player == null)
+                    {
+                        Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetMapCooldown.Failed.NoDatabaseConnection"));
+                    }
+                    else
+                    {
+                        player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetMapCooldown.Failed.NoDatabaseConnection"));
+                    }
+                }
+            });
+        });
     }
 }
