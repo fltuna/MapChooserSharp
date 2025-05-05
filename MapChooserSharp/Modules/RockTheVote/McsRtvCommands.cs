@@ -10,6 +10,7 @@ using MapChooserSharp.API.RtvController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using MapChooserSharp.Modules.RockTheVote.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -24,10 +25,12 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
     protected override bool UseTranslationKeyInModuleChatPrefix => true;
     
     private IMcsInternalRtvControllerApi _mcsRtvController = null!;
+    private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     
     protected override void OnAllPluginsLoaded()
     {
         _mcsRtvController = ServiceProvider.GetRequiredService<IMcsInternalRtvControllerApi>();
+        _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         
         Plugin.AddCommand("css_rtv", "Rock The Vote", CommandRtv);
         Plugin.AddCommand("css_enablertv", "Enable RTV", CommandEnableRtv);
@@ -67,8 +70,15 @@ public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase
                 break;
             
             case PlayerRtvResult.CommandInCooldown:
-                // TODO() Toggle verbose option in plugin config
-                client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.IsInCooldown.Verbose", $"{_mcsRtvController.RtvCommandUnlockTime - Server.CurrentTime:F0}"));
+                if (_mcsPluginConfigProvider.PluginConfig.GeneralConfig.VerboseCooldownPrint)
+                {
+                    client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.IsInCooldown.Verbose", $"{_mcsRtvController.RtvCommandUnlockTime - Server.CurrentTime:F0}"));
+                }
+                else
+                {
+                    client.PrintToChat(LocalizeWithModulePrefixForPlayer(client, "RTV.Notification.IsInCooldown.Normal"));
+                }
+                
                 break;
             
             case PlayerRtvResult.CommandDisabled:

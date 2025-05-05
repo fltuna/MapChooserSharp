@@ -14,7 +14,7 @@ internal class McsPluginConfigParser(string configPath, IServiceProvider provide
 {
     private string ConfigPath { get; } = configPath;
     
-    private static Version _currentConfigVersion = PluginConstants.PluginVersion;
+    private static readonly Version CurrentConfigVersion = PluginConstants.PluginVersion;
     
     private List<McsSupportedMenuType> _avaiableMenuTypes = new();
 
@@ -91,17 +91,17 @@ internal class McsPluginConfigParser(string configPath, IServiceProvider provide
             return;
         }
         
-        int result = configVersion.CompareTo(_currentConfigVersion);
+        int result = configVersion.CompareTo(CurrentConfigVersion);
 
         if (result < 0)
         {
             Logger.LogWarning("Config file version is older than the current version. Some settings may not work correctly.");
-            Logger.LogWarning($"Config version: {configVersion} | Current version: {_currentConfigVersion}");
+            Logger.LogWarning($"Config version: {configVersion} | Current version: {CurrentConfigVersion}");
         }
         else if (result > 0)
         {
             Logger.LogWarning("Config file version is newer than the current version. Some settings may not be compatible.");
-            Logger.LogWarning($"Config version: {configVersion} | Current version: {_currentConfigVersion}");
+            Logger.LogWarning($"Config version: {configVersion} | Current version: {CurrentConfigVersion}");
         }
         else
         {
@@ -209,7 +209,12 @@ internal class McsPluginConfigParser(string configPath, IServiceProvider provide
             throw new InvalidOperationException("General.ShouldUseAliasMapNameIfAvailable is not found or invalid");
         }
         
-        return new McsGeneralConfig(aliasNameSetting);
+        if (!generalTable.TryGetValue("VerboseCooldownPrint", out var verboseCooldownPrintObj) || verboseCooldownPrintObj is not bool verboseCooldownPrint)
+        {
+            throw new InvalidOperationException("General.ShouldUseAliasMapNameIfAvailable is not found or invalid");
+        }
+        
+        return new McsGeneralConfig(aliasNameSetting, verboseCooldownPrint);
     }
     
     

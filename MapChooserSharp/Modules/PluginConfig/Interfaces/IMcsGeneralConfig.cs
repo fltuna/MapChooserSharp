@@ -3,4 +3,6 @@
 internal interface IMcsGeneralConfig
 {
     internal bool ShouldUseAliasMapNameIfAvailable { get; }
+    
+    internal bool VerboseCooldownPrint { get; }
 }
