@@ -109,7 +109,6 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     #region Vote Controll Area
 
 
-    // TODO() These settings should be plugin config
     public int MaxVoteMenuElements => _mcsPluginConfigProvider.PluginConfig.VoteConfig.MaxMenuElements;
     public readonly FakeConVar<bool> ShouldShuffleVoteMenu = new("mcs_vote_shuffle_menu", "Should vote menu elements is shuffled?", false);
     public readonly FakeConVar<float> MapVoteEndTime = new("mcs_vote_end_time", "How long to take vote ends in seconds?", 15.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(5.0F, 120.0F));

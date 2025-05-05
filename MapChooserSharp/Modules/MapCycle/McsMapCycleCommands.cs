@@ -259,7 +259,6 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             if (currentMap != null)
             {
-                // TODO() Use alias name if available 
                 player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.CurrentMap", _mcsInternalMapConfigProviderApi.GetMapName(currentMap)));
             }
             else
