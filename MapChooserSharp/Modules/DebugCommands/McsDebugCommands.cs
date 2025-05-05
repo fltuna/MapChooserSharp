@@ -146,6 +146,7 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
             foreach (IMapGroupSettings setting in mapCfg.GroupSettings)
             {
                 info.ReplyToCommand($"Group {setting.GroupName}'s cooldown: {setting.GroupCooldown.MapConfigCooldown}");
+                info.ReplyToCommand($"Hash by map: {setting.GetHashCode()} | Hash by group settings: {_mcsInternalMapConfigProviderApi.GetGroupSettings()[setting.GroupName].GetHashCode()}");
                 info.ReplyToCommand($"Group {setting.GroupName}'s cooldown Remains: {setting.GroupCooldown.CurrentCooldown}");
             }
         }

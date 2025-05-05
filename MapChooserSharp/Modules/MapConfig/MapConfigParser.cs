@@ -179,6 +179,14 @@ internal class MapConfigParser(string configPath)
                 mapConfigs[key] = mapConfig;
             }
         }
+
+        // Cereate actual group settings
+        Dictionary<string, IMapGroupSettings> actualGroupSettings = new();
+        
+        foreach (var (key, value) in groupConfigs)
+        {
+            actualGroupSettings[key] = new MapGroupSettings(key, new MapCooldown(value.Cooldown ?? 0));
+        }
         
         // Convert NullableMapConfig to IMapConfig
         Dictionary<string, IMapConfig> finalMapConfigs = new Dictionary<string, IMapConfig>();
@@ -199,6 +207,21 @@ internal class MapConfigParser(string configPath)
                 config.DaysAllowed!,
                 config.AllowedTimeRanges!
             );
+
+            
+            // Create link to actual group settings in map config's GroupSettings
+            List<IMapGroupSettings> linkToActualGroupSettings = [];
+            
+            foreach (var (_, settingFromGroup) in actualGroupSettings)
+            {
+                foreach (IMapGroupSettings settingFromMap in config.GroupSettings)
+                {
+                    if (settingFromGroup.GroupName == settingFromMap.GroupName)
+                    {
+                        linkToActualGroupSettings.Add(settingFromGroup);
+                    }
+                }
+            }
             
             // Create IMapConfig
             finalMapConfigs[mapName] = new Models.MapConfig(
@@ -216,15 +239,8 @@ internal class MapConfigParser(string configPath)
                 nominationConfig,
                 mapCooldown,
                 config.ExtraConfiguration,
-                config.GroupSettings
+                linkToActualGroupSettings
             );
-        }
-
-        Dictionary<string, IMapGroupSettings> actualGroupSettings = new();
-        
-        foreach (var (key, value) in groupConfigs)
-        {
-            actualGroupSettings[key] = new MapGroupSettings(key, new MapCooldown(value.Cooldown ?? 0));
         }
         
         return new McsMapConfigProvider(finalMapConfigs, actualGroupSettings);

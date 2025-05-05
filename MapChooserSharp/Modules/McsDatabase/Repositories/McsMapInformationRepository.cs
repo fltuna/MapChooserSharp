@@ -153,7 +153,8 @@ public class McsMapInformationRepository
             
             var mapConfigProvider = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
             var mapConfigs = mapConfigProvider.GetMapConfigs();
-            
+
+            int mapCount = 0;
             foreach (var (mapName, mapConfig) in mapConfigs)
             {
                 var mapInfo = mapInfos.FirstOrDefault(m => m.MapName == mapName);
@@ -166,13 +167,15 @@ public class McsMapInformationRepository
                 {
                     mapConfig.MapCooldown.CurrentCooldown = 0;
                 }
+
+                mapCount++;
             }
+            Plugin.Logger.LogInformation($"Successfully collected cooldowns from database for {mapCount} maps");
         }
         catch (Exception ex)
         {
             Plugin.Logger.LogError(ex, "Failed to collect map cooldowns");
             throw;
         }
-        Plugin.Logger.LogInformation("All map cooldown information collected");
     }
 }

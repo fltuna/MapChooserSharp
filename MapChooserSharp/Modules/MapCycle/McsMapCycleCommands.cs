@@ -432,6 +432,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
             try
             {
                 await _mcsDatabaseProvider.GroupInfoRepository.UpsertGroupCooldownAsync(groupSetting.GroupName, cooldown);
+                groupSetting.GroupCooldown.CurrentCooldown = cooldown;
                 isOperationSucceeded = true;
             }
             catch (Exception)
