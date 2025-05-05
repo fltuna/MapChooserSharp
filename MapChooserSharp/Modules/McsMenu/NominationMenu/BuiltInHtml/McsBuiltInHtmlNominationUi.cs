@@ -6,6 +6,7 @@ using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Models;
 using MapChooserSharp.Modules.MapVote;
+using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
 using MapChooserSharp.Modules.Nomination;
@@ -28,7 +29,7 @@ public class McsBuiltInHtmlNominationUi(CCSPlayerController playerController, IS
     
     private readonly IDebugLogger _debugLogger = provider.GetRequiredService<IDebugLogger>();
     
-    private readonly McsMapVoteController _voteController = provider.GetRequiredService<McsMapVoteController>();
+    private readonly IMcsInternalMapVoteControllerApi _voteController = provider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
     
     public int NominationOptionCount => _nominationMenuOptions.Count;
     
