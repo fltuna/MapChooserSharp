@@ -3,7 +3,7 @@ using MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.Interfaces;
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders;
 
-internal class UnsupportedSqlProvider: IMcsSqlQueryProvider
+internal sealed class UnsupportedSqlProvider: IMcsSqlQueryProvider
 {
     public IMcsMapInformationSqlQueries MapInfoSqlQueries() => throw new NotSupportedException("Database provider not supported");
     

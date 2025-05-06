@@ -21,7 +21,7 @@ using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace MapChooserSharp.Modules.RockTheVote;
 
-internal class McsRtvController(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), IMcsInternalRtvControllerApi
+internal sealed class McsRtvController(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), IMcsInternalRtvControllerApi
 {
     public override string PluginModuleName => "McsRtvController";
     public override string ModuleChatPrefix => "Prefix.RTV";

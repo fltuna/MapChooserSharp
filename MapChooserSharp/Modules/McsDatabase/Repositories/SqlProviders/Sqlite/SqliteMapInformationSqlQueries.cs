@@ -2,7 +2,7 @@
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.Sqlite;
 
-public class SqliteMapInformationSqlQueries: IMcsMapInformationSqlQueries
+public sealed class SqliteMapInformationSqlQueries: IMcsMapInformationSqlQueries
 {
     public string GetEnsureTableExistsSql() => @"
         CREATE TABLE IF NOT EXISTS McsMapInformation (

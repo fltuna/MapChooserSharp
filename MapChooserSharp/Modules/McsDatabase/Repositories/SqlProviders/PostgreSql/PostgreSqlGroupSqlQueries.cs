@@ -2,7 +2,7 @@
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.PostgreSql;
 
-internal class PostgreSqlGroupSqlQueries : IMcsGroupSqlQueries
+internal sealed class PostgreSqlGroupSqlQueries : IMcsGroupSqlQueries
 {
     public string GetEnsureTableExistsSql() => throw new NotImplementedException("This functionality is not implemented.");
     

@@ -4,7 +4,7 @@ using MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.Interfaces;
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.Sqlite;
 
-internal class SqliteSqlProvider : IMcsSqlQueryProvider
+internal sealed class SqliteSqlProvider : IMcsSqlQueryProvider
 {
     private readonly IMcsMapInformationSqlQueries _mcsMapInformationSqlQueries = new SqliteMapInformationSqlQueries();
     

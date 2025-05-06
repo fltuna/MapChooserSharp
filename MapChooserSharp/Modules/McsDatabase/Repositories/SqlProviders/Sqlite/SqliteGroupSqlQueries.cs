@@ -2,7 +2,7 @@
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.Sqlite;
 
-internal class SqliteGroupSqlQueries : IMcsGroupSqlQueries
+internal sealed class SqliteGroupSqlQueries : IMcsGroupSqlQueries
 {
     public string GetEnsureTableExistsSql() => @"
         CREATE TABLE IF NOT EXISTS McsGroupInformation (

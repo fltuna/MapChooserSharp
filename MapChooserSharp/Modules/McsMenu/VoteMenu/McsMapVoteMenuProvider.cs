@@ -8,7 +8,7 @@ using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.McsMenu.VoteMenu;
 
-public class McsMapVoteMenuProvider(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsMapVoteMenuProvider
+public sealed class McsMapVoteMenuProvider(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsMapVoteMenuProvider
 {
     public override string PluginModuleName => "McsMapVoteMenuProvider";
     public override string ModuleChatPrefix => "unused";

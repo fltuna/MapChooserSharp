@@ -2,7 +2,7 @@
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.MySql;
 
-internal class MySqlGroupSqlQueries : IMcsGroupSqlQueries
+internal sealed class MySqlGroupSqlQueries : IMcsGroupSqlQueries
 {
     public string GetEnsureTableExistsSql() => throw new NotImplementedException("This functionality is not implemented.");
     

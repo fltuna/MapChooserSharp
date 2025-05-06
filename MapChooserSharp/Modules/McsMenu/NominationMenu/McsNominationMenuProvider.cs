@@ -9,7 +9,7 @@ using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.McsMenu.NominationMenu;
 
-public class McsNominationMenuProvider(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider),  IMcsNominationMenuProvider
+public sealed class McsNominationMenuProvider(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider),  IMcsNominationMenuProvider
 {
     public override string PluginModuleName => "McsNominationMenuProvider";
     public override string ModuleChatPrefix => "unused";

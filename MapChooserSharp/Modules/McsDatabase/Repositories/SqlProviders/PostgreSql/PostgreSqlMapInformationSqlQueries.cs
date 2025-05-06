@@ -2,7 +2,7 @@
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.PostgreSql;
 
-public class PostgreSqlMapInformationSqlQueries: IMcsMapInformationSqlQueries
+public sealed class PostgreSqlMapInformationSqlQueries: IMcsMapInformationSqlQueries
 {
     public string GetEnsureTableExistsSql() => throw new NotImplementedException("This functionality is not implemented.");
     

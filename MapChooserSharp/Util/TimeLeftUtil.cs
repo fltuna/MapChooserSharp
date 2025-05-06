@@ -12,7 +12,7 @@ using TNCSSPluginFoundation.Utils.Entity;
 
 namespace MapChooserSharp.Util;
 
-internal class TimeLeftUtil(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), ITimeLeftUtil
+internal sealed class TimeLeftUtil(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), ITimeLeftUtil
 {
     public override string PluginModuleName => "TimeleftUtil";
     public override string ModuleChatPrefix => "unused";

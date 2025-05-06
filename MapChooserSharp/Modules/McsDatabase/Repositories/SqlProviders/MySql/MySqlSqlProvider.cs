@@ -4,7 +4,7 @@ using MySqlConnector;
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.MySql;
 
-internal class MySqlSqlProvider : IMcsSqlQueryProvider
+internal sealed class MySqlSqlProvider : IMcsSqlQueryProvider
 {
     private readonly IMcsMapInformationSqlQueries _mcsMapInformationSqlQueries = new MySqlMapInformationSqlQueries();
     

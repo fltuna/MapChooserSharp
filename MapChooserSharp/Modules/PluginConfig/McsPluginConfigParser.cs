@@ -10,7 +10,7 @@ using Tomlyn.Model;
 
 namespace MapChooserSharp.Modules.PluginConfig;
 
-internal class McsPluginConfigParser(string configPath, IServiceProvider provider): PluginBasicFeatureBase(provider)
+internal sealed class McsPluginConfigParser(string configPath, IServiceProvider provider): PluginBasicFeatureBase(provider)
 {
     private string ConfigPath { get; } = configPath;
     

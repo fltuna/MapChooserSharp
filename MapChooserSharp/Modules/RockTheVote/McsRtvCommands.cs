@@ -18,7 +18,7 @@ using TNCSSPluginFoundation.Utils.Entity;
 
 namespace MapChooserSharp.Modules.RockTheVote;
 
-public class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider)
+public sealed class McsRtvCommands(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider)
 {
     public override string PluginModuleName => "McsRtvCommands";
     public override string ModuleChatPrefix => _mcsRtvController.ModuleChatPrefix;

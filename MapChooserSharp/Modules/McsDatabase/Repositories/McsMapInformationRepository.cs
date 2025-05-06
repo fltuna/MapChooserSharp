@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories;
 
-public class McsMapInformationRepository
+public sealed class McsMapInformationRepository
     : McsDatabaseRepositoryBase, IMcsMapInformationRepository
 {
     

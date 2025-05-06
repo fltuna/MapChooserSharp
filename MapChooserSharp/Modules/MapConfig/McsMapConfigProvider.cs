@@ -3,7 +3,7 @@ using MapChooserSharp.Modules.MapConfig.Interfaces;
 
 namespace MapChooserSharp.Modules.MapConfig;
 
-public class McsMapConfigProvider: IMcsInternalMapConfigProviderApi
+public sealed class McsMapConfigProvider: IMcsInternalMapConfigProviderApi
 {
     private readonly Dictionary<string, IMapConfig> _mapConfigs;
     private readonly Dictionary<string, IMapGroupSettings> _groupConfigs;

@@ -11,7 +11,7 @@ using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.MapVote;
 
-public class McsMapVoteCommands(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider)
+public sealed class McsMapVoteCommands(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider)
 {
     public override string PluginModuleName => "McsMapVoteCommands";
     public override string ModuleChatPrefix => "unused";

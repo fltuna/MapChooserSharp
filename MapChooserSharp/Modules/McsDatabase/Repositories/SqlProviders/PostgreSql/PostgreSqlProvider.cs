@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.PostgreSql;
 
-internal class PostgreSqlProvider : IMcsSqlQueryProvider
+internal sealed class PostgreSqlProvider : IMcsSqlQueryProvider
 {
     private readonly IMcsMapInformationSqlQueries _mcsMapInformationSqlQueries = new PostgreSqlMapInformationSqlQueries();
     
