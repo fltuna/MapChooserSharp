@@ -130,7 +130,11 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     public readonly FakeConVar<int> VoteStartTimingRound = new("mcs_vote_start_timing_round", "When should vote started if map is based on mp_maxrounds? (rounds)", 2,
         ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 15));
     
-    
+    protected override void OnInitialize()
+    {
+        TrackConVar(VoteStartTimingTime);
+        TrackConVar(VoteStartTimingRound);
+    }
     
     public override void RegisterServices(IServiceCollection services)
     {
