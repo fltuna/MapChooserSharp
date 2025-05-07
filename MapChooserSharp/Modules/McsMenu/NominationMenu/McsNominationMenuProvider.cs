@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.BuiltInHtml;
+using MapChooserSharp.Modules.McsMenu.NominationMenu.Cs2MenuManager.ScreenMenu;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Cs2ScreenMenuApi;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
@@ -74,13 +75,13 @@ public sealed class McsNominationMenuProvider(IServiceProvider serviceProvider, 
         // TODO() save menu type to DB and restore.
         
         // fallback to server's settings if failed to obtain player data from DB 
-        _playerVoteMenuTypes[slot] = _pluginConfigProvider.PluginConfig.VoteConfig.CurrentMenuType;
+        _playerVoteMenuTypes[slot] = _pluginConfigProvider.PluginConfig.NominationConfig.CurrentMenuType;
     }
 
 
     private void InitializeSupportedMenus()
     {
-        foreach (McsSupportedMenuType type in _pluginConfigProvider.PluginConfig.VoteConfig.AvailableMenuTypes)
+        foreach (McsSupportedMenuType type in _pluginConfigProvider.PluginConfig.NominationConfig.AvailableMenuTypes)
         {
             switch (type)
             {
@@ -90,6 +91,10 @@ public sealed class McsNominationMenuProvider(IServiceProvider serviceProvider, 
                 
                 case McsSupportedMenuType.Cs2ScreenMenuApi:
                     _uiFactories[type] = new McsCs2ScreenMenuApiNominationUiFactory(ServiceProvider);
+                    break;
+                
+                case McsSupportedMenuType.Cs2MenuManagerScreen:
+                    _uiFactories[type] = new McsCs2MenuManagerScreenMenuNominationUiFactory(ServiceProvider);
                     break;
             }
         }
