@@ -57,14 +57,13 @@ jobs:
           mkdir artifacts
           mkdir artifacts\shared\MapChooserSharp.API\
           mkdir artifacts\plugins\MapChooserSharp\
-          mkdir artifacts\plugins\MapChooserSharp\runtimes\
-          mkdir artifacts\plugins\MapChooserSharp\lang\
-          Copy-Item -Path "MapChooserSharp\bin\Release\*\publish\runtimes" -Destination "artifacts\plugins\MapChooserSharp\runtimes" -Force
-          Copy-Item -Path "MapChooserSharp\bin\Release\*\publish\Dapper.dll" -Destination "artifacts\plugins\MapChooserSharp\Dapper.dll" -Force
-          Copy-Item -Path "MapChooserSharp\bin\Release\*\publish\System.Data.SQLite.dll" -Destination "artifacts\plugins\MapChooserSharp\System.Data.SQLite.dll" -Force
-          Copy-Item -Path "MapChooserSharp\bin\Release\*\MapChooserSharp.dll" -Destination "artifacts\plugins\MapChooserSharp\MapChooserSharp.dll" -Force
+          mkdir artifacts\plugins\MapChooserSharp\
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\runtimes" -Destination "artifacts\plugins\MapChooserSharp" -Force -Recurse
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\Dapper.dll" -Destination "artifacts\plugins\MapChooserSharp\Dapper.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\System.Data.SQLite.dll" -Destination "artifacts\plugins\MapChooserSharp\System.Data.SQLite.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\MapChooserSharp.dll" -Destination "artifacts\plugins\MapChooserSharp\MapChooserSharp.dll" -Force
           Copy-Item -Path "MapChooserSharp.API\bin\Release\*\MapChooserSharp.API.dll" -Destination "artifacts\shared\MapChooserSharp.API\MapChooserSharp.API.dll" -Force
-          Copy-Item -Path "lang\" -Destination "artifacts\plugins\MapChooserSharp\lang\" -Recurse -Force
+          Copy-Item -Path "lang\" -Destination "artifacts\plugins\MapChooserSharp\" -Recurse -Force
 
       - name: Compress artifacts
         run:
