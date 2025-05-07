@@ -193,7 +193,93 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
 
         var currentMenuType = DecideMenuType(menuTypeStr, availableMenus);
 
-        return new McsVoteConfig(availableMenus, currentMenuType, (int)maxVoteElementsLong, shouldPrintVoteToChatBool);
+        var soundConfig = ParseVoteSoundConfig(voteTable);
+
+        return new McsVoteConfig(availableMenus, currentMenuType, (int)maxVoteElementsLong, shouldPrintVoteToChatBool, soundConfig);
+    }
+
+    private IMcsVoteSoundConfig ParseVoteSoundConfig(TomlTable tomlModel)
+    {
+        if (!tomlModel.TryGetValue("Sound", out var voteSoundObj) || voteSoundObj is not TomlTable voteSoundTable)
+        {
+            throw new InvalidOperationException("MapVote.Sound section is not found");
+        }
+
+        if (!voteSoundTable.TryGetValue("SoundFile", out var soundFileObj) || soundFileObj is not string soundFile)
+        {
+            throw new InvalidOperationException("MapVote.Sound.SoundFile is not found or invalid");
+        }
+        
+        
+        // ====================================
+        // Initial vote sounds
+        // ====================================
+
+        if (!voteSoundTable.TryGetValue("InitialVoteCountdownStartSound", out var initialVoteCountdownStartSoundObj) || initialVoteCountdownStartSoundObj is not string initialVoteCountdownStartSound)
+        {
+            throw new InvalidOperationException("MapVote.Sound.InitialVoteCountdownStartSound is not found or invalid");
+        }
+
+        if (!voteSoundTable.TryGetValue("InitialVoteStartSound", out var initialVoteStartSoundObj) || initialVoteStartSoundObj is not string initialVoteStartSound)
+        {
+            throw new InvalidOperationException("MapVote.Sound.InitialVoteStartSound is not found or invalid");
+        }
+
+        if (!voteSoundTable.TryGetValue("InitialVoteFinishSound", out var initialVoteFinishSoundObj) || initialVoteFinishSoundObj is not string initialVoteFinishSound)
+        {
+            throw new InvalidOperationException("MapVote.Sound.InitialVoteFinishSound is not found or invalid");
+        }
+        
+        List<string> initialVoteCountdownSoundTable = new();
+        
+        for (int i = 1; i <= 10; i++)
+        {
+            if (!voteSoundTable.TryGetValue($"InitialVoteCountdownSound{i}", out var initialVoteCountdownSoundObj) || initialVoteCountdownSoundObj is not string initialVoteCountdownSound)
+            {
+                throw new InvalidOperationException($"MapVote.Sound.InitialVoteCountdownSound{i} is not found or invalid");
+            }
+            
+            initialVoteCountdownSoundTable.Add(initialVoteCountdownSound);
+        }
+        
+        var initialVoteSounds = new McsVoteSound(initialVoteCountdownStartSound, initialVoteStartSound, initialVoteFinishSound, initialVoteCountdownSoundTable);
+        
+        
+        // ====================================
+        // Runoff vote sounds
+        // ====================================
+
+        if (!voteSoundTable.TryGetValue("RunoffVoteCountdownStartSound", out var runoffVoteCountdownStartSoundObj) || runoffVoteCountdownStartSoundObj is not string runoffVoteCountdownStartSound)
+        {
+            throw new InvalidOperationException("MapVote.Sound.RunoffVoteCountdownStartSound is not found or invalid");
+        }
+
+        if (!voteSoundTable.TryGetValue("RunoffVoteStartSound", out var runoffVoteStartSoundObj) || runoffVoteStartSoundObj is not string runoffVoteStartSound)
+        {
+            throw new InvalidOperationException("MapVote.Sound.RunoffVoteStartSound is not found or invalid");
+        }
+
+        if (!voteSoundTable.TryGetValue("RunoffVoteFinishSound", out var runoffVoteFinishSoundObj) || runoffVoteFinishSoundObj is not string runoffVoteFinishSound)
+        {
+            throw new InvalidOperationException("MapVote.Sound.RunoffVoteFinishSound is not found or invalid");
+        }
+        
+        List<string> runoffVoteCountdownSoundTable = new();
+        
+        for (int i = 1; i <= 10; i++)
+        {
+            if (!voteSoundTable.TryGetValue($"RunoffVoteCountdownSound{i}", out var runoffVoteCountdownSoundObj) || runoffVoteCountdownSoundObj is not string runoffVoteCountdownSound)
+            {
+                throw new InvalidOperationException($"MapVote.Sound.RunoffVoteCountdownSound{i} is not found or invalid");
+            }
+            
+            runoffVoteCountdownSoundTable.Add(runoffVoteCountdownSound);
+        }
+        
+        var runoffVoteSounds = new McsVoteSound(runoffVoteCountdownStartSound, runoffVoteStartSound, runoffVoteFinishSound, runoffVoteCountdownSoundTable);
+        
+
+        return new McsVoteSoundConfig(soundFile, initialVoteSounds, runoffVoteSounds);
     }
 
 
