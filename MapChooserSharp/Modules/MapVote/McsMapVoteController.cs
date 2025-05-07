@@ -1008,7 +1008,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
                 continue;
             
             controller.PrintToChat(
-                LocalizeStringForPlayer(controller, "MapVote.Broadcast.VoteResult.NextMapConfirmed", 
+                LocalizeWithPluginPrefixForPlayer(controller, "MapVote.Broadcast.VoteResult.NextMapConfirmed", 
                     GetMapName(winMap, controller).ToString(), $"{mapVotePercentage:F2}", totalVotes));
         }
     }
