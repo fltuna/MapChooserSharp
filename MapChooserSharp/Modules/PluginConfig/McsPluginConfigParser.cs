@@ -200,8 +200,6 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         var availableMenus =  _avaiableMenuTypes;
 
         var currentMenuType = DecideMenuType(menuTypeStr, availableMenus);
-        
-        Server.PrintToChatAll($"Type: {currentMenuType}");
 
         var soundConfig = ParseVoteSoundConfig(voteTable);
 
@@ -411,6 +409,14 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
                         break;
 
                     availableMenuTypes.Add(McsSupportedMenuType.Cs2ScreenMenuApi);
+                    break;
+                
+                case McsSupportedMenuType.Cs2MenuManagerScreen:
+                    Server.PrintToConsole("CHECKING");
+                    if (!AssemblyUtility.IsAssemblyLoaded("CS2MenuManager"))
+                        break;
+                    
+                    availableMenuTypes.Add(McsSupportedMenuType.Cs2MenuManagerScreen);
                     break;
             }
         }

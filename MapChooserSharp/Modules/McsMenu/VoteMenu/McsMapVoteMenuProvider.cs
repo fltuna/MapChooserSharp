@@ -2,6 +2,8 @@
 using CounterStrikeSharp.API.Core;
 using MapChooserSharp.Models;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.BuiltInHtml;
+using MapChooserSharp.Modules.McsMenu.VoteMenu.Cs2MenuManager;
+using MapChooserSharp.Modules.McsMenu.VoteMenu.Cs2MenuManager.ScreenMenu;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Cs2ScreenMenuApi;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
@@ -75,7 +77,6 @@ public sealed class McsMapVoteMenuProvider(IServiceProvider serviceProvider, boo
         
         // fallback to server's settings if failed to obtain player data from DB 
         _playerVoteMenuTypes[slot] = _pluginConfigProvider.PluginConfig.VoteConfig.CurrentMenuType;
-        Server.PrintToChatAll($"{_pluginConfigProvider.PluginConfig.VoteConfig.CurrentMenuType}");
     }
 
 
@@ -91,6 +92,10 @@ public sealed class McsMapVoteMenuProvider(IServiceProvider serviceProvider, boo
                 
                 case McsSupportedMenuType.Cs2ScreenMenuApi:
                     _uiFactories[type] = new McsCs2ScreenMenuApiUiFactory(ServiceProvider);
+                    break;
+                
+                case McsSupportedMenuType.Cs2MenuManagerScreen:
+                    _uiFactories[type] = new McsCs2MenuManagerScreenMenuUiFactory(ServiceProvider);
                     break;
             }
         }
