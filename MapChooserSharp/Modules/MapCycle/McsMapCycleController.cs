@@ -391,11 +391,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
                 break;
             
             case McsMapExtendType.RoundTime:
-                CreateVoteStartTimer(() =>
-                {
-                    Server.PrintToChatAll($"{_timeLeftUtil.RoundTimeLeft} > {VoteStartTimingTime.Value}");
-                    return _timeLeftUtil.RoundTimeLeft / 60 > VoteStartTimingTime.Value;
-                });
+                CreateVoteStartTimer(() => _timeLeftUtil.RoundTimeLeft / 60 > VoteStartTimingTime.Value);
                 break;
             
             case McsMapExtendType.Rounds:

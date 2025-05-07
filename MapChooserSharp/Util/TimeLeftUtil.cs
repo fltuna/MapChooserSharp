@@ -216,8 +216,8 @@ internal sealed class TimeLeftUtil(IServiceProvider serviceProvider, bool hotRel
             return false;
         }
 
-        int currentTime = mp_roundtime.GetPrimitiveValue<int>();
-        int newTime = currentTime + minutes;
+        float currentTime = mp_roundtime.GetPrimitiveValue<float>();
+        float newTime = currentTime + minutes;
         DebugLogger.LogTrace($"New {mp_roundtime.Name} is {newTime}");
         
         mp_roundtime.SetValue(newTime);
@@ -308,7 +308,7 @@ internal sealed class TimeLeftUtil(IServiceProvider serviceProvider, bool hotRel
         if (player == null)
             return GetFormattedRoundsLeft(roundsLeft);
         
-        return Plugin.LocalizeStringForPlayer(player, "MapCycle.Command.Notification.TimeLeft.TimeFormat.Rounds");
+        return Plugin.LocalizeStringForPlayer(player, "MapCycle.Command.Notification.TimeLeft.TimeFormat.Rounds", roundsLeft);
     }
     
     private McsMapExtendType DetermineExtendType()

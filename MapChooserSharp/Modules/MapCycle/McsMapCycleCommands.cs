@@ -7,6 +7,7 @@ using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapCycleController;
+using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle.Interfaces;
@@ -110,14 +111,43 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     private void CommandTimeLeft(CCSPlayerController? player, CommandInfo info)
     {
         // TODO() Support round time and round count
-        string timeleft = _timeLeftUtil.GetFormattedTimeLeft(_timeLeftUtil.TimeLimit, player);
-        if (player == null)
+        switch (_timeLeftUtil.ExtendType)
         {
-            Server.PrintToConsole(Plugin.LocalizeString("MapCycle.Command.Notification.TimeLeft", timeleft));
-        }
-        else
-        {
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.TimeLeft", timeleft));
+            case McsMapExtendType.TimeLimit:
+                string timeleft = _timeLeftUtil.GetFormattedTimeLeft(_timeLeftUtil.TimeLimit, player);
+                if (player == null)
+                {
+                    Server.PrintToConsole(Plugin.LocalizeString("MapCycle.Command.Notification.TimeLeft", timeleft));
+                }
+                else
+                {
+                    player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.TimeLeft", timeleft));
+                }
+                break;
+
+            case McsMapExtendType.RoundTime:
+                string roundTimeLeft = _timeLeftUtil.GetFormattedTimeLeft(_timeLeftUtil.RoundTimeLeft, player);
+                if (player == null)
+                {
+                    Server.PrintToConsole(Plugin.LocalizeString("MapCycle.Command.Notification.TimeLeft", roundTimeLeft));
+                }
+                else
+                {
+                    player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.TimeLeft", roundTimeLeft));
+                }
+                break;
+            
+            case McsMapExtendType.Rounds:
+                string roundsLeft = _timeLeftUtil.GetFormattedRoundsLeft(_timeLeftUtil.RoundsLeft, player);
+                if (player == null)
+                {
+                    Server.PrintToConsole(Plugin.LocalizeString("MapCycle.Command.Notification.RoundLeft", roundsLeft));
+                }
+                else
+                {
+                    player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.RoundLeft", roundsLeft));
+                }
+                break;
         }
     }
 
