@@ -12,4 +12,6 @@ internal interface IMcsVoteConfig
     internal int MaxMenuElements { get; }
     
     internal bool ShouldPrintVoteToChat { get; }
+    
+    internal IMcsVoteSoundConfig VoteSoundConfig { get; }
 }
