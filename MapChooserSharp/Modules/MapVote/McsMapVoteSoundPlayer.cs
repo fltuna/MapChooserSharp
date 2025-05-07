@@ -15,8 +15,6 @@ internal class McsMapVoteSoundPlayer(IMcsVoteSoundConfig config)
         if (string.IsNullOrEmpty(sound))
             return;
         
-        Server.PrintToChatAll(sound);
-
         
         foreach (CCSPlayerController player in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
         {
@@ -42,8 +40,6 @@ internal class McsMapVoteSoundPlayer(IMcsVoteSoundConfig config)
         if (string.IsNullOrEmpty(sound))
             return;
         
-        Server.PrintToChatAll(sound);
-        
         
         foreach (CCSPlayerController player in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
         {
@@ -65,8 +61,6 @@ internal class McsMapVoteSoundPlayer(IMcsVoteSoundConfig config)
         
         if (string.IsNullOrEmpty(sound))
             return;
-        
-        Server.PrintToChatAll(sound);
         
         
         foreach (CCSPlayerController player in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
@@ -90,7 +84,6 @@ internal class McsMapVoteSoundPlayer(IMcsVoteSoundConfig config)
         if (string.IsNullOrEmpty(sound))
             return;
         
-        Server.PrintToChatAll(sound);
         
         foreach (CCSPlayerController player in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
         {
