@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapVoteController;
@@ -30,7 +31,17 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
     private IMcsInternalMapCycleControllerApi _mapCycleController = null!;
+    
+    
+    private readonly Dictionary<int, float> _playerNextCommandAvaiableTime = new();
 
+    
+    public readonly FakeConVar<float> NominationCommandCooldown = new ("mcs_nomination_command_cooldown", "Cooldown for nomination command", 10.0F);
+
+    protected override void OnInitialize()
+    {
+        TrackConVar(NominationCommandCooldown);
+    }
 
     protected override void OnAllPluginsLoaded()
     {
@@ -67,6 +78,15 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
             player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
             return;
         }
+
+        if (_playerNextCommandAvaiableTime.TryGetValue(player.Slot, out float nextCommandAvaiableTime) && nextCommandAvaiableTime - Server.CurrentTime > 0.0)
+        {
+            float time = (float)Math.Ceiling(nextCommandAvaiableTime - Server.CurrentTime);
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.CommandCooldown", $"{time:F0}"));
+            return;
+        }
+
+        _playerNextCommandAvaiableTime[player.Slot] = Server.CurrentTime + NominationCommandCooldown.Value;
         
         if (info.ArgCount < 2)
         {
