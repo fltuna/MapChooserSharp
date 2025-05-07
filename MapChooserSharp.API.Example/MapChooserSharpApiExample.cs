@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Core.Capabilities;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.Events;
+using MapChooserSharp.API.Events.Commands;
 using MapChooserSharp.API.Events.Nomination;
 using MapChooserSharp.API.Events.RockTheVote;
 
@@ -37,6 +38,8 @@ public class MapChooserSharpApiExample: BasePlugin
         _mcsApi.EventSystem.RegisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
         _mcsApi.EventSystem.RegisterEventHandler<McsPlayerRtvCastEvent>(OnPlayerRtv);
         _mcsApi.EventSystem.RegisterEventHandler<McsAdminForceRtvEvent>(OnForceRtv);
+        
+        _mcsApi.EventSystem.RegisterEventHandler<McsMapInfoCommandExecutedEvent>(OnMapInfoCommandExecuted);
     }
 
     public override void Unload(bool hotReload)
@@ -48,6 +51,8 @@ public class MapChooserSharpApiExample: BasePlugin
         _mcsApi.EventSystem.UnregisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
         _mcsApi.EventSystem.UnregisterEventHandler<McsPlayerRtvCastEvent>(OnPlayerRtv);
         _mcsApi.EventSystem.UnregisterEventHandler<McsAdminForceRtvEvent>(OnForceRtv);
+        
+        _mcsApi.EventSystem.RegisterEventHandler<McsMapInfoCommandExecutedEvent>(OnMapInfoCommandExecuted);
     }
 
 
@@ -135,5 +140,13 @@ public class MapChooserSharpApiExample: BasePlugin
         }
         
         return McsEventResult.Continue;
+    }
+
+
+    private void OnMapInfoCommandExecuted(McsMapInfoCommandExecutedEvent @event)
+    {
+        var player = @event.Player;
+        
+        player.PrintToChat($"{@event.ModulePrefix} Additional map info: TEST");
     }
 }

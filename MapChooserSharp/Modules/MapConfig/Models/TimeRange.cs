@@ -34,6 +34,6 @@ public class TimeRange(
 
     public override string ToString()
     {
-        return StartTime + " - " + EndTime;
+        return StartTime.ToString("HH:mm") + " - " + EndTime.ToString("HH:mm");
     }
 }
