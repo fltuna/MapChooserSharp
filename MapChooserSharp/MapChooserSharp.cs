@@ -90,6 +90,12 @@ public sealed class MapChooserSharp: TncssPluginBase
         #if DEBUG
         RegisterModule<McsDebugCommands>();
         #endif
+        
+        RegisterListener<Listeners.OnMapEnd>(() =>
+        {
+            // Reset ConVar value to config value when map end
+            ConVarConfigurationService.ExecuteConfigs();
+        });
     }
 
     protected override void TncssLateOnPluginLoad(ServiceProvider provider)
