@@ -7,15 +7,15 @@ using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories;
 
-public abstract class McsDatabaseRepositoryBase(IServiceProvider provider): PluginBasicFeatureBase(provider)
+public abstract class McsDatabaseRepositoryBase(IServiceProvider provider, string tableName): PluginBasicFeatureBase(provider)
 {
-    internal static IMcsSqlQueryProvider CreateSqlProvider(string databaseType)
+    internal IMcsSqlQueryProvider CreateSqlProvider(McsSupportedSqlType type)
     {
-        return databaseType switch
+        return type switch
         {
-            "sqlite" => new SqliteSqlProvider(),
-            "mysql" => new MySqlSqlProvider(),
-            "postgresql" => new PostgreSqlProvider(),
+            McsSupportedSqlType.Sqlite => new SqliteSqlProvider(tableName),
+            McsSupportedSqlType.MySql => new MySqlSqlProvider(tableName),
+            McsSupportedSqlType.PostgreSql => new PostgreSqlProvider(tableName),
             _ => new UnsupportedSqlProvider()
         };
     }

@@ -2,8 +2,10 @@
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.MySql;
 
-internal sealed class MySqlMapInformationSqlQueries: IMcsMapInformationSqlQueries
+internal sealed class MySqlMapInformationSqlQueries(string tableName) : IMcsMapInformationSqlQueries
 {
+    public string TableName { get; } = tableName;
+
     public string GetEnsureTableExistsSql() => throw new NotImplementedException("This functionality is not implemented.");
     
     public string GetDecrementCooldownsSql() => throw new NotImplementedException("This functionality is not implemented.");

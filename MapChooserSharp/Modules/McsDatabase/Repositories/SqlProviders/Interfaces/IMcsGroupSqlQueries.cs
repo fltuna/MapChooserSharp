@@ -2,6 +2,8 @@
 
 internal interface IMcsGroupSqlQueries
 {
+    string TableName { get; }
+    
     /// <summary>
     /// Get SQL for ensuring the McsGroupInformation table exists
     /// </summary>
