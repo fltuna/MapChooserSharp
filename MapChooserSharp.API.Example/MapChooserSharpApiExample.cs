@@ -97,7 +97,7 @@ public class MapChooserSharpApiExample: BasePlugin
     private McsEventResultWithCallback OnMapNominationBegin(McsNominationBeginEvent @event)
     {
         // Mapped with end of extra config setting name
-        // [MapChooserSharp.ze_example_map.Extra.Shop]
+        // [ze_example_abc.extra.shop]
         if (@event.NominationData.MapConfig.ExtraConfiguration.TryGetValue("shop", out var shopSettings))
         {
             if (shopSettings.TryGetValue("cost", out var cost))
