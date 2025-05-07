@@ -72,8 +72,18 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
     private readonly HashSet<int> _rtvVoteParticipants = new();
 
     private int CountsRequiredToInitiateRtv { get; set; } = 0;
-    
-    
+
+    protected override void OnInitialize()
+    {
+        TrackConVar(RtvCommandUnlockTimeNextMapConfirmed);
+        TrackConVar(RtvCommandUnlockTimeMapNotChanged);
+        TrackConVar(RtvCommandUnlockTimeMapExtend);
+        TrackConVar(RtvCommandUnlockTimeMapStart);
+        TrackConVar(RtvVoteStartThreshold);
+        TrackConVar(MapChangeTimingAfterRtvSuccess);
+        TrackConVar(MapChangeTimingShouldRoundEnd);
+    }
+
     public override void RegisterServices(IServiceCollection services)
     {
         services.AddSingleton<IMcsInternalRtvControllerApi>(this);

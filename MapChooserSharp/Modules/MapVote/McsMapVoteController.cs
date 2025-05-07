@@ -110,7 +110,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
 
     public int MaxVoteMenuElements => _mcsPluginConfigProvider.PluginConfig.VoteConfig.MaxMenuElements;
-    public readonly FakeConVar<bool> ShouldShuffleVoteMenu = new("mcs_vote_shuffle_menu", "Should vote menu elements is shuffled?", false);
+    public readonly FakeConVar<bool> ShouldShuffleVoteMenu = new("mcs_vote_shuffle_menu", "Should vote menu elements is shuffled per player?", false);
     public readonly FakeConVar<float> MapVoteEndTime = new("mcs_vote_end_time", "How long to take vote ends in seconds?", 15.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(5.0F, 120.0F));
     public readonly FakeConVar<int> VoteStartCountDownTime = new("mcs_vote_countdown_time", "How long to take vote starts in seconds", 13, ConVarFlags.FCVAR_NONE, new RangeValidator<int>(0, 120));
     
