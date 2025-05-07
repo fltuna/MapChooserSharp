@@ -26,7 +26,10 @@ public interface IMcsRtvControllerApi
     /// <returns>Player's RTV result</returns>
     public PlayerRtvResult AddPlayerToRtv(CCSPlayerController player);
 
-
+    /// <summary>
+    /// Initiate a rtv vote
+    /// </summary>
+    public void InitiateRtvVote();
 
     /// <summary>
     /// Enables RTV
