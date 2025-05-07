@@ -29,8 +29,6 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
     
     private readonly Dictionary<int, List<ItemOption>> _chachedMenuOptions = new();
 
-    private CS2MenuManager.API.Menu.ScreenMenu? _currentMenu;
-
     public int VoteOptionCount => _voteOptions.Count;
     public void OpenMenu()
     {
@@ -53,7 +51,7 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
         }
         
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Creating vote menu");
-        _currentMenu = new CS2MenuManager.API.Menu.ScreenMenu(menuTitle.ToString(), _plugin)
+        CS2MenuManager.API.Menu.ScreenMenu menu = new CS2MenuManager.API.Menu.ScreenMenu(menuTitle.ToString(), _plugin)
         {
             ShowResolutionsOption = false,
             MenuType = MenuType.Both,
@@ -63,9 +61,9 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
         if (_chachedMenuOptions.TryGetValue(playerController.Slot, out var menuOps))
         {
             _debugLogger.LogTrace($"[Player {playerController.PlayerName}] vote menu menu is already cached, reusing...");
-            _currentMenu.ItemOptions.Clear();
-            _currentMenu.ItemOptions.AddRange(menuOps);
-            DisplayMenu(playerController, _currentMenu);
+            menu.ItemOptions.Clear();
+            menu.ItemOptions.AddRange(menuOps);
+            DisplayMenu(playerController, menu);
             return;
         }
 
@@ -96,13 +94,13 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
             menuOptions = menuOptions.OrderBy(x => random.Next()).ToList();
         }
         
-        _currentMenu.ItemOptions.Clear();
-        _currentMenu.ItemOptions.AddRange(menuOptions);
+        menu.ItemOptions.Clear();
+        menu.ItemOptions.AddRange(menuOptions);
         _chachedMenuOptions.TryAdd(playerController.Slot, menuOptions);
         
         
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Menu init completed, opening...");
-        DisplayMenu(playerController, _currentMenu);
+        DisplayMenu(playerController, menu);
     }
 
     public void CloseMenu()
