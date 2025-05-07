@@ -181,7 +181,7 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
         return PlayerRtvResult.Success;
     }
 
-    internal void InitiateRtvVote()
+    public void InitiateRtvVote()
     {
         RtvCommandStatus = RtvStatus.Triggered;
         _mcsMapVoteController.InitiateVote(true);
