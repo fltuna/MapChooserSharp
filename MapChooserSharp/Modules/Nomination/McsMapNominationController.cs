@@ -247,11 +247,11 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     {
         if (option.IsAdminNomination)
         {
-            client.ExecuteClientCommandFromServer($"css_nominate_addmap {option.MapConfig.MapName}");
+            AdminNominateMap(client, option.MapConfig);
         }
         else
         {
-            client.ExecuteClientCommandFromServer($"css_nominate {option.MapConfig.MapName}");
+            NominateMap(client, option.MapConfig);
         }
 
         if (_mcsActiveUserNominationMenu.TryGetValue(client.Slot, out var ui))
