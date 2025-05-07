@@ -95,11 +95,12 @@ jobs:
           
           
       - name: Compress artifacts
-        run:
+        run: |
           Compress-Archive -Path artifacts/* -Destination MapChooserSharp-win-x64.zip
           Compress-Archive -Path artifacts-linux-x64/* -Destination MapChooserSharp-linux-x64.zip
           Compress-Archive -Path artifacts-windows-x64-with-dependencies/* -Destination MapChooserSharp-win-x64-with-dependencies.zip
           Compress-Archive -Path artifacts-linux-x64-with-dependencies/* -Destination MapChooserSharp-linux-x64-with-dependencies.zip
+          
           
       - name: Upload release assets
         uses: actions/upload-artifact@v4
