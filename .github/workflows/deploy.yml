@@ -135,3 +135,40 @@ jobs:
           gh release create "${{ github.ref_name }}" --title "Release ${{ github.ref_name }}" --generate-notes --draft=false artifacts/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  publish-nuget:
+    runs-on: windows-latest
+    needs: release
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install dependencies
+        run: dotnet restore
+        working-directory: MapChooserSharp.API
+
+      - name: Build
+        run: dotnet build -c Release -p:DebugType=None -p:DebugSymbols=false
+        working-directory: MapChooserSharp.API
+
+      - name: Pack
+        run: dotnet pack --configuration Release
+        working-directory: MapChooserSharp.API
+
+      - name: Extract version
+        id: package_version
+        run: |
+          $xml = [Xml] (Get-Content MapChooserSharp.API/MapChooserSharp.API.csproj)
+          $version = $xml.Project.PropertyGroup.PackageVersion
+          echo "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+        shell: pwsh
+
+      - name: Publish to Nuget
+        run: |
+          dotnet nuget push "bin/Release/MapChooserSharp.API.${{env.VERSION}}.nupkg" --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+        working-directory: MapChooserSharp.API
