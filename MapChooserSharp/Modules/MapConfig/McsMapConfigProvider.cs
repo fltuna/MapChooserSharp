@@ -31,13 +31,8 @@ public sealed class McsMapConfigProvider: IMcsInternalMapConfigProviderApi
 
     public IMapConfig? GetMapConfig(string mapName)
     {
-        foreach (var (key, value) in _mapConfigs)
-        {
-            if (key == mapName)
-                return value;
-        }
-        
-        return null;
+        _mapConfigs.TryGetValue(mapName, out var mapConfig);
+        return mapConfig;
     }
 
     public IMapConfig? GetMapConfig(long workshopId)
