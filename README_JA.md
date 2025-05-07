@@ -25,11 +25,14 @@ CounterStrikeSharpで実装された強力なAPIとカスタマイズ性を備�
 
 ### インストール
 
-1. 最新のプラグインを [リリースページ](https://github.com/fltuna/MapChooserSharp/releases/latest) からダウンロードします。
-2. ZIPファイルを解凍
-3. でてきたフォルダを `game/csgo/addons/counterstrikesharp/` に入れる
-4. サーバーを起動
-5. 完了!
+1. [リリースページ](https://github.com/fltuna/MapChooserSharp/releases/latest) にアクセスします
+2. 状況に合わせて最適なZIPファイルをダウンロードします
+    1. 最初のインストールか、リリースページで再ダウンロードを促されている場合は `MapChooserSharp-osname-with-dependencies.zip` をダウンロードしてください
+    2. アップデートだけであれば `MapChooserSharp-osname.zip` をダウンロードしてください
+3. ZIPファイルを解凍
+4. でてきたフォルダを `game/csgo/addons/counterstrikesharp/` に入れる
+5. サーバーを起動
+6. 完了!
 
 ## カスタマイズ
 
