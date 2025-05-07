@@ -88,25 +88,39 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
 
         var mapConfigs = _mcsInternalMapConfigProviderApi.GetMapConfigs();
 
-        var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).ToDictionary();
+        var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).Select(kv => kv.Value) .ToList();
+
+        List<IMapConfig> filteredMaps = new();
+
+        foreach (IMapConfig map in matchedMaps)
+        {
+            if (map.IsDisabled || map.NominationConfig.RestrictToAllowedUsersOnly)
+                continue;
+
+            if (map.NominationConfig.RequiredPermissions.Any() &&
+                !AdminManager.PlayerHasPermissions(player, map.NominationConfig.RequiredPermissions.ToArray()))
+                continue;
+            
+            filteredMaps.Add(map);
+        }
         
-        if (!matchedMaps.Any())
+        if (!filteredMaps.Any())
         {
             player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.NotMapsFound", mapName));
 
             _mapNominationController.ShowNominationMenu(player);
             return;
         }
-
-        if (matchedMaps.Count > 1)
+        
+        if (filteredMaps.Count > 1)
         {
             player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Command.Notification.MultipleResult", matchedMaps.Count, mapName));
 
-            _mapNominationController.ShowNominationMenu(player, matchedMaps.Select(kv => kv.Value).ToList());
+            _mapNominationController.ShowNominationMenu(player, filteredMaps);
             return;
         }
         
-        _mapNominationController.NominateMap(player, matchedMaps.First().Value);
+        _mapNominationController.NominateMap(player, filteredMaps.First());
     }
 
     [RequiresPermissions(@"css/map")]
