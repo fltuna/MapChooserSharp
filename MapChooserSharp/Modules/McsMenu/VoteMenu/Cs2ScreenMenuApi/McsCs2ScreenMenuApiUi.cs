@@ -57,7 +57,8 @@ public class McsCs2ScreenMenuApiUi(CCSPlayerController playerController, IServic
         _currentMenu = new Menu(playerController, _plugin);
         _currentMenu.Title = menuTitle.ToString();
         _currentMenu.ShowPageCount = false;
-        _currentMenu.MenuType = MenuType.KeyPress;
+        _currentMenu.MenuType = MenuType.Both;
+        _currentMenu.ShowResolutionOption = false;
 
         // If menu option is already exists (this is intended for !revote feature)
         if (_chachedMenuOptions.TryGetValue(playerController.Slot, out var menuOps))
@@ -65,7 +66,6 @@ public class McsCs2ScreenMenuApiUi(CCSPlayerController playerController, IServic
             _debugLogger.LogTrace($"[Player {playerController.PlayerName}] vote menu is already cached, reusing...");
             _currentMenu.Options.Clear();
             _currentMenu.Options.AddRange(menuOps);
-            // Menu Open
             return;
         }
 
@@ -105,6 +105,7 @@ public class McsCs2ScreenMenuApiUi(CCSPlayerController playerController, IServic
         _currentMenu.Options.Clear();
         _currentMenu.Options.AddRange(menuOptions);
         _chachedMenuOptions.TryAdd(playerController.Slot, menuOptions);
+        _currentMenu.ShowResolutionOption = false;
         
         
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Menu init completed, opening...");

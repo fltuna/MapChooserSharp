@@ -1,5 +1,7 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.BuiltInHtml;
+using MapChooserSharp.Modules.McsMenu.NominationMenu.Cs2ScreenMenuApi;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
@@ -8,7 +10,7 @@ using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.McsMenu.NominationMenu;
 
-public sealed class McsNominationMenuProvider(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider),  IMcsNominationMenuProvider
+public sealed class McsNominationMenuProvider(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider),  IMcsNominationMenuProvider
 {
     public override string PluginModuleName => "McsNominationMenuProvider";
     public override string ModuleChatPrefix => "unused";
@@ -55,6 +57,14 @@ public sealed class McsNominationMenuProvider(IServiceProvider serviceProvider) 
         _pluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
 
         Plugin.RegisterListener<Listeners.OnClientConnected>(OnClientConnected);
+        
+        if (hotReload)
+        {
+            foreach (CCSPlayerController controller in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
+            {
+                OnClientConnected(controller.Slot);
+            }
+        }
 
         InitializeSupportedMenus();
     }
@@ -76,6 +86,10 @@ public sealed class McsNominationMenuProvider(IServiceProvider serviceProvider) 
             {
                 case McsSupportedMenuType.BuiltInHtml:
                     _uiFactories[type] = new McsBuiltInHtmlNominationUiFactory(ServiceProvider);
+                    break;
+                
+                case McsSupportedMenuType.Cs2ScreenMenuApi:
+                    _uiFactories[type] = new McsCs2ScreenMenuApiNominationUiFactory(ServiceProvider);
                     break;
             }
         }
