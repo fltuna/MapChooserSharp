@@ -30,10 +30,10 @@ public class MapChooserSharpApiExample: BasePlugin
             throw new InvalidOperationException("IMapChooserSharpApi is not available");
         }
 
-        
+        // Nomination API example
         AddCommand("mcsapi_test_nomination", "Test nomination with API", CommandTestMapNomination);
         
-        
+        // Event API example
         _mcsApi.EventSystem.RegisterEventHandler<McsNominationBeginEvent>(OnMapNominationBegin);
         _mcsApi.EventSystem.RegisterEventHandler<McsMapNominatedEvent>(OnMapNominated);
         _mcsApi.EventSystem.RegisterEventHandler<McsPlayerRtvCastEvent>(OnPlayerRtv);
@@ -87,17 +87,42 @@ public class MapChooserSharpApiExample: BasePlugin
             return;
         }
         
+        // You don't have to check permission, check number of users, etc... Because it will check by MCS side.
         _mcsApi.McsNominationApi.NominateMap(playerController, matchedMap.First().Value);
     }
-    
 
+    // This is just an example value.
+    private const int PlayerShopBalance = 100;
+    
     private McsEventResultWithCallback OnMapNominationBegin(McsNominationBeginEvent @event)
     {
-        if (@event.Player != null && @event.Player.PlayerPawn.Value != null && @event.Player.PlayerPawn.Value.Health < 80)
+        // Mapped with end of extra config setting name
+        // [MapChooserSharp.ze_example_map.Extra.Shop]
+        if (@event.NominationData.MapConfig.ExtraConfiguration.TryGetValue("shop", out var shopSettings))
         {
+            if (shopSettings.TryGetValue("cost", out var cost))
+            {
+                int costValue = int.Parse(cost);
+
+                if (PlayerShopBalance >= costValue)
+                    return McsEventResult.Continue;
+                
+                // If player doesn't have enough money, you can stop nomination
+                return McsEventResultWithCallback.Stop(result =>
+                {
+                    @event.Player.PrintToChat($"{@event.ModulePrefix} You don't have enough money to nomiante this map!");
+                });
+            }
+        }
+        
+        // Just a working example
+        if (@event.Player.PlayerPawn.Value != null && @event.Player.PlayerPawn.Value.Health < 80)
+        {
+            // When you stopping the event, the original MCS methods are completely cancelled and no messages will print.
+            // This is a API responcibility, You should'nt forget to notify the player.
             return McsEventResultWithCallback.Stop(result =>
             {
-                @event.Player!.PrintToChat($"[McsMapNominationBeginEvent Listener] Your health is not enough to nominate!!! Cancelling nomination. Status: {result}");
+                @event.Player.PrintToChat($"[McsMapNominationBeginEvent Listener] Your health is not enough to nominate!!! Cancelling nomination. Status: {result}");
                 @event.Player.PrintToChat($"{@event.ModulePrefix} You can use MCS module's prefix!");
             });
         }
@@ -136,7 +161,7 @@ public class MapChooserSharpApiExample: BasePlugin
         }
         else
         {
-            Server.PrintToChatAll($"{@event.ModulePrefix} {player.PlayerName}cast force rtv");
+            Server.PrintToChatAll($"{@event.ModulePrefix} {player.PlayerName} cast force rtv");
         }
         
         return McsEventResult.Continue;
