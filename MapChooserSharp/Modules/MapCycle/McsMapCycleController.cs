@@ -124,8 +124,8 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private bool IsFirstMapEnded { get; set; }
     private bool IsSecondMapIsPassed { get; set; }
 
-    public readonly FakeConVar<int> VoteStartTimingTime = new("mcs_vote_start_timing_time", "When should vote started if map is based on mp_timelimit or mp_roundtime? (minutes)", 3,
-        ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 15));
+    public readonly FakeConVar<int> VoteStartTimingTime = new("mcs_vote_start_timing_time", "When should vote started if map is based on mp_timelimit or mp_roundtime? (seconds)", 180,
+        ConVarFlags.FCVAR_NONE, new RangeValidator<int>(0, 600));
     
     public readonly FakeConVar<int> VoteStartTimingRound = new("mcs_vote_start_timing_round", "When should vote started if map is based on mp_maxrounds? (rounds)", 2,
         ConVarFlags.FCVAR_NONE, new RangeValidator<int>(2, 15));
@@ -391,11 +391,11 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         switch (_timeLeftUtil.ExtendType)
         {
             case McsMapExtendType.TimeLimit:
-                CreateVoteStartTimer(() => _timeLeftUtil.TimeLimit / 60 > VoteStartTimingTime.Value) ;
+                CreateVoteStartTimer(() => _timeLeftUtil.TimeLimit  > VoteStartTimingTime.Value) ;
                 break;
             
             case McsMapExtendType.RoundTime:
-                CreateVoteStartTimer(() => _timeLeftUtil.RoundTimeLeft / 60 > VoteStartTimingTime.Value);
+                CreateVoteStartTimer(() => _timeLeftUtil.RoundTimeLeft > VoteStartTimingTime.Value);
                 break;
             
             case McsMapExtendType.Rounds:
