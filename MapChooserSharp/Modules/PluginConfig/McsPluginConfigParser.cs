@@ -420,12 +420,37 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
 # Should use alias map name if available? (This will take effect to all things that prints a map name)
 ShouldUseAliasMapNameIfAvailable = true
 
+# Should print the cooldown? 
+# if true, and commands in cooldown, it will show cooldown message with seconds
+# if false, and commands in cooldown, it will show only cooldown message
+VerboseCooldownPrint = true
+
+
+[General.Sql]
+# SQL settings for MapChooserSharp
+
+# What SQL provider should be use?
+#
+# Currently Supports:
+# - Sqlite
+#
+# See GitHub readme for more and updated information.
+Type = ""sqlite""
+Address = """"
+User = """"
+Password = """"
+
+GroupInformationTableName = ""McsGroupInformation""
+MapInformationTableName = ""McsMapInformation""
+
+
+
 [MapCycle]
 # Fallback settings for maps with no config
 # These settings are ignored when map has a config.
 
 # How many extends allowed if map is not in map config.
-FallbackMaxExtends = 6
+FallbackMaxExtends = 3
 
 # How long to extend when map is extended in time left/ round time based game?
 FallbackExtendTimePerExtends = 15
@@ -434,9 +459,14 @@ FallbackExtendTimePerExtends = 15
 FallbackExtendRoundsPerExtends = 5
 
 
+
 [MapVote]
 # What menu type should be use?
-# See GitHub readme for more information.
+#
+# Currently supports:
+# - BuiltInHtml
+#
+# See GitHub readme for more and updated information.
 MenuType = ""BuiltInHtml""
 
 # How many maps should be appeared in map vote?
@@ -447,9 +477,86 @@ MaxVoteElements = 5
 ShouldPrintVoteToChat = true
 
 
+# What countdown ui type should be use?
+#
+# Currently supports:
+# - None
+# - CenterHud
+# - CenterAlert
+# - CenterHtml
+# - Chat
+#
+# See GitHub readme for more information.
+CountdownUiType = ""CenterHtml""
+
+
+[MapVote.Sound]
+# Sound setting of map vote
+# If you leave value as blank, then no sound will played.
+
+
+# Path to .vsndevts. file extension should be end with `.vsndevts`
+# If you already precached a .vsndevts file in another plugin, then you can leave as blank.
+SoundFile = """"
+
+
+# Initial vote sounds
+
+# This sound will be played when starting initial vote countdown
+InitialVoteCountdownStartSound = """"
+
+# This sound will be played when starting initial vote
+InitialVoteStartSound = """"
+
+# This sound will be played when finishing initial vote (This sound will not be played when runoff vote starts)
+InitialVoteFinishSound = """"
+
+# Vote countdown sound mapped to its seconds
+InitialVoteCountdownSound1 = """"
+InitialVoteCountdownSound2 = """"
+InitialVoteCountdownSound3 = """"
+InitialVoteCountdownSound4 = """"
+InitialVoteCountdownSound5 = """"
+InitialVoteCountdownSound6 = """"
+InitialVoteCountdownSound7 = """"
+InitialVoteCountdownSound8 = """"
+InitialVoteCountdownSound9 = """"
+InitialVoteCountdownSound10 = """"
+
+
+# Runoff vote sounds
+
+# This sound will be played when starting runoff vote countdown
+RunoffVoteCountdownStartSound = """"
+
+# This sound will be played when starting runoff vote
+RunoffVoteStartSound = """"
+
+# This sound will be played when finishing runoff vote
+RunoffVoteFinishSound = """"
+
+
+# Runoff vote countdown sound mapped to its seconds
+RunoffVoteCountdownSound1 = """"
+RunoffVoteCountdownSound2 = """"
+RunoffVoteCountdownSound3 = """"
+RunoffVoteCountdownSound4 = """"
+RunoffVoteCountdownSound5 = """"
+RunoffVoteCountdownSound6 = """"
+RunoffVoteCountdownSound7 = """"
+RunoffVoteCountdownSound8 = """"
+RunoffVoteCountdownSound9 = """"
+RunoffVoteCountdownSound10 = """"
+
+
+
 [Nomination]
 # What menu type should be use?
-# See GitHub readme for more information.
+#
+# Currently supports:
+# - BuiltInHtml
+#
+# See GitHub readme for more and updated information.
 MenuType = ""BuiltInHtml""
 
 
