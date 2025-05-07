@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using MapChooserSharp.Models;
+using MapChooserSharp.Modules.MapVote.Countdown;
 using MapChooserSharp.Modules.McsDatabase;
 using MapChooserSharp.Modules.McsMenu;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
@@ -178,6 +179,11 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         {
             throw new InvalidOperationException("MapVote.MenuType is not found or invalid");
         }
+
+        if (!voteTable.TryGetValue("CountdownUiType", out var countdownUiTypeObj) || countdownUiTypeObj is not string countdownUiType)
+        {
+            throw new InvalidOperationException("MapVote.MenCountdownUiTypeuType is not found or invalid");
+        }
         
 
         if (!voteTable.TryGetValue("MaxVoteElements", out var maxVoteElementsObj) || maxVoteElementsObj is not long maxVoteElementsLong)
@@ -192,11 +198,16 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         
         var availableMenus =  _avaiableMenuTypes;
 
-        var currentMenuType = DecideMenuType(menuTypeStr, availableMenus);
+        var currentMenuType = DecideMenuType(countdownUiType, availableMenus);
 
         var soundConfig = ParseVoteSoundConfig(voteTable);
 
-        return new McsVoteConfig(availableMenus, currentMenuType, (int)maxVoteElementsLong, shouldPrintVoteToChatBool, soundConfig);
+        if (!Enum.TryParse(countdownUiType, true, out McsCountdownType countdownType))
+        {
+            throw new InvalidOperationException("MapVote.MenCountdownUiTypeuType is invalid");
+        }
+
+        return new McsVoteConfig(availableMenus, currentMenuType, (int)maxVoteElementsLong, shouldPrintVoteToChatBool, soundConfig, countdownType);
     }
 
     private IMcsVoteSoundConfig ParseVoteSoundConfig(TomlTable tomlModel)

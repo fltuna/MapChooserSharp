@@ -5,6 +5,7 @@ using MapChooserSharp.Modules.MapVote.Countdown.CenterHtml;
 using MapChooserSharp.Modules.MapVote.Countdown.CenterHud;
 using MapChooserSharp.Modules.MapVote.Countdown.Chat;
 using MapChooserSharp.Modules.MapVote.Countdown.Interfaces;
+using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 
@@ -22,7 +23,7 @@ internal sealed class McsCountdownUiController(IServiceProvider serviceProvider,
     
     private readonly Dictionary<McsCountdownType, IMcsCountdownUi> _countdownUis = new();
     
-    
+    private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     
     public override void RegisterServices(IServiceCollection services)
     {
@@ -37,6 +38,8 @@ internal sealed class McsCountdownUiController(IServiceProvider serviceProvider,
         _countdownUis[McsCountdownType.CenterHtml] = new McsCenterHtmlCountdownUi(ServiceProvider);
         _countdownUis[McsCountdownType.Chat] = new McsChatCountdownUi(ServiceProvider);
 
+        _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
+        
         if (hotReload)
         {
             foreach (CCSPlayerController player in Utilities.GetPlayers())
@@ -68,9 +71,9 @@ internal sealed class McsCountdownUiController(IServiceProvider serviceProvider,
 
     private void PlayerConnectFull(CCSPlayerController player)
     {
+        McsCountdownType type = _mcsPluginConfigProvider.PluginConfig.VoteConfig.CurrentCountdownType;
+            
         // TODO() Player preference from DB
-
-        McsCountdownType type = McsCountdownType.CenterHtml;
         
         UpdateCountdownType(player, type);
     }
