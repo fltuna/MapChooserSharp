@@ -21,7 +21,7 @@
 
   <Target Name="CopyPlugin" AfterTargets="Build" Condition="'$(CS2_SERVER_DIR)' != ''">
     <Message Text="Copying the plugin files to CounterStrikeSharp plugins directory" Importance="High" />
-    <Copy SourceFiles="$(TargetDir)$(ProjectName).deps.json;$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb" DestinationFolder="$(CS2_SERVER_DIR)\game\csgo\addons\counterstrikesharp\shared\$(ProjectName)" />
+    <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(CS2_SERVER_DIR)\game\csgo\addons\counterstrikesharp\shared\$(ProjectName)" />
     <Message Text="Successfully copied the plugin files" Importance="High" />
   </Target>
 
