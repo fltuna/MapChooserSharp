@@ -22,7 +22,6 @@ using MapChooserSharp.Modules.MapVote.Models;
 using MapChooserSharp.Modules.McsMenu;
 using MapChooserSharp.Modules.McsMenu.VoteMenu;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
-using MapChooserSharp.Modules.McsMenu.VoteMenu.SimpleHtml;
 using MapChooserSharp.Modules.Nomination;
 using MapChooserSharp.Modules.Nomination.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;

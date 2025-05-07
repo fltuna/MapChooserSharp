@@ -3,7 +3,6 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Menu;
 using MapChooserSharp.API.MapVoteController;
-using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
@@ -11,9 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation;
 using TNCSSPluginFoundation.Interfaces;
 
-namespace MapChooserSharp.Modules.McsMenu.VoteMenu.SimpleHtml;
+namespace MapChooserSharp.Modules.McsMenu.VoteMenu.BuiltInHtml;
 
-public class McsSimpleHtmlVoteUi(CCSPlayerController playerController, IServiceProvider provider) : IMcsMapVoteUserInterface
+public class McsBuiltInHtmlVoteUi(CCSPlayerController playerController, IServiceProvider provider) : IMcsMapVoteUserInterface
 {
     private IMcsGeneralMenuOption? _mcsGeneralMenuOption;
     

@@ -1,7 +1,7 @@
 ﻿using CounterStrikeSharp.API.Core;
 using MapChooserSharp.Models;
+using MapChooserSharp.Modules.McsMenu.VoteMenu.BuiltInHtml;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
-using MapChooserSharp.Modules.McsMenu.VoteMenu.SimpleHtml;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -75,7 +75,7 @@ public sealed class McsMapVoteMenuProvider(IServiceProvider serviceProvider) : P
             switch (type)
             {
                 case McsSupportedMenuType.BuiltInHtml:
-                    _uiFactories[type] = new McsSimpleHtmlVoteUiFactory(ServiceProvider);
+                    _uiFactories[type] = new McsBuiltInHtmlVoteUiFactory(ServiceProvider);
                     break;
             }
         }
