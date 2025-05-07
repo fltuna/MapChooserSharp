@@ -90,8 +90,8 @@ jobs:
         
       - name: Copy TNCSSPluginFoundation to with dependencies artifacts
         run: |
-          Copy-Item -Path "TNCSSPluginFoundation-Extracted\*" -Destination "artifacts-windows-x64-with-dependencies\*" -Force
-          Copy-Item -Path "TNCSSPluginFoundation-Extracted\*" -Destination "artifacts-linux-x64-with-dependencies\*" -Force
+          Copy-Item -Path "TNCSSPluginFoundation-Extracted\*" -Destination "artifacts-windows-x64-with-dependencies\" -Force -Recurse
+          Copy-Item -Path "TNCSSPluginFoundation-Extracted\*" -Destination "artifacts-linux-x64-with-dependencies\" -Force  -Recurse
           
           
       - name: Compress artifacts
