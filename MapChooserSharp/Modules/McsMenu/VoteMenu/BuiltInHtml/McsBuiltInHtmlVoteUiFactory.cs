@@ -1,14 +1,14 @@
 ﻿using CounterStrikeSharp.API.Core;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 
-namespace MapChooserSharp.Modules.McsMenu.VoteMenu.SimpleHtml;
+namespace MapChooserSharp.Modules.McsMenu.VoteMenu.BuiltInHtml;
 
-public class McsSimpleHtmlVoteUiFactory(IServiceProvider provider) : IMcsMapVoteUiFactory
+public class McsBuiltInHtmlVoteUiFactory(IServiceProvider provider) : IMcsMapVoteUiFactory
 {
     public int MaxMenuElements { get; } = 5;
 
     public IMcsMapVoteUserInterface Create(CCSPlayerController player)
     {
-        return new McsSimpleHtmlVoteUi(player, provider);
+        return new McsBuiltInHtmlVoteUi(player, provider);
     }
 }

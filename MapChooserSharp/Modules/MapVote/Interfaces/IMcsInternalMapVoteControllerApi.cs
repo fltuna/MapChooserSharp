@@ -6,4 +6,6 @@ internal interface IMcsInternalMapVoteControllerApi: IMcsMapVoteControllerApi
 {
     public string PlaceHolderExtendMap { get; }
     public string PlaceHolderDontChangeMap { get; }
+    
+    public int VoteEndTime { get; }
 }

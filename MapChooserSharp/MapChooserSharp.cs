@@ -74,12 +74,12 @@ public sealed class MapChooserSharp: TncssPluginBase
         // Plugin core modules
         RegisterModule<McsMapNominationController>();
         RegisterModule<McsMapNominationCommands>();
-        RegisterModule<McsNominationMenuProvider>();
+        RegisterModule<McsNominationMenuProvider>(hotReload);
         
         RegisterModule<McsMapVoteController>();
         RegisterModule<McsMapVoteCommands>();
         RegisterModule<McsCountdownUiController>(hotReload);
-        RegisterModule<McsMapVoteMenuProvider>();
+        RegisterModule<McsMapVoteMenuProvider>(hotReload);
         
         RegisterModule<McsRtvController>(hotReload);
         RegisterModule<McsRtvCommands>();

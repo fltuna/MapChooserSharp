@@ -5,6 +5,7 @@ using MapChooserSharp.Modules.McsDatabase;
 using MapChooserSharp.Modules.McsMenu;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Models;
+using MapChooserSharp.Util;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
 using Tomlyn;
@@ -198,7 +199,7 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         
         var availableMenus =  _avaiableMenuTypes;
 
-        var currentMenuType = DecideMenuType(countdownUiType, availableMenus);
+        var currentMenuType = DecideMenuType(menuTypeStr, availableMenus);
 
         var soundConfig = ParseVoteSoundConfig(voteTable);
 
@@ -371,7 +372,7 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
     private McsSupportedMenuType DecideMenuType(string menuTypeStr, List<McsSupportedMenuType> availableMenus)
     {
         // if menu type is invalid, fall back to builtin html menu
-        if (!Enum.TryParse<McsSupportedMenuType>(menuTypeStr, true, out var currentMenuType))
+        if (!Enum.TryParse(menuTypeStr, true, out McsSupportedMenuType currentMenuType))
         {
             currentMenuType = McsSupportedMenuType.BuiltInHtml;
         }
@@ -403,7 +404,20 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
                     availableMenuTypes.Add(McsSupportedMenuType.BuiltInHtml);
                     break;
                 
-                // TODO() Add availability check
+                case McsSupportedMenuType.Cs2ScreenMenuApi:
+                    if (!AssemblyUtility.IsAssemblyLoaded("CS2ScreenMenuAPI"))
+                        break;
+
+                    availableMenuTypes.Add(McsSupportedMenuType.Cs2ScreenMenuApi);
+                    break;
+                
+                case McsSupportedMenuType.Cs2MenuManagerScreen:
+                    Server.PrintToConsole("CHECKING");
+                    if (!AssemblyUtility.IsAssemblyLoaded("CS2MenuManager"))
+                        break;
+                    
+                    availableMenuTypes.Add(McsSupportedMenuType.Cs2MenuManagerScreen);
+                    break;
             }
         }
         

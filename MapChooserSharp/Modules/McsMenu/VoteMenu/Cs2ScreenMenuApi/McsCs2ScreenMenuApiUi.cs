@@ -2,8 +2,8 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Menu;
+using CS2ScreenMenuAPI;
 using MapChooserSharp.API.MapVoteController;
-using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
@@ -11,9 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation;
 using TNCSSPluginFoundation.Interfaces;
 
-namespace MapChooserSharp.Modules.McsMenu.VoteMenu.SimpleHtml;
+namespace MapChooserSharp.Modules.McsMenu.VoteMenu.Cs2ScreenMenuApi;
 
-public class McsSimpleHtmlVoteUi(CCSPlayerController playerController, IServiceProvider provider) : IMcsMapVoteUserInterface
+public class McsCs2ScreenMenuApiUi(CCSPlayerController playerController, IServiceProvider provider): IMcsMapVoteUserInterface
 {
     private IMcsGeneralMenuOption? _mcsGeneralMenuOption;
     
@@ -27,10 +27,12 @@ public class McsSimpleHtmlVoteUi(CCSPlayerController playerController, IServiceP
     
     private readonly IMcsInternalMapVoteControllerApi _voteController = provider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
     
-    private readonly Dictionary<int, List<ChatMenuOption>> _chachedMenuOptions = new();
+    private readonly Dictionary<int, List<IMenuOption>> _chachedMenuOptions = new();
+
+    private Menu? _currentMenu;
 
     public int VoteOptionCount => _voteOptions.Count;
-
+    
     public void OpenMenu()
     {
         if (_voteController.CurrentVoteState != McsMapVoteState.Voting && _voteController.CurrentVoteState != McsMapVoteState.RunoffVoting)
@@ -44,29 +46,33 @@ public class McsSimpleHtmlVoteUi(CCSPlayerController playerController, IServiceP
         if (_mcsGeneralMenuOption != null && _mcsGeneralMenuOption.MenuTitle != string.Empty)
         {
             // TODO() If map countdown setting is verbose, then use verbose title.
-            menuTitle.Append(_plugin.LocalizeStringForPlayer(playerController, _mcsGeneralMenuOption.MenuTitle + ".Html"));
+            menuTitle.Append(_plugin.LocalizeStringForPlayer(playerController, _mcsGeneralMenuOption.MenuTitle));
         }
         else
         {
-            menuTitle.Append(_plugin.LocalizeStringForPlayer(playerController,"General.Menu.Title" + ".Html"));
+            menuTitle.Append(_plugin.LocalizeStringForPlayer(playerController,"General.Menu.Title"));
         }
         
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Creating vote menu");
-        CenterHtmlMenu menu = new(menuTitle.ToString(), _plugin);
+        _currentMenu = new Menu(playerController, _plugin);
+        _currentMenu.Title = menuTitle.ToString();
+        _currentMenu.ShowPageCount = false;
+        _currentMenu.MenuType = MenuType.Both;
+        _currentMenu.ShowResolutionOption = false;
 
         // If menu option is already exists (this is intended for !revote feature)
         if (_chachedMenuOptions.TryGetValue(playerController.Slot, out var menuOps))
         {
-            _debugLogger.LogTrace($"[Player {playerController.PlayerName}] vote menu menu is already cached, reusing...");
-            menu.MenuOptions.Clear();
-            menu.MenuOptions.AddRange(menuOps);
-            MenuManager.OpenCenterHtmlMenu(_plugin, playerController, menu);
+            _debugLogger.LogTrace($"[Player {playerController.PlayerName}] vote menu is already cached, reusing...");
+            _currentMenu.Options.Clear();
+            _currentMenu.Options.AddRange(menuOps);
             return;
         }
 
+        
 
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] has no cached menu, creating menu...");
-        List<ChatMenuOption> options = new();
+        List<IMenuOption> menuOptions = new ();
 
         foreach (var (option, index) in _voteOptions.Select((value, i) => (value, i)))
         {
@@ -78,31 +84,36 @@ public class McsSimpleHtmlVoteUi(CCSPlayerController playerController, IServiceP
                 .Replace(_voteController.PlaceHolderDontChangeMap,
                     _plugin.LocalizeStringForPlayer(playerController, "Word.DontChangeMap"));
             
-            options.Add(new ChatMenuOption(optionText, false, (controller, menuOption) =>
+            
+            menuOptions.Add(new MenuOption
             {
-                _voteOptions[(byte)index].VoteCallback.Invoke(playerController, (byte)index);
-            }));
+                Text = optionText,
+                Callback = (_, _) =>
+                {
+                    _voteOptions[(byte)index].VoteCallback.Invoke(playerController, (byte)index);
+                }
+            });
         }
 
         if (IsMenuShuffleEnabled)
         {
             _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Shuffling enabled... menu");
             Random random = Random.Shared;
-            options = options.OrderBy(x => random.Next()).ToList();
+            menuOptions = menuOptions.OrderBy(x => random.Next()).ToList();
         }
         
-        menu.MenuOptions.Clear();
-        menu.MenuOptions.AddRange(options);
-        _chachedMenuOptions.TryAdd(playerController.Slot, options);
+        _currentMenu.Options.Clear();
+        _currentMenu.Options.AddRange(menuOptions);
+        _chachedMenuOptions.TryAdd(playerController.Slot, menuOptions);
+        _currentMenu.ShowResolutionOption = false;
         
         
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Menu init completed, opening...");
-        MenuManager.OpenCenterHtmlMenu(_plugin, playerController, menu);
     }
 
     public void CloseMenu()
     {
-        MenuManager.CloseActiveMenu(playerController);
+        _currentMenu?.Close(playerController);
     }
 
     public void SetVoteOptions(List<IMcsVoteOption> voteOptions)
