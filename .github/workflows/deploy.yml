@@ -57,7 +57,6 @@ jobs:
           mkdir artifacts
           mkdir artifacts\shared\MapChooserSharp.API\
           mkdir artifacts\plugins\MapChooserSharp\
-          mkdir artifacts\plugins\MapChooserSharp\
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\runtimes" -Destination "artifacts\plugins\MapChooserSharp" -Force -Recurse
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\Dapper.dll" -Destination "artifacts\plugins\MapChooserSharp\Dapper.dll" -Force
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\System.Data.SQLite.dll" -Destination "artifacts\plugins\MapChooserSharp\System.Data.SQLite.dll" -Force
