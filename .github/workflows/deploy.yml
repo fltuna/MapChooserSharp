@@ -57,22 +57,56 @@ jobs:
           mkdir artifacts
           mkdir artifacts\shared\MapChooserSharp.API\
           mkdir artifacts\plugins\MapChooserSharp\
-          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\runtimes" -Destination "artifacts\plugins\MapChooserSharp" -Force -Recurse
-          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\Dapper.dll" -Destination "artifacts\plugins\MapChooserSharp\Dapper.dll" -Force
-          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\System.Data.SQLite.dll" -Destination "artifacts\plugins\MapChooserSharp\System.Data.SQLite.dll" -Force
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\MapChooserSharp.dll" -Destination "artifacts\plugins\MapChooserSharp\MapChooserSharp.dll" -Force
           Copy-Item -Path "MapChooserSharp.API\bin\Release\*\MapChooserSharp.API.dll" -Destination "artifacts\shared\MapChooserSharp.API\MapChooserSharp.API.dll" -Force
           Copy-Item -Path "lang\" -Destination "artifacts\plugins\MapChooserSharp\" -Recurse -Force
 
+      - name: Copy and create linux x64 artifact
+        run: |
+          Copy-Item -Path "artifacts\*" -Destination "artifacts-linux-x64\" -Force -Recurse
+          
+      - name: Copy and create artifacts with dependencies
+        run: |
+          Copy-Item -Path "artifacts-linux-x64\*" -Destination "artifacts-linux-x64-with-dependencies\" -Force -Recurse
+          Copy-Item -Path "artifacts\*" -Destination "artifacts-windows-x64-with-dependencies\" -Force -Recurse
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\Dapper.dll" -Destination "artifacts-windows-x64-with-dependencies\plugins\MapChooserSharp\Dapper.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\Dapper.dll" -Destination "artifacts-linux-x64-with-dependencies\plugins\MapChooserSharp\Dapper.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\System.Data.SQLite.dll" -Destination "artifacts-windows-x64-with-dependencies\plugins\MapChooserSharp\System.Data.SQLite.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\System.Data.SQLite.dll" -Destination "artifacts-linux-x64-with-dependencies\plugins\MapChooserSharp\System.Data.SQLite.dll" -Force
+          
+      - name: Copy runtime artifacts
+        run: |
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\runtimes\win-x64\native\SQLite.Interop.dll" -Destination "artifacts-windows-x64-with-dependencies\plugins\MapChooserSharp\SQLite.Interop.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\runtimes\linux-x64\native\SQLite.Interop.dll" -Destination "artifacts-linux-x64-with-dependencies\plugins\MapChooserSharp\SQLite.Interop.dll" -Force
+          
+      - name: TNCSSPluginFoundation Download from GitHub
+        run: Invoke-WebRequest https://github.com/fltuna/TNCSSPluginFoundation/releases/latest/download/TNCSSPluginFoundation.zip -OutFile TNCSSPluginFoundation.zip
+          
+      - name: TNCSSPluginFoundation Extract ZIP and put into artifacts
+        run: Expand-Archive -Path TNCSSPluginFoundation.zip -DestinationPath TNCSSPluginFoundation-Extracted\
+        
+      - name: Copy TNCSSPluginFoundation to with dependencies artifacts
+        run: |
+          Copy-Item -Path "TNCSSPluginFoundation-Extracted\*" -Destination "artifacts-windows-x64-with-dependencies\*" -Force
+          Copy-Item -Path "TNCSSPluginFoundation-Extracted\*" -Destination "artifacts-linux-x64-with-dependencies\*" -Force
+          
+          
       - name: Compress artifacts
         run:
-          Compress-Archive -Path artifacts/* -Destination MapChooserSharp.zip
-      
+          Compress-Archive -Path artifacts/* -Destination MapChooserSharp-win-x64.zip
+          Compress-Archive -Path artifacts-linux-x64/* -Destination MapChooserSharp-linux-x64.zip
+          Compress-Archive -Path artifacts-windows-x64-with-dependencies/* -Destination MapChooserSharp-win-x64-with-dependencies.zip
+          Compress-Archive -Path artifacts-linux-x64-with-dependencies/* -Destination MapChooserSharp-linux-x64-with-dependencies.zip
+          
       - name: Upload release assets
         uses: actions/upload-artifact@v4
         with:
           name: release-artifacts
-          path: MapChooserSharp.zip
+          path: |
+            MapChooserSharp-win-x64.zip
+            MapChooserSharp-linux-x64.zip
+            MapChooserSharp-win-x64-with-dependencies.zip
+            MapChooserSharp-linux-x64-with-dependencies.zip
 
   release:
     runs-on: windows-latest
@@ -94,6 +128,6 @@ jobs:
 
       - name: Create Release and Upload Asset
         run: |
-          gh release create "${{ github.ref_name }}" --title "Release ${{ github.ref_name }}" --generate-notes --draft=false artifacts/MapChooserSharp.zip
+          gh release create "${{ github.ref_name }}" --title "Release ${{ github.ref_name }}" --generate-notes --draft=false artifacts/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
