@@ -63,10 +63,13 @@ jobs:
 
       - name: Copy and create linux x64 artifact
         run: |
+          mkdir artifacts-linux-x64\
           Copy-Item -Path "artifacts\*" -Destination "artifacts-linux-x64\" -Force -Recurse
           
       - name: Copy and create artifacts with dependencies
         run: |
+          mkdir artifacts-linux-x64-with-dependencies\
+          mkdir artifacts-windows-x64-with-dependencies\
           Copy-Item -Path "artifacts-linux-x64\*" -Destination "artifacts-linux-x64-with-dependencies\" -Force -Recurse
           Copy-Item -Path "artifacts\*" -Destination "artifacts-windows-x64-with-dependencies\" -Force -Recurse
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\Dapper.dll" -Destination "artifacts-windows-x64-with-dependencies\plugins\MapChooserSharp\Dapper.dll" -Force
