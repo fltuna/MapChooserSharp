@@ -4,14 +4,14 @@ using MySqlConnector;
 
 namespace MapChooserSharp.Modules.McsDatabase.Repositories.SqlProviders.MySql;
 
-internal sealed class MySqlSqlProvider : IMcsSqlQueryProvider
+internal sealed class MySqlSqlProvider(string tableName) : IMcsSqlQueryProvider
 {
-    private readonly IMcsMapInformationSqlQueries _mcsMapInformationSqlQueries = new MySqlMapInformationSqlQueries();
+    private readonly IMcsMapInformationSqlQueries _mcsMapInformationSqlQueries = new MySqlMapInformationSqlQueries(tableName);
     
     public IMcsMapInformationSqlQueries MapInfoSqlQueries() => _mcsMapInformationSqlQueries;
 
     
-    private readonly IMcsGroupSqlQueries _mcsGroupSqlQueries = new MySqlGroupSqlQueries();
+    private readonly IMcsGroupSqlQueries _mcsGroupSqlQueries = new MySqlGroupSqlQueries(tableName);
     
     public IMcsGroupSqlQueries GroupSqlQueries() => _mcsGroupSqlQueries;
 

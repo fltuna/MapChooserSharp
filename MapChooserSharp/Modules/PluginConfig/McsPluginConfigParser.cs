@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using MapChooserSharp.Models;
+using MapChooserSharp.Modules.McsDatabase;
 using MapChooserSharp.Modules.McsMenu;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Models;
@@ -299,8 +300,60 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         {
             throw new InvalidOperationException("General.ShouldUseAliasMapNameIfAvailable is not found or invalid");
         }
+
+        var sqlConfig = ParseSqlConfig(generalTable);
         
-        return new McsGeneralConfig(aliasNameSetting, verboseCooldownPrint);
+        return new McsGeneralConfig(aliasNameSetting, verboseCooldownPrint, sqlConfig);
+    }
+
+    private McsSqlConfig ParseSqlConfig(TomlTable tomlModel)
+    {
+        if (!tomlModel.TryGetValue("Sql", out var sqlTableObj) || sqlTableObj is not TomlTable sqlTable)
+        {
+            throw new InvalidOperationException("General.Sql section is not found");
+        }
+        
+        if (!sqlTable.TryGetValue("Type", out var sqlTypeObj) || sqlTypeObj is not string sqlType)
+        {
+            throw new InvalidOperationException("General.Sql.Type is not found or invalid");
+        }
+        
+        if (!sqlTable.TryGetValue("Address", out var sqlAddressObj) || sqlAddressObj is not string sqlAddress)
+        {
+            throw new InvalidOperationException("General.Sql.Address is not found or invalid");
+        }
+        
+        if (!sqlTable.TryGetValue("User", out var sqlUserObj) || sqlUserObj is not string sqlUser)
+        {
+            throw new InvalidOperationException("General.Sql.User is not found or invalid");
+        }
+        
+        if (!sqlTable.TryGetValue("Password", out var sqlPasswordObj) || sqlPasswordObj is not string sqlPassword)
+        {
+            throw new InvalidOperationException("General.Sql.Password is not found or invalid");
+        }
+        
+        
+        
+        if (!sqlTable.TryGetValue("GroupInformationTableName", out var groupTableNameObj) || groupTableNameObj is not string groupTableName)
+        {
+            throw new InvalidOperationException("General.Sql.GroupInformationTableName is not found or invalid");
+        }
+        
+        if (!sqlTable.TryGetValue("MapInformationTableName", out var mapTableNameObj) || mapTableNameObj is not string mapTableName)
+        {
+            throw new InvalidOperationException("General.Sql.MapInformationTableName is not found or invalid");
+        }
+
+
+        if (!Enum.TryParse(sqlType, true, out McsSupportedSqlType type))
+        {
+            throw new InvalidOperationException("General.Sql.Type is invalid");
+        }
+
+        var sqlConfig = new McsSqlConfig(sqlAddress, sqlUser, ref sqlPassword, groupTableName, mapTableName, type);
+        
+        return sqlConfig;
     }
     
     

@@ -2,6 +2,8 @@
 
 internal interface IMcsMapInformationSqlQueries
 {
+    string TableName { get; }
+    
     string GetEnsureTableExistsSql();
     
     string GetDecrementCooldownsSql();

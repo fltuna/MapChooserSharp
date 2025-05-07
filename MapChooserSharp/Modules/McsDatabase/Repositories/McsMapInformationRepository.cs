@@ -18,10 +18,10 @@ public sealed class McsMapInformationRepository
 
     private readonly string _connectionString;
 
-    public McsMapInformationRepository(string connectionString, string providerName, IServiceProvider provider): base(provider)
+    public McsMapInformationRepository(string connectionString, McsSupportedSqlType providerType, string tableName, IServiceProvider provider): base(provider, tableName)
     {
         _mcsInternalMapConfigProviderApi = provider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
-        _sqlQueryProvider = CreateSqlProvider(providerName);
+        _sqlQueryProvider = CreateSqlProvider(providerType);
         _connectionString = connectionString;
         
         EnsureTableExists();

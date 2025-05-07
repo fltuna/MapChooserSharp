@@ -18,7 +18,7 @@ internal sealed class McsDatabaseProvider(IServiceProvider serviceProvider)
     
     private IMcsPluginConfigProvider _pluginConfigProvider = null!;
     private string _connectionString = null!;
-    private string _providerName = null!;
+    private McsSupportedSqlType _providerType = McsSupportedSqlType.Sqlite;
     
     
     public IMcsMapInformationRepository MapInfoRepository { get; private set; } = null!;
@@ -36,8 +36,8 @@ internal sealed class McsDatabaseProvider(IServiceProvider serviceProvider)
         
         ConfigureDatabase();
         
-        MapInfoRepository = new McsMapInformationRepository(_connectionString, _providerName, ServiceProvider);
-        GroupInfoRepository = new McsGroupInformationRepository(_connectionString, _providerName, ServiceProvider);
+        MapInfoRepository = new McsMapInformationRepository(_connectionString, _providerType, _pluginConfigProvider.PluginConfig.GeneralConfig.SqlConfig.MapSettingsSqlTableName, ServiceProvider);
+        GroupInfoRepository = new McsGroupInformationRepository(_connectionString, _providerType, _pluginConfigProvider.PluginConfig.GeneralConfig.SqlConfig.GroupSettingsSqlTableName, ServiceProvider);
         
         MapInfoRepository.EnsureAllMapInfoExistsAsync().ConfigureAwait(false);
         GroupInfoRepository.EnsureAllGroupInfoExistsAsync().ConfigureAwait(false);
@@ -48,23 +48,19 @@ internal sealed class McsDatabaseProvider(IServiceProvider serviceProvider)
         var config = _pluginConfigProvider.PluginConfig;
         
         // Todo database type from config
-        switch ("sqlite")
+        switch (config.GeneralConfig.SqlConfig.DataBaseType)
         {
-            // case "mysql":
-            //     _providerName = "mysql";
-            //     _connectionString = $"Server={config.MySqlHost};Port={config.MySqlPort};Database={config.MySqlDatabase};User={config.MySqlUser};Password={config.MySqlPassword};";
-            //     Plugin.Logger.LogInformation("Using MySQL database");
-            //     break;
-            //     
-            // case "postgresql":
-            //     _providerName = "postgresql";
-            //     _connectionString = $"Host={config.PostgresHost};Port={config.PostgresPort};Database={config.PostgresDatabase};Username={config.PostgresUser};Password={config.PostgresPassword};";
-            //     Plugin.Logger.LogInformation("Using PostgreSQL database");
-            //     break;
+            case McsSupportedSqlType.MySql:
+                // Plugin.Logger.LogInformation("Using MySQL database");
+                throw new NotImplementedException("MySQL support is not implemented yet");
                 
-            case "sqlite":
+            case McsSupportedSqlType.PostgreSql:
+                // Plugin.Logger.LogInformation("Using PostgreSQL database");
+                throw new NotImplementedException("PostgreSql support is not implemented yet");
+                
+            case McsSupportedSqlType.Sqlite:
             default:
-                _providerName = "sqlite";
+                _providerType = McsSupportedSqlType.Sqlite;
                 string dbPath = Path.Combine(Plugin.ModuleDirectory, "MapChooserSharp.db");
                 _connectionString = $"Data Source={dbPath}";
                 Plugin.Logger.LogInformation($"Using SQLite database at {dbPath}");
