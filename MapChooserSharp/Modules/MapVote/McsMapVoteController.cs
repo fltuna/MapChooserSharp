@@ -50,6 +50,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private ITimeLeftUtil _timeLeftUtil = null!;
     private IMcsMapVoteMenuProvider _mcsVoteMenuProvider = null!;
     private McsCountdownUiController _countdownUiController = null!;
+    private McsMapVoteSoundPlayer _mapVoteSoundPlayer = null!;
     
     
 
@@ -72,6 +73,17 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
+
+        
+        _mapVoteSoundPlayer = new McsMapVoteSoundPlayer(_mcsPluginConfigProvider.PluginConfig.VoteConfig.VoteSoundConfig);
+
+        if (_mcsPluginConfigProvider.PluginConfig.VoteConfig.VoteSoundConfig.VSndEvtsSoundFilePath != string.Empty)
+        {
+            Plugin.RegisterListener<Listeners.OnServerPrecacheResources>((manifest) =>
+            {
+                manifest.AddResource(_mcsPluginConfigProvider.PluginConfig.VoteConfig.VoteSoundConfig.VSndEvtsSoundFilePath);
+            });
+        }
         
         Plugin.RegisterListener<Listeners.OnClientDisconnect>(OnClientDisconnect);
         
@@ -353,10 +365,13 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
                 StartVote();
                 return;
             }
+            
+            _mapVoteSoundPlayer.PlayVoteCountdownSoundToAll(count, false);
             _countdownUiController.ShowCountdownToAll(count);
             count--;
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
 
+        _mapVoteSoundPlayer.PlayVoteCountdownStartSoundToAll(false);
         FireVoteInitiatedEvent();
         return McsMapVoteState.InitializeAccepted;
     }
@@ -383,6 +398,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         _mapVoteTimer = Plugin.AddTimer(MapVoteEndTime.Value, EndVote, TimerFlags.STOP_ON_MAPCHANGE);
 
+        _mapVoteSoundPlayer.PlayVoteStartSoundToAll(false);
         FireVoteStartedEvent();
     }
     
@@ -429,6 +445,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             var mapCfg = pickedMaps.First().MapConfig!;
             
             PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NoVotes", mapCfg.MapName);
+            _mapVoteSoundPlayer.PlayVoteFinishedSoundToAll(false);
             FireNextMapConfirmedEvent(mapCfg);
             EndVotePostInitialization();
             CurrentVoteState = McsMapVoteState.NextMapConfirmed;
@@ -450,6 +467,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         }
 
         var winMap = winners.First();
+        
+        _mapVoteSoundPlayer.PlayVoteFinishedSoundToAll(false);
         
         // If MapConfig is null, then this is "extend map" or "don't change"
         if (winMap.MapConfig == null)
@@ -547,10 +566,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
                 return;
             }
             
+            _mapVoteSoundPlayer.PlayVoteCountdownSoundToAll(count, true);
             _countdownUiController.ShowCountdownToAll(count);
             count--;
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
 
+        _mapVoteSoundPlayer.PlayVoteCountdownStartSoundToAll(true);
         FireVoteInitiatedEvent();
     }
 
@@ -578,6 +599,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         _mapVoteTimer = Plugin.AddTimer(MapVoteEndTime.Value, EndRunoffVote, TimerFlags.STOP_ON_MAPCHANGE);
 
+        _mapVoteSoundPlayer.PlayVoteStartSoundToAll(true);
         FireVoteStartedEvent();
     }
 
@@ -606,6 +628,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             DebugLogger.LogTrace($"Voters slots: {string.Join(", " ,voteData.GetVoters())}");
         }
 
+        _mapVoteSoundPlayer.PlayVoteFinishedSoundToAll(true);
 
         int totalVotes = AllVotesCount;
 
