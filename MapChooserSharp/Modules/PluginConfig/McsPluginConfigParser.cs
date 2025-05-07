@@ -479,6 +479,8 @@ FallbackExtendRoundsPerExtends = 5
 #
 # Currently supports:
 # - BuiltInHtml
+# - Cs2ScreenMenuApi
+# - Cs2MenuManagerScreen
 #
 # See GitHub readme for more and updated information.
 MenuType = ""BuiltInHtml""
@@ -569,6 +571,8 @@ RunoffVoteCountdownSound10 = """"
 #
 # Currently supports:
 # - BuiltInHtml
+# - Cs2ScreenMenuApi
+# - Cs2MenuManagerScreen
 #
 # See GitHub readme for more and updated information.
 MenuType = ""BuiltInHtml""

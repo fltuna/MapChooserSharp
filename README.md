@@ -37,6 +37,8 @@ See [ConVar Document](docs/en/configuration/CONVAR.md) for ConVar configuration
 
 See [Map Config Document](docs/en/configuration/MAP_CONFIG.md) for Map configuration
 
+See [Plugin Config Document](docs/en/configuration/PLUGIN_CONFIG.md) for Plugin configuration
+
 ## Commands list
 
 See [Commands Document](docs/en/COMMANDS.md)

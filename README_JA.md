@@ -37,6 +37,8 @@ ConVarに関しては [ConVarドキュメント](docs/ja/configuration/CONVAR.md
 
 Map Configについては [Configドキュメント](docs/ja/configuration/MAP_CONFIG.md) を参照してください。
 
+プラグインの設定については [プラグイン設定ドキュメント](docs/ja/configuration/PLUGIN_CONFIG.md) を参照してください。
+
 ## コマンドリスト
 
 詳細は [Commands Document](docs/ja/COMMANDS.md) を参照してください。
