@@ -1,6 +1,8 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 using MapChooserSharp.Models;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.BuiltInHtml;
+using MapChooserSharp.Modules.McsMenu.VoteMenu.Cs2ScreenMenuApi;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +10,7 @@ using TNCSSPluginFoundation.Models.Plugin;
 
 namespace MapChooserSharp.Modules.McsMenu.VoteMenu;
 
-public sealed class McsMapVoteMenuProvider(IServiceProvider serviceProvider) : PluginModuleBase(serviceProvider), IMcsMapVoteMenuProvider
+public sealed class McsMapVoteMenuProvider(IServiceProvider serviceProvider, bool hotReload) : PluginModuleBase(serviceProvider), IMcsMapVoteMenuProvider
 {
     public override string PluginModuleName => "McsMapVoteMenuProvider";
     public override string ModuleChatPrefix => "unused";
@@ -56,6 +58,14 @@ public sealed class McsMapVoteMenuProvider(IServiceProvider serviceProvider) : P
 
         Plugin.RegisterListener<Listeners.OnClientConnected>(OnClientConnected);
 
+        if (hotReload)
+        {
+            foreach (CCSPlayerController controller in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
+            {
+                OnClientConnected(controller.Slot);
+            }
+        }
+
         InitializeSupportedMenus();
     }
 
@@ -65,6 +75,7 @@ public sealed class McsMapVoteMenuProvider(IServiceProvider serviceProvider) : P
         
         // fallback to server's settings if failed to obtain player data from DB 
         _playerVoteMenuTypes[slot] = _pluginConfigProvider.PluginConfig.VoteConfig.CurrentMenuType;
+        Server.PrintToChatAll($"{_pluginConfigProvider.PluginConfig.VoteConfig.CurrentMenuType}");
     }
 
 
@@ -76,6 +87,10 @@ public sealed class McsMapVoteMenuProvider(IServiceProvider serviceProvider) : P
             {
                 case McsSupportedMenuType.BuiltInHtml:
                     _uiFactories[type] = new McsBuiltInHtmlVoteUiFactory(ServiceProvider);
+                    break;
+                
+                case McsSupportedMenuType.Cs2ScreenMenuApi:
+                    _uiFactories[type] = new McsCs2ScreenMenuApiUiFactory(ServiceProvider);
                     break;
             }
         }

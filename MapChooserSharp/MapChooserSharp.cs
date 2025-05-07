@@ -79,7 +79,7 @@ public sealed class MapChooserSharp: TncssPluginBase
         RegisterModule<McsMapVoteController>();
         RegisterModule<McsMapVoteCommands>();
         RegisterModule<McsCountdownUiController>(hotReload);
-        RegisterModule<McsMapVoteMenuProvider>();
+        RegisterModule<McsMapVoteMenuProvider>(hotReload);
         
         RegisterModule<McsRtvController>(hotReload);
         RegisterModule<McsRtvCommands>();

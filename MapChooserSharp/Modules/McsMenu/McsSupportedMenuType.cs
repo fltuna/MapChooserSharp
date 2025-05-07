@@ -3,4 +3,5 @@
 public enum McsSupportedMenuType
 {
     BuiltInHtml,
+    Cs2ScreenMenuApi,
 }
