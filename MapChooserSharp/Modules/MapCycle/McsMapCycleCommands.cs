@@ -5,6 +5,7 @@ using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities;
+using MapChooserSharp.API.Events.Commands;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.API.MapVoteController;
@@ -29,6 +30,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
     private IMcsDatabaseProvider _mcsDatabaseProvider = null!;
+    private IMcsInternalEventManager _mcsInternalEventManager = null!;
 
 
     protected override void OnAllPluginsLoaded()
@@ -37,6 +39,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         _mcsDatabaseProvider = ServiceProvider.GetRequiredService<IMcsDatabaseProvider>();
+        _mcsInternalEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         
         Plugin.AddCommand("css_timeleft", "Show timeleft", CommandTimeLeft);
         Plugin.AddCommand("css_nextmap", "Show next map", CommandNextMap);
@@ -302,17 +305,50 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     {
         if (player == null)
             return;
-        
-        var currentMap = _mapCycleController.CurrentMap;
-        
-        if (currentMap != null && currentMap.MapDescription != string.Empty)
+
+        IMapConfig? mapConfig;
+
+
+        if (info.ArgCount < 2)
         {
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo", currentMap.MapDescription));
+            mapConfig = _mapCycleController.CurrentMap;
         }
         else
         {
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.NotAvailable"));
+            mapConfig = _mcsInternalMapConfigProviderApi.GetMapConfig(info.ArgByIndex(1));
         }
+        
+        if (mapConfig == null)
+        {
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.NotAvailable"));
+            return;
+        }
+        
+        
+        
+        player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo", mapConfig.MapName));
+        
+        if (mapConfig.MapNameAlias != String.Empty)
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.AliasName", mapConfig.MapNameAlias));
+        
+        if (mapConfig.MapDescription != String.Empty)
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.Description", mapConfig.MapDescription));
+        
+        if (mapConfig.MaxExtends > 0)
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MaxExtends", mapConfig.MaxExtends));
+        
+        if (mapConfig.WorkshopId > 0)
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.WorkshopId", mapConfig.WorkshopId));
+        
+        if (mapConfig.NominationConfig.DaysAllowed.Any())
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.DaysAllowed", string.Join(", ", mapConfig.NominationConfig.DaysAllowed)));
+        
+        if (mapConfig.NominationConfig.AllowedTimeRanges.Any())
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.AllowedTimeRanges", string.Join(", ", mapConfig.NominationConfig.AllowedTimeRanges)));
+
+
+        var infoCommandExecutedEvent = new McsMapInfoCommandExecutedEvent(GetTextWithPluginPrefixForPlayer(player, ""), player, mapConfig);
+        _mcsInternalEventManager.FireEventNoResult(infoCommandExecutedEvent);
     }
 
     private void CommandExtendsLeft(CCSPlayerController? player, CommandInfo info)
