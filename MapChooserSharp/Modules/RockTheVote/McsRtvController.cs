@@ -9,6 +9,7 @@ using MapChooserSharp.API.Events.MapVote;
 using MapChooserSharp.API.Events.RockTheVote;
 using MapChooserSharp.API.RtvController;
 using MapChooserSharp.Interfaces;
+using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapCycle.Interfaces;
 using MapChooserSharp.Modules.MapVote;
@@ -52,10 +53,6 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
         new("mcs_rtv_map_change_timing", 
             "Seconds to change map after RTV is success. Set 0.0 to change immediately", 3.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 60.0F));
 
-    public readonly FakeConVar<bool> MapChangeTimingShouldRoundEnd =
-        new("mcs_rtv_map_change_timing_should_round_end",
-            "Map change should be round end? If true, ignores mcs_rtv_map_change_timing setting", true);
-
     
     
     public RtvStatus RtvCommandStatus { get; private set; } = RtvStatus.Enabled;
@@ -67,6 +64,7 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
     private IMcsInternalEventManager _mcsEventManager = null!;
     private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
     private IMcsInternalMapCycleControllerApi _mcsMapCycleController = null!;
+    private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
 
 
     private readonly HashSet<int> _rtvVoteParticipants = new();
@@ -81,7 +79,6 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
         TrackConVar(RtvCommandUnlockTimeMapStart);
         TrackConVar(RtvVoteStartThreshold);
         TrackConVar(MapChangeTimingAfterRtvSuccess);
-        TrackConVar(MapChangeTimingShouldRoundEnd);
     }
 
     public override void RegisterServices(IServiceCollection services)
@@ -94,6 +91,7 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
         _mcsMapCycleController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleControllerApi>();
+        _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         
         _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
         _mcsEventManager.RegisterEventHandler<McsMapNotChangedEvent>(OnMapNotChanged);
@@ -248,17 +246,8 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
     private void ChangeToNextMap()
     {
         RtvCommandStatus = RtvStatus.Triggered;
-        _mcsMapCycleController.ChangeMapOnNextRoundEnd = MapChangeTimingShouldRoundEnd.Value;
-
-        if (MapChangeTimingShouldRoundEnd.Value)
-        {
-            PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.ChangeToNextMapNextRound");
-        }
-        else
-        {
-            PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.ChangeToNextMapImmediately", MapChangeTimingAfterRtvSuccess.Value);
-            _mcsMapCycleController.ChangeToNextMap(MapChangeTimingAfterRtvSuccess.Value);
-        }
+        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.ChangeToNextMapImmediately", _mcsInternalMapConfigProviderApi.GetMapName(_mcsMapCycleController.NextMap!), MapChangeTimingAfterRtvSuccess.Value);
+        _mcsMapCycleController.ChangeToNextMap(MapChangeTimingAfterRtvSuccess.Value);
     }
 
     #endregion
@@ -267,6 +256,8 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
     {
         ResetRtvStatus();
         CreateRtvCommandUnlockTimer(RtvCommandUnlockTimeOverride.NextMapConfirm);
+        
+        _mcsMapCycleController.ChangeMapOnNextRoundEnd = true;
     }
 
     private void OnMapNotChanged(McsMapNotChangedEvent @event)
@@ -294,7 +285,6 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
 
     private void OnMapStart(string _)
     {
-        RtvCommandStatus = RtvStatus.Enabled;
         ResetRtvStatus();
         CreateRtvCommandUnlockTimer(RtvCommandUnlockTimeOverride.MapStart);
     }
