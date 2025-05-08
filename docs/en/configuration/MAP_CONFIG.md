@@ -41,6 +41,176 @@ Also, One of file must be placed on root of `config/` folder.
     └── MapChooserSharp.dll
 ```
 
+## About Settings Application Order and Groups
+
+### Map Priority
+
+The priority of map settings is `Map > Group > Default`, meaning map settings have the highest priority.
+
+If, for example, you set `MinPlayers = 0` as the default, set `MinPlayers = 16` in a group, and then set `MinPlayers = 32` in the map settings while inheriting from this group, the final value of `MinPlayers` will be `32`.
+
+### Map Settings Application Order
+
+Here we'll explain using `ze_example_xyz` as an example map config.
+
+### 1. Default Values
+
+First, the map config gets the setting values from `[MapChooserSharpSettings.Default]`.
+
+If we were to write the config at this point into a file...
+
+---
+
+If the default file is like this:
+
+```toml
+[MapChooserSharpSettings.Default]
+MinPlayers = 0
+MaxPlayers = 0
+OnlyNomination = false
+```
+
+It would be as follows:
+
+```toml
+[ze_example_xyz]
+MinPlayers = 0
+MaxPlayers = 0
+OnlyNomination = false
+```
+
+### 2. Group Settings
+
+Next, MapChooserSharp can apply group settings to maps.
+
+Groups can be defined with `MapChooserSharpSettings.Groups.<GroupName>`.
+```toml
+[MapChooserSharpSettings.Groups.Group1]
+MinPlayers = 16
+OnlyNomination = true
+```
+
+And the `Group1` part after `MapChooserSharpSettings.Groups` becomes the group name.
+
+```toml
+[ze_example_xyz]
+GroupSettings = ["Group1"]
+```
+
+### How to Set Groups
+
+Maps can have multiple groups, but the settings of the first group have the highest priority.
+
+Groups can be used as follows:
+
+```toml
+[ze_example_789]
+GroupSettings = ["Group1", "Group2", "Group3", ......]
+```
+
+In this case, Group1 has the highest priority among Group settings, so it overwrites values applied by Group2 or Group3.
+
+Group settings have higher priority than Default settings, so `MinPlayers` changes from the default `0` to `16`.
+
+Also, `OnlyNomination` changes from `false` to `true`.
+
+At this point, if we recreate the data loaded into the plugin as a config, it would be as follows:
+
+```toml
+[ze_example_xyz]
+MinPlayers = 16
+MaxPlayers = 0
+OnlyNomination = true
+```
+
+### 3. Map Settings
+
+Next, the plugin reads the map's config data.
+
+Let's say there's a definition like this:
+
+```toml
+[ze_example_xyz]
+MinPlayers = 32
+```
+
+Then, as mentioned earlier, map settings have the highest priority, so if we recreate the data finally loaded into the plugin as a config, it would be as follows:
+
+```toml
+[ze_example_xyz]
+MinPlayers = 32
+MaxPlayers = 0
+OnlyNomination = true
+```
+
+### 4. Some Exceptions
+
+The following values are integrated rather than overwritten:
+- AllowedSteamIds
+- DisallowedSteamIds
+- Extra settings
+
+---
+
+For example, let's say there are configs like these:
+
+Group Setting 1
+
+```toml
+[MapChooserSharpSettings.Groups.Group1]
+MinPlayers = 0
+AllowedSteamIds = [123012301230]
+
+[MapChooserSharpSettings.Groups.Group1.extra.shop]
+cost = 100
+```
+Group Setting 2
+
+```toml
+[MapChooserSharpSettings.Groups.Group2]
+MinPlayers = 32
+AllowedSteamIds = [123456789]
+DisallowedSteamIds = [987654321]
+
+[MapChooserSharpSettings.Groups.Group2.extra.AnotherShop]
+cost = 999
+```
+
+Map Setting
+
+```toml
+[ze_example_xyz]
+MinPlayers = 40
+AllowedSteamIds = [000000]
+DisallowedSteamIds = [000000]
+GroupSettings = ["Group1", "Group2"]
+
+[ze_example_xyz.extra.ExternalShop]
+cost = 10000
+```
+
+These will ultimately look like this:
+
+```toml
+[ze_example_xyz]
+MinPlayers = 40
+AllowedSteamIds = [000000, 123012301230, 123456789]
+DisallowedSteamIds = [000000, 987654321]
+
+[ze_example_xyz.extra.ExternalShop]
+cost = 10000
+
+[ze_example_xyz.extra.AnotherShop]
+cost = 999
+
+[ze_example_xyz.extra.extra.shop]
+cost = 100
+```
+
+This is how MapChooserSharp achieves config flexibility.
+
+---
+
 ## Configuration Details
 
 ```
@@ -88,6 +258,10 @@ If disabled here, the map cannot be nominated and will not be selected in random
 ### WorkshopId
 
 For workshop maps, specifying this value eliminates the need to edit the config when the map name changes.
+
+If this key is blank, It will use `ds_workshop_changelevel <keyName>` for workshop map or `changelevel <keyName>` for official map.
+
+We will use top key name for map name. e.g. when key is `[ze_example_abc]` then `ds_workshop_changelevel ze_example_abc`.
 
 ### OnlyNomination
 

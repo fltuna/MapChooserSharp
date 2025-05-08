@@ -4,30 +4,30 @@
 ## For Users
 
 
-| ConVar         | Description                                 | note                                                                           |
-|----------------|---------------------------------------------|--------------------------------------------------------------------------------|
-| css_timeleft   | Show timeleft                               |                                                                                |
-| css_nextmap    | Show next map                               |                                                                                |
-| css_currentmap | Show current map                            |                                                                                |
-| css_mapinfo    | Show current map's information if available |                                                                                |
-| css_extends    | Shows remaining extends                     |                                                                                |
-| css_revote     | Revote command                              |                                                                                |
-| css_nominate   | Nominate a map                              |                                                                                |
-| css_nomlist    | Shows nomination list                       | Admins can see who nominated a map using `full` argument e.g. `!nomlist full`  |
-| css_rtv        | Rock The Vote                               |                                                                                |
+| Command                | Description                                 | note                                                                                                                           |
+|------------------------|---------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| css_timeleft           | Show timeleft                               | You can get same result for typing `timeleft` in chat                                                                          |
+| css_nextmap            | Show next map                               | You can get same result for typing `nextmap` in chat                                                                           |
+| css_currentmap         | Show current map                            | You can get same result for typing `currentmap` in chat                                                                        |
+| css_mapinfo            | Show current map's information if available |                                                                                                                                |
+| css_extends            | Shows remaining extends                     |                                                                                                                                |
+| css_revote             | Revote command                              |                                                                                                                                |
+| css_nominate [MapName] | Nominate a map                              | You can get same result for typing `nominate` in chat. Also, if you don't specify the map name, then nomination menu will open |
+| css_nomlist            | Shows nomination list                       | Admins can see who nominated a map using `full` argument e.g. `!nomlist full`                                                  |
+| css_rtv                | Rock The Vote                               |                                                                                                                                |
 
 ## For Admins
 
 
-| ConVar                 | Description                    | note |
-|------------------------|--------------------------------|------|
-| css_setnextmap         | Set next map                   |      |
-| css_removenextmap      | Remove next map                |      |
-| css_setmapcooldown     | Set specified map's cooldown   |      |
-| css_setgroupcooldown   | Set specified group's cooldown |      |
-| css_cancelvote         | Cancel the current vote        |      |
-| css_nominate_addmap    | Insert a map to nomination     |      |
-| css_nominate_removemap | Remove a map from nomination   |      |
-| css_enablertv          | Enable RTV                     |      |
-| css_disablertv         | Disable RTV                    |      |
-| css_forcertv           | Force RTV                      |      |
+| Command                                     | Description                    | note                                                                                        |
+|---------------------------------------------|--------------------------------|---------------------------------------------------------------------------------------------|
+| css_setnextmap <MapName>                    | Set next map                   |                                                                                             |
+| css_removenextmap                           | Remove next map                |                                                                                             |
+| css_setmapcooldown <MapName> <Cooldown>     | Set specified map's cooldown   |                                                                                             |
+| css_setgroupcooldown <GroupName> <Cooldown> | Set specified group's cooldown |                                                                                             |
+| css_cancelvote                              | Cancel the current vote        |                                                                                             |
+| css_nominate_addmap [MapName]               | Insert a map to nomination     | If you don't specify the map name, then nomination menu will open.                          |
+| css_nominate_removemap [MapName]            | Remove a map from nomination   | If you don't specify the map name, and nominated map exists, then nomination menu will open |
+| css_enablertv                               | Enable RTV                     |                                                                                             |
+| css_disablertv                              | Disable RTV                    |                                                                                             |
+| css_forcertv                                | Force RTV                      |                                                                                             |

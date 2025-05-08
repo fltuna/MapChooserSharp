@@ -39,7 +39,176 @@
     └── MapChooserSharp.dll
 ```
 
+## 設定の適用順とグループについて
 
+### マップの優先度
+
+マップの設定優先度は `マップ > グループ > デフォルト` のようにマップの設定が一番優先度が高いです。
+
+もし、`MinPlayers = 0`をデフォルトで設定し、グループでは`MinPlayers = 16`とし、マップの設定ではこのグループを継承し`MinPlayers = 32`と設定した場合、最終的な`MinPlayers`の値は`32`になります。
+
+### マップの設定適用順
+
+ここでは`ze_example_xyz`をマップコンフィグ例として解説します。
+
+### 1. デフォルト値
+
+まず最初に、マップコンフィグは、`[MapChooserSharpSettings.Default]`内の設定値を取得します。
+
+この時点でのコンフィグをファイルに起こすと...
+
+---
+
+デフォルトファイルが次のような場合
+
+```toml
+[MapChooserSharpSettings.Default]
+MinPlayers = 0
+MaxPlayers = 0
+OnlyNomination = false
+```
+
+以下のようになります。
+
+```toml
+[ze_example_xyz]
+MinPlayers = 0
+MaxPlayers = 0
+OnlyNomination = false
+```
+
+### 2. グループ設定
+
+次にMapChooserSharpではマップにグループ設定を適用することができます。
+
+グループは`MapChooserSharpSettings.Groups.<GroupName>`で定義できます。
+```toml
+[MapChooserSharpSettings.Groups.Group1]
+MinPlayers = 16
+OnlyNomination = true
+```
+
+そして、`MapChooserSharpSettings.Groups`の後ろの`Group1`のところがグループ名となります。
+
+```toml
+[ze_example_xyz]
+GroupSettings = ["Group1"]
+```
+
+### グループの設定方法
+
+マップのグループは複数持つことができますが、一番最初のグループの設定の優先度が高くなります。
+
+
+グループの使用は次のように行えます。
+
+```toml
+[ze_example_789]
+GroupSettings = ["Group1", "Group2", "Group3", ......]
+```
+
+この際、Group設定の中ではGroup1が一番優先度が高いため、Group2やGroup3で適用された値を上書きします。
+
+GroupはDefault設定より優先度が高いため、`MinPlayers`がデフォルトの`0`から`16`に変わります。
+
+また、`OnlyNomination`も`false`から`true`になります。
+
+ひとまず現時点で、プラグインにロードされたデータをコンフィグで再現すると次のようになります
+
+```toml
+[ze_example_xyz]
+MinPlayers = 16
+MaxPlayers = 0
+OnlyNomination = true
+```
+
+### 3. マップ設定
+
+次にプラグインはマップのコンフィグデータを読み取ります。
+
+以下のような定義があったとします。
+
+```toml
+[ze_example_xyz]
+MinPlayers = 32
+```
+
+そうなると、前述の通り優先度はマップが一番高いため、最終的にプラグインにロードされたデータをコンフィグで再現すると次のようになります。
+
+```toml
+[ze_example_xyz]
+MinPlayers = 32
+MaxPlayers = 0
+OnlyNomination = true
+```
+
+### 4. 一部の例外
+
+以下に例示する値は上書きではなく統合されます。
+- AllowedSteamIds
+- DisallowedSteamIds
+- Extra設定
+
+---
+
+例えば、以下のようなコンフィグがあったとします。
+
+グループ設定1
+
+```toml
+[MapChooserSharpSettings.Groups.Group1]
+MinPlayers = 0
+AllowedSteamIds = [123012301230]
+
+[MapChooserSharpSettings.Groups.Group1.extra.shop]
+cost = 100
+```
+グループ設定2
+
+```toml
+[MapChooserSharpSettings.Groups.Group2]
+MinPlayers = 32
+AllowedSteamIds = [123456789]
+DisallowedSteamIds = [987654321]
+
+[MapChooserSharpSettings.Groups.Group2.extra.AnotherShop]
+cost = 999
+```
+
+マップ設定
+
+```toml
+[ze_example_xyz]
+MinPlayers = 40
+AllowedSteamIds = [000000]
+DisallowedSteamIds = [000000]
+GroupSettings = ["Group1", "Group2"]
+
+[ze_example_xyz.extra.ExternalShop]
+cost = 10000
+```
+
+これらは最終的に以下のような形になります。
+
+```toml
+[ze_example_xyz]
+MinPlayers = 40
+AllowedSteamIds = [000000, 123012301230, 123456789]
+DisallowedSteamIds = [000000, 987654321]
+
+[ze_example_xyz.extra.ExternalShop]
+cost = 10000
+
+[ze_example_xyz.extra.AnotherShop]
+cost = 999
+
+[ze_example_xyz.extra.extra.shop]
+cost = 100
+```
+
+このような仕組みでMapChooserSharpはコンフィグの柔軟性を実現しています。
+
+---
 
 ## 設定値の詳細
 
@@ -87,7 +256,11 @@ cost = 100
 
 ### WorkshopId
 
-ワークショップの場合はこの値を指定することで、マップ名が変わってもコンフィグを編集するがなくなります。
+ワークショップの場合はこの値を指定することで、マップ名が変わってもコンフィグを編集する必要がなくなります。
+
+このキーを設定しなかった場合、ワークショップマップは`ds_workshop_changelevel <keyName>` 公式マップは `changelevel <keyName>` でマップ変更がなされます。
+
+また、マップ名としてトップのキーの名前を使用します。 例: `[ze_example_abc]` の場合は `ds_workshop_changelevel ze_example_abc` になります。
 
 ### OnlyNomination
 

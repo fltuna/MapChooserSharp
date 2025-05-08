@@ -6,6 +6,32 @@ CounterStrikeSharp implmentation of map chooser plugin with powerful API and con
 
 [日本語](README_JA.md)
 
+## Features
+
+### Abundant Customization Options
+
+See [ConVar Document](docs/en/configuration/CONVAR.md) for ConVar configuration
+
+See [Map Config Document](docs/en/configuration/MAP_CONFIG.md) for Map configuration
+
+See [Plugin Config Document](docs/en/configuration/PLUGIN_CONFIG.md) for Plugin configuration
+
+### Automatic Detection of Map Time Type
+
+It checks three CVars: `mp_timelimit`, `mp_maxrounds`, and `mp_roundtime`, and automatically selects the most appropriate one.
+
+The check order is `mp_maxrounds` -> `mp_timelimit` -> `mp_roundtime`. If any of these CVars is non-zero, it will use that CVar as the basis for detecting the map time type.
+
+Also, for `mp_roundtime`-based servers like surf servers, the round time is directly extended when an map extend occurs.
+
+### Powerful API
+
+See [MCS API document](docs/en/development/USING_MCS_API.md)
+
+## Known Issues
+
+- UI doesn't display when using CenterHTML for Countdown HUD
+
 ## Installation
 
 ### Dependency
@@ -34,21 +60,9 @@ You don't need to install both of them, but you need to install at least one of 
 5. Run the server
 6. It's done
 
-## Configuraiton
-
-See [ConVar Document](docs/en/configuration/CONVAR.md) for ConVar configuration
-
-See [Map Config Document](docs/en/configuration/MAP_CONFIG.md) for Map configuration
-
-See [Plugin Config Document](docs/en/configuration/PLUGIN_CONFIG.md) for Plugin configuration
-
 ## Commands list
 
 See [Commands Document](docs/en/COMMANDS.md)
-
-## Using MCS API
-
-See [MCS API document](docs/en/development/USING_MCS_API.md)
 
 ## Reosuces
 

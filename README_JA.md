@@ -6,6 +6,37 @@ CounterStrikeSharpで実装された強力なAPIとカスタマイズ性を備�
 
 [English](README.md)
 
+
+## 機能
+
+### 豊富なカスタマイズ項目
+
+ConVarに関しては [ConVarドキュメント](docs/ja/configuration/CONVAR.md) を参照してください。
+
+Map Configについては [Configドキュメント](docs/ja/configuration/MAP_CONFIG.md) を参照してください。
+
+プラグインの設定については [プラグイン設定ドキュメント](docs/ja/configuration/PLUGIN_CONFIG.md) を参照してください。
+
+### 使いやすいコマンド
+
+詳細は [コマンドドキュメント](docs/ja/COMMANDS.md) を参照してください。
+
+### マップの時間タイプの自動検出
+
+`mp_timelimit`, `mp_maxrounds`, `mp_roundtime`の3個のCVarを確認して自動的に最適なものを選択します。
+
+確認順は `mp_maxrounds` -> `mp_timelimit` -> `mp_roundtime` でどれかのCVarが0でなかった場合にそのCVarを元としてマップの時間タイプを検出します。
+
+また、surfサーバーのような`mp_roundtime`ベースの場合は、延長された場合にラウンドの時間がそのまま延長されます。
+
+### 強力なAPI
+
+詳細は [MCS API ドキュメント](docs/ja/development/USING_MCS_API.md) を参照してください。
+
+## 既知の問題
+
+- Countdown HUDでCenterHTMLを使用するとUIが表示されない
+
 ## インストール
 
 ### 必要な依存関係
@@ -33,22 +64,6 @@ CounterStrikeSharpで実装された強力なAPIとカスタマイズ性を備�
 4. でてきたフォルダを `game/csgo/addons/counterstrikesharp/` に入れる
 5. サーバーを起動
 6. 完了!
-
-## カスタマイズ
-
-ConVarに関しては [ConVarドキュメント](docs/ja/configuration/CONVAR.md) を参照してください。
-
-Map Configについては [Configドキュメント](docs/ja/configuration/MAP_CONFIG.md) を参照してください。
-
-プラグインの設定については [プラグイン設定ドキュメント](docs/ja/configuration/PLUGIN_CONFIG.md) を参照してください。
-
-## コマンドリスト
-
-詳細は [Commands Document](docs/ja/COMMANDS.md) を参照してください。
-
-## MCS APIを活用する
-
-詳細は [MCS API ドキュメント](docs/ja/development/USING_MCS_API.md) を参照してください。
 
 ## Reosuces
 
