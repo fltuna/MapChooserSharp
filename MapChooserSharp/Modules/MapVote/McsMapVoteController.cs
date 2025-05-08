@@ -310,6 +310,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
                 .Where(map => !map.Value.NominationConfig.RequiredPermissions.Any())
                 .Where(map => !map.Value.NominationConfig.DaysAllowed.Any() || map.Value.NominationConfig.DaysAllowed.Contains(DateTime.Today.DayOfWeek) )
                 .Where(map => !map.Value.NominationConfig.AllowedTimeRanges.Any() || map.Value.NominationConfig.AllowedTimeRanges.Count(range => range.IsInRange(TimeOnly.FromDateTime(DateTime.Now))) >= 1 )
+                .Where(map => !map.Value.MapName.Equals(_mapCycleController.CurrentMap?.MapName))
                 .Take(numToPick);
 
             foreach (var (key, value) in pickedMaps)
