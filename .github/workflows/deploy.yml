@@ -29,6 +29,26 @@ jobs:
       - name: Build
         run: dotnet build -c Release -p:DebugType=None -p:DebugSymbols=false
 
+      - name: Create development artifacts
+        run: |
+          mkdir artifacts
+          mkdir artifacts\shared\MapChooserSharp.API\
+          mkdir artifacts\plugins\MapChooserSharp\
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\MapChooserSharp.dll" -Destination "artifacts\plugins\MapChooserSharp\MapChooserSharp.dll" -Force
+          Copy-Item -Path "MapChooserSharp.API\bin\Release\*\MapChooserSharp.API.dll" -Destination "artifacts\shared\MapChooserSharp.API\MapChooserSharp.API.dll" -Force
+          Copy-Item -Path "lang\" -Destination "artifacts\plugins\MapChooserSharp\" -Recurse -Force
+
+      - name: Compress artifacts
+        run: |
+          Compress-Archive -Path artifacts/* -Destination MapChooserSharp-Development.zip
+
+      - name: Upload release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: MapChooserSharp-Development
+          path: |
+            MapChooserSharp-Development.zip
+
   publish:
     runs-on: windows-latest
     if: startsWith(github.ref, 'refs/tags/')
