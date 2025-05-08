@@ -181,7 +181,7 @@ internal class MapConfigParser(string configPath)
         }
 
         // Cereate actual group settings
-        Dictionary<string, IMapGroupSettings> actualGroupSettings = new();
+        Dictionary<string, IMapGroupSettings> actualGroupSettings = new(StringComparer.OrdinalIgnoreCase);
         
         foreach (var (key, value) in groupConfigs)
         {
@@ -189,7 +189,7 @@ internal class MapConfigParser(string configPath)
         }
         
         // Convert NullableMapConfig to IMapConfig
-        Dictionary<string, IMapConfig> finalMapConfigs = new Dictionary<string, IMapConfig>();
+        Dictionary<string, IMapConfig> finalMapConfigs = new(StringComparer.OrdinalIgnoreCase);
         foreach (var (mapName, config) in mapConfigs)
         {
             // Create IMapCooldown
