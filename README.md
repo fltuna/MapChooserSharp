@@ -28,6 +28,10 @@ Also, for `mp_roundtime`-based servers like surf servers, the round time is dire
 
 See [MCS API document](docs/en/development/USING_MCS_API.md)
 
+## A handy commands
+
+See [Commands Document](docs/en/COMMANDS.md)
+
 ## Known Issues
 
 - UI doesn't display when using CenterHTML for Countdown HUD
@@ -59,10 +63,6 @@ You don't need to install both of them, but you need to install at least one of 
 4. Put folders into `game/csgo/addons/counterstrikesharp/`
 5. Run the server
 6. It's done
-
-## Commands list
-
-See [Commands Document](docs/en/COMMANDS.md)
 
 ## Reosuces
 
