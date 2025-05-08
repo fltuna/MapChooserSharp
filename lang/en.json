@@ -53,6 +53,7 @@
     "Nomination.Command.Notification.MultipleResult": "{lime}{0}{default} maps found with {lime}{1}{default}",
     "Nomination.Command.Notification.Usage": "Usage: !nominate <MapName>",
     "NominationAddMap.Command.Notification.Usage": "Usage: !nominate_addmap <MapName>",
+    "NominationAddMap.Command.Notification.AdminNominationProhibited": "Admin nomination is disabled for this map",
     "NominationRemoveMap.Menu.MenuTitle": "Nomination Remove Menu",
     "NominationRemoveMap.Menu.MenuTitle.Html": "Nomination Remove Menu",
     "NominationRemoveMap.Command.Notification.Usage": "Usage: !nominate_removemap <MapName>",

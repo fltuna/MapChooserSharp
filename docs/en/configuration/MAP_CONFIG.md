@@ -327,7 +327,9 @@ Nomination becomes impossible if the number of players on the server is less tha
 
 ### ProhibitAdminNomination
 
-Prohibits nomination via `!nominate_addmap`.
+Prohibits nomination via `!nominate_addmap`. 
+
+Server Console can bypasses this limit.
 
 ### DaysAllowed
 

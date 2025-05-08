@@ -53,6 +53,7 @@
     "Nomination.Command.Notification.MultipleResult": "{lime}{1}{default} にマッチする {lime}{0}{default} 個のマップが見つかりました",
     "Nomination.Command.Notification.Usage": "使い方: !nominate <マップ名>",
     "NominationAddMap.Command.Notification.Usage": "使い方: !nominate_addmap <マップ名>",
+    "NominationAddMap.Command.Notification.AdminNominationProhibited": "このマップの管理者によるノミネートは禁止されています。",
     "NominationRemoveMap.Menu.MenuTitle": "ノミネーション削除メニュー",
     "NominationRemoveMap.Menu.MenuTitle.Html": "ノミネーション削除メニュー",
     "NominationRemoveMap.Command.Notification.Usage": "使い方: !nominate_removemap <マップ名>",
