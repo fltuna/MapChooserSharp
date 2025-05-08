@@ -1,5 +1,8 @@
 ﻿# [MapChooserSharp](https://github.com/fltuna/MapChooserSharp)
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fltuna/MapChooserSharp) ![NuGet Version](https://img.shields.io/nuget/v/MapChooserSharp.API)
+
+
 CounterStrikeSharp implmentation of map chooser plugin with powerful API and configuration.
 
 ## Translated readme is available
