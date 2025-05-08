@@ -710,7 +710,7 @@ MaxPlayers = 64
 # Minimal players requires to nominate this map
 MinPlayers = 10
 
-# Make only root user and console can nominate this map
+# Make only server console can nominate this map
 ProhibitAdminNomination = false
 
 # If this value(s) are set, the nomination will be restricted to these days.

@@ -161,16 +161,9 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
 
     public void AdminNominateMap(CCSPlayerController? player, IMapConfig mapConfig)
     {
-        if (mapConfig.NominationConfig.ProhibitAdminNomination)
+        if (mapConfig.NominationConfig.ProhibitAdminNomination && player != null)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole("TODO_TRANSLATE| This map is not allowed to nominate as admin nomination");
-            }
-            else
-            {
-                player.PrintToChat("TODO_TRANSLATE| This map is not allowed to nominate as admin nomination");
-            }
+            player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "NominationAddMap.Command.Notification.AdminNominationProhibited"));
             return;
         }
 
