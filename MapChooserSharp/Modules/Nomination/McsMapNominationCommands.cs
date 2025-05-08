@@ -54,6 +54,8 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         Plugin.AddCommand("css_nomlist", "Shows nomination list", CommandNomList);
         Plugin.AddCommand("css_nominate_addmap", "Insert a map to nomination", CommandNominateAddMap);
         Plugin.AddCommand("css_nominate_removemap", "Remove a map from nomination", CommandNominateRemoveMap);
+        
+        Plugin.AddCommandListener("say", SayCommandListener, HookMode.Pre);
     }
 
     protected override void OnUnloadModule()
@@ -62,6 +64,8 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         Plugin.RemoveCommand("css_nomlist", CommandNomList);
         Plugin.RemoveCommand("css_nominate_addmap", CommandNominateAddMap);
         Plugin.RemoveCommand("css_nominate_removemap", CommandNominateRemoveMap);
+        
+        Plugin.RemoveCommandListener("say", SayCommandListener, HookMode.Pre);
     }
     
     
@@ -371,5 +375,28 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
     {
         _mcsInternalMapConfigProviderApi.GetMapConfigs().TryGetValue(mapName, out var mapConfig);
         return mapConfig;
+    }
+    
+    
+    private HookResult SayCommandListener(CCSPlayerController? player, CommandInfo info)
+    {
+        if(player == null)
+            return HookResult.Continue;
+
+        if (info.ArgCount < 2)
+            return HookResult.Continue;
+        
+        string arg1 = info.ArgByIndex(1);
+
+        bool commandFound = false;
+
+
+        if (arg1.Equals("nominate", StringComparison.OrdinalIgnoreCase))
+        {
+            player.ExecuteClientCommandFromServer("css_nominate");
+            commandFound = true;
+        }
+
+        return commandFound ? HookResult.Handled : HookResult.Continue;
     }
 }
