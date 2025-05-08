@@ -685,14 +685,9 @@ MaxExtends = 3
 # Extend time per extend (minutes)
 ExtendTimePerExtends = 15
 
-# Map time (Map's default mp_timelimit value)
-MapTime = 20
-
 # If cycle is round based
 # How many rounds extended in per extend?
 # ExtendRoundsPerExtends = 5
-# Map rounds (Map's default mp_maxrounds)
-# MapRounds = 10
 
 # ===== Nomination Settings =====
 

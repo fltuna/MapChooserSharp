@@ -503,7 +503,7 @@ ShouldPrintVoteToChat = true
 # - Chat
 #
 # See GitHub readme for more information.
-CountdownUiType = ""CenterHtml""
+CountdownUiType = ""CenterHud""
 
 
 [MapVote.Sound]
