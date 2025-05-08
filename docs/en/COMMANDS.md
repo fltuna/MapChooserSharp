@@ -14,7 +14,7 @@
 | css_revote             | Revote command                              |                                                                                                                                |
 | css_nominate [MapName] | Nominate a map                              | You can get same result for typing `nominate` in chat. Also, if you don't specify the map name, then nomination menu will open |
 | css_nomlist            | Shows nomination list                       | Admins can see who nominated a map using `full` argument e.g. `!nomlist full`                                                  |
-| css_rtv                | Rock The Vote                               |                                                                                                                                |
+| css_rtv                | Rock The Vote                               | You can get same result for typing `rtv` in chat                                                                               |
 
 ## For Admins
 
