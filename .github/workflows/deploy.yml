@@ -42,7 +42,7 @@ jobs:
         run: |
           Compress-Archive -Path artifacts/* -Destination MapChooserSharp-Development.zip
 
-      - name: Upload release assets
+      - name: Upload development assets
         uses: actions/upload-artifact@v4
         with:
           name: MapChooserSharp-Development
