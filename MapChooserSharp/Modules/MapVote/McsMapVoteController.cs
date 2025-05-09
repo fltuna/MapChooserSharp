@@ -409,6 +409,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     {
         if (_mapVoteContent == null)
         {
+            DebugLogger.LogInformation("Map Vote content is NULL! cancelling McsMapVoteController::EndVote()");
             CurrentVoteState = McsMapVoteState.NoActiveVote;
             return;
         }
@@ -610,6 +611,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     {
         if (_mapVoteContent == null)
         {
+            DebugLogger.LogInformation("Map Vote content is NULL! cancelling McsMapVoteController::EndVote()");
             CurrentVoteState = McsMapVoteState.NoActiveVote;
             return;
         }
