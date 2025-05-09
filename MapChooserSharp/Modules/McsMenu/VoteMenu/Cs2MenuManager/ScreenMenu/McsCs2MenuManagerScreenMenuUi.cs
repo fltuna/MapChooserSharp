@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CS2MenuManager.API.Class;
@@ -100,7 +101,18 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
         
         
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Menu init completed, opening...");
-        DisplayMenu(playerController, menu);
+        
+        
+        // Open blank menu before actual menu opened
+        // Because sometimes screen menu is not appear
+        CS2MenuManager.API.Menu.ScreenMenu blankMenu =
+            new CS2MenuManager.API.Menu.ScreenMenu(menuTitle.ToString(), _plugin);
+        blankMenu.Display(playerController, 1);
+        
+        Server.NextFrame(() =>
+        {
+            DisplayMenu(playerController, menu);
+        });
     }
 
     public void CloseMenu()
