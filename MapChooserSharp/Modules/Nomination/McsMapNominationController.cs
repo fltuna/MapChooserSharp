@@ -22,6 +22,7 @@ using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
 using MapChooserSharp.Modules.Nomination.Interfaces;
 using MapChooserSharp.Modules.Nomination.Models;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
 using TNCSSPluginFoundation.Utils.Entity;
 
@@ -194,7 +195,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         {
             PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.Admin.Nominated", executorName, _mcsInternalMapConfigProviderApi.GetMapName(mapConfig));
         }
-        
+        Logger.LogInformation($"Admin {executorName} is inserted {mapConfig.MapName} to nomination.");
     }
 
     /// <summary>
@@ -300,6 +301,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         
         string executorName = PlayerUtil.GetPlayerName(player);
         PrintLocalizedChatToAllWithModulePrefix("Nomination.Broadcast.Admin.RemovedNomiantion", executorName, _mcsInternalMapConfigProviderApi.GetMapName(mapConfig));
+        Logger.LogInformation($"Admin {executorName} is removed {mapConfig.MapName} from nomination.");
     }
 
     private void PrintNominationResult(CCSPlayerController player, IMapConfig mapConfig, bool isFirstNomination)

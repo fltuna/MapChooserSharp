@@ -703,6 +703,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         string executorName = PlayerUtil.GetPlayerName(player);
         
         PrintLocalizedChatToAll("MapVote.Broadcast.Admin.CancelVote", executorName);
+        Logger.LogInformation($"Admin {executorName} is cancelled current map vote!");
         return McsMapVoteState.Cancelling;
     }
     
