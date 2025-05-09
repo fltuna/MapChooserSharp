@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 
 namespace MapChooserSharp.Modules.MapVote;
@@ -25,7 +26,12 @@ internal class McsMapVoteSoundPlayer(IMcsVoteSoundConfig config)
     private void PlayVoteCountdownStartSoundToPlayer(CCSPlayerController player, string soundName)
     {
         // TODO() Sound volume per player
-        player.EmitSound(soundName);
+        var playerPawn = player.PlayerPawn.Value;
+        
+        if (playerPawn == null)
+            return;
+
+        playerPawn.EmitSound(soundName, new RecipientFilter(player), 1.0F);
     }
     
     public void PlayVoteCountdownSoundToAll(int seconds, bool isRunoffVote)
