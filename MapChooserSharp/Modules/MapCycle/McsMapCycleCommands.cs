@@ -246,6 +246,8 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         {
             PrintLocalizedChatToAll("MapCycle.Broadcast.Admin.SetNextMap", executorName, _mcsInternalMapConfigProviderApi.GetMapName(newNextMap));
         }
+        
+        Logger.LogInformation($"Admin {executorName} is set next map to {newNextMap.MapName} (Workshop ID: {newNextMap.WorkshopId})");
     }
     
     [RequiresPermissions(@"css/root")]
@@ -265,12 +267,14 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         else
         {
             string nextMapName = _mcsInternalMapConfigProviderApi.GetMapName(_mapCycleController.NextMap);
+            string nextMapActualName = _mapCycleController.NextMap.MapName;
             
             _mapCycleController.RemoveNextMap();
             
             string executorName = PlayerUtil.GetPlayerName(player);
             
             PrintLocalizedChatToAll("MapCycle.Command.Admin.Broadcast.RemoveNextmap.Removed", executorName, nextMapName);
+            Logger.LogInformation($"Admin {executorName} removed {nextMapActualName} from next map");
         }
     }
     
@@ -425,6 +429,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
                 if (isOperationSucceeded)
                 {
                     PrintLocalizedChatToAll("MapCycle.Command.Admin.Broadcast.SetMapCooldown.Updated", executorName, mapConfig.MapName, cooldown);
+                    Logger.LogInformation($"Admin {executorName} is updated {mapConfig.MapName} map cooldown to {cooldown} (Workshop ID: {mapConfig.WorkshopId})");
                 }
                 else
                 {
@@ -436,6 +441,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
                     {
                         player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetMapCooldown.Failed.NoDatabaseConnection"));
                     }
+                    Logger.LogInformation($"Admin {executorName} is tried to update map {mapConfig.MapName} cooldown to {cooldown}, but failed to connect to database.");
                 }
             });
         });
@@ -511,6 +517,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
                 if (isOperationSucceeded)
                 {
                     PrintLocalizedChatToAll("MapCycle.Command.Admin.Broadcast.SetGroupCooldown.Updated", executorName, groupSetting.GroupName, cooldown);
+                    Logger.LogInformation($"Admin {executorName} is updated {groupSetting.GroupName} group cooldown to {cooldown}");
                 }
                 else
                 {
@@ -522,6 +529,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
                     {
                         player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetGroupCooldown.Failed.NoDatabaseConnection"));
                     }
+                    Logger.LogInformation($"Admin {executorName} is tried to update group {groupSetting.GroupName} cooldown to {cooldown}, but failed to connect to database.");
                 }
             });
         });

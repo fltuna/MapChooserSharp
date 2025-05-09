@@ -16,6 +16,7 @@ using MapChooserSharp.Modules.MapVote;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.RockTheVote.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
 using TNCSSPluginFoundation.Utils.Entity;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
@@ -214,6 +215,7 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
         
         string executorName = PlayerUtil.GetPlayerName(client);
         PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.ForceRtv", executorName);
+        Logger.LogInformation($"Admin {executorName} is forcefully triggered the RTV!");
         
         EnableRtvCommand(client, true);
         InitiateRtvVote();
@@ -229,6 +231,7 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
         
         string executorName = PlayerUtil.GetPlayerName(client);
         PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.EnabledRtv", executorName);
+        Logger.LogInformation($"Admin {executorName} is enabled RTV");
     }
 
     public void DisableRtvCommand(CCSPlayerController? client = null, bool silently = false)
@@ -241,6 +244,7 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
 
         string executorName = PlayerUtil.GetPlayerName(client);
         PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.Admin.DisableRtv", executorName);
+        Logger.LogInformation($"Admin {executorName} is disabled RTV");
     }
 
     private void ChangeToNextMap()
