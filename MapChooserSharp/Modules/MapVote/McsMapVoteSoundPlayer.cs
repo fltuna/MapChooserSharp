@@ -19,19 +19,8 @@ internal class McsMapVoteSoundPlayer(IMcsVoteSoundConfig config)
         
         foreach (CCSPlayerController player in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
         {
-            PlayVoteCountdownStartSoundToPlayer(player, sound);
+            PlaySoundToPlayer(player, sound);
         }
-    }
-
-    private void PlayVoteCountdownStartSoundToPlayer(CCSPlayerController player, string soundName)
-    {
-        // TODO() Sound volume per player
-        var playerPawn = player.PlayerPawn.Value;
-        
-        if (playerPawn == null)
-            return;
-
-        playerPawn.EmitSound(soundName, new RecipientFilter(player), 1.0F);
     }
     
     public void PlayVoteCountdownSoundToAll(int seconds, bool isRunoffVote)
@@ -49,14 +38,8 @@ internal class McsMapVoteSoundPlayer(IMcsVoteSoundConfig config)
         
         foreach (CCSPlayerController player in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
         {
-            PlayVoteCountdownSoundToPlayer(player, sound);
+            PlaySoundToPlayer(player, sound);
         }
-    }
-    
-    private void PlayVoteCountdownSoundToPlayer(CCSPlayerController player, string soundName)
-    {
-        // TODO() Sound volume per player
-        player.EmitSound(soundName);
     }
     
     public void PlayVoteStartSoundToAll(bool isRunoffVote)
@@ -71,14 +54,8 @@ internal class McsMapVoteSoundPlayer(IMcsVoteSoundConfig config)
         
         foreach (CCSPlayerController player in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
         {
-            PlayVoteStartSoundToPlayer(player, sound);
+            PlaySoundToPlayer(player, sound);
         }
-    }
-    
-    private void PlayVoteStartSoundToPlayer(CCSPlayerController player, string soundName)
-    {
-        // TODO() Sound volume per player
-        player.EmitSound(soundName);
     }
 
     public void PlayVoteFinishedSoundToAll(bool isRunoffVote)
@@ -93,13 +70,18 @@ internal class McsMapVoteSoundPlayer(IMcsVoteSoundConfig config)
         
         foreach (CCSPlayerController player in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
         {
-            PlayVoteFinishedSoundToPlayer(player, sound);
+            PlaySoundToPlayer(player, sound);
         }
     }
 
-    private void PlayVoteFinishedSoundToPlayer(CCSPlayerController player, string soundName)
+    private void PlaySoundToPlayer(CCSPlayerController player, string soundName, float volume = 1.0F)
     {
         // TODO() Sound volume per player
-        player.EmitSound(soundName);
+        var playerPawn = player.PlayerPawn.Value;
+        
+        if (playerPawn == null)
+            return;
+
+        playerPawn.EmitSound(soundName, new RecipientFilter(player), volume);
     }
 }
