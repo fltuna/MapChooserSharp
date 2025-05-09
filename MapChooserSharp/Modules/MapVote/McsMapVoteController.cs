@@ -881,7 +881,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
     public void PlayerReVote(CCSPlayerController player)
     {
-        if (CurrentVoteState != McsMapVoteState.Voting)
+        if (CurrentVoteState != McsMapVoteState.Voting && CurrentVoteState != McsMapVoteState.RunoffVoting)
             return;
         
         if (_mapVoteContent == null)
