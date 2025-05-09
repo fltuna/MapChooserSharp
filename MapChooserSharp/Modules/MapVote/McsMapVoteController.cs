@@ -301,15 +301,15 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             var unusedMapList = unusedMapPool.ToList();
             var pickedMaps = unusedMapList
                 .OrderBy(_ => _random.Next())
-                .Where(map => map.Value.MapCooldown.CurrentCooldown <= 0)
-                .Where(map => !map.Value.GroupSettings.Any() || map.Value.GroupSettings.Count(setting => setting.GroupCooldown.CurrentCooldown > 0) == 0)
-                .Where(map => !map.Value.OnlyNomination)
-                .Where(map => !map.Value.NominationConfig.RestrictToAllowedUsersOnly)
-                .Where(map => map.Value.NominationConfig.MinPlayers == 0 || map.Value.NominationConfig.MinPlayers <= Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }))
-                .Where(map => map.Value.NominationConfig.MaxPlayers == 0 || map.Value.NominationConfig.MaxPlayers > Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }))
-                .Where(map => !map.Value.NominationConfig.RequiredPermissions.Any())
-                .Where(map => !map.Value.NominationConfig.DaysAllowed.Any() || map.Value.NominationConfig.DaysAllowed.Contains(DateTime.Today.DayOfWeek) )
-                .Where(map => !map.Value.NominationConfig.AllowedTimeRanges.Any() || map.Value.NominationConfig.AllowedTimeRanges.Count(range => range.IsInRange(TimeOnly.FromDateTime(DateTime.Now))) >= 1 )
+                // .Where(map => map.Value.MapCooldown.CurrentCooldown <= 0)
+                // .Where(map => !map.Value.GroupSettings.Any() || map.Value.GroupSettings.Count(setting => setting.GroupCooldown.CurrentCooldown > 0) == 0)
+                // .Where(map => !map.Value.OnlyNomination)
+                // .Where(map => !map.Value.NominationConfig.RestrictToAllowedUsersOnly)
+                // .Where(map => map.Value.NominationConfig.MinPlayers == 0 || map.Value.NominationConfig.MinPlayers <= Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }))
+                // .Where(map => map.Value.NominationConfig.MaxPlayers == 0 || map.Value.NominationConfig.MaxPlayers > Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }))
+                // .Where(map => !map.Value.NominationConfig.RequiredPermissions.Any())
+                // .Where(map => !map.Value.NominationConfig.DaysAllowed.Any() || map.Value.NominationConfig.DaysAllowed.Contains(DateTime.Today.DayOfWeek) )
+                // .Where(map => !map.Value.NominationConfig.AllowedTimeRanges.Any() || map.Value.NominationConfig.AllowedTimeRanges.Count(range => range.IsInRange(TimeOnly.FromDateTime(DateTime.Now))) >= 1 )
                 .Where(map => !map.Value.MapName.Equals(_mapCycleController.CurrentMap?.MapName))
                 .Take(numToPick);
 
@@ -717,12 +717,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         if (mapVoteContent.IsRtvVote)
         {
-            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NotChanging", mapVotePercentage, AllVotesCount);
+            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.NotChanging", $"{mapVotePercentage:F2}", AllVotesCount);
             FireMapNotChangedEvent();
         }
         else
         {
-            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.Extend", mapVotePercentage, AllVotesCount);
+            PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.Extend", $"{mapVotePercentage:F2}", AllVotesCount);
             
             // Ensure extend type for just in case
             _timeLeftUtil.ReDetermineExtendType();
