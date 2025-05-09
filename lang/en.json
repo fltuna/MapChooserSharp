@@ -71,7 +71,7 @@
     "MapVote.Broadcast.CenterHtml": "Vote starting in {0} seconds",
     "MapVote.Broadcast.NotEnoughMapsToStartVote": "There is no enough maps to initiate vote! please contact to server admin!",
     "MapVote.Broadcast.VoteCast": "{lime}{0}{default} voted to {lime}{1}{default}",
-    "MapVote.Broadcast.VoteFinished": "Vote finished! Received {0} of {1} votes ({2}%)",
+    "MapVote.Broadcast.VoteFinished": "Vote finished! Received {1} of {0} votes ({2}%)",
     "MapVote.Broadcast.StartingRunoffVote": "No maps got over {0}% of votes! Starting runoff vote!",
     "MapVote.Broadcast.Admin.CancelVote": "Admin {lime}{0}{default} cancelled the map vote!",
     "MapVote.Broadcast.VoteResult.NoVotes": "There is no votes! Next map is set to {lime}{0}{default}",
