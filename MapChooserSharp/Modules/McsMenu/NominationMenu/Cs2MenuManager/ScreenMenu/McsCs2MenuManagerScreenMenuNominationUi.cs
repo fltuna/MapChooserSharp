@@ -77,10 +77,21 @@ public class McsCs2MenuManagerScreenMenuNominationUi(CCSPlayerController playerC
         
         menu.ItemOptions.Clear();
         menu.ItemOptions.AddRange(menuOptions);
-        menu.Display(playerController, 0);
         
         
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Menu init completed, opening...");
+        
+        
+        // Open blank menu before actual menu opened
+        // Because sometimes screen menu is not appear
+        CS2MenuManager.API.Menu.ScreenMenu blankMenu =
+            new CS2MenuManager.API.Menu.ScreenMenu(menuTitle.ToString(), _plugin);
+        blankMenu.Display(playerController, 0);
+        
+        Server.NextFrame(() =>
+        {;
+            menu.Display(playerController, 0);
+        });
     }
 
     public void CloseMenu()
