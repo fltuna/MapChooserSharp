@@ -37,7 +37,7 @@ public sealed class MapChooserSharp: TncssPluginBase
 {
     public override string ModuleName => "MapChooserSharp";
     public override string ModuleVersion => PluginConstants.PluginVersion.ToString();
-    public override string ModuleAuthor => "faketuna A.K.A fltuna or tuna";
+    public override string ModuleAuthor => "faketuna A.K.A fltuna or tuna, Spitice, uru";
     public override string ModuleDescription => "Provides basic map cycle functionality.";
 
     public override string BaseCfgDirectoryPath => "unused";
