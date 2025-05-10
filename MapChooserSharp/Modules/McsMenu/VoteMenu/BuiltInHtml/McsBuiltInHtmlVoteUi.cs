@@ -6,6 +6,7 @@ using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
+using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation;
 using TNCSSPluginFoundation.Interfaces;
@@ -26,7 +27,11 @@ public class McsBuiltInHtmlVoteUi(CCSPlayerController playerController, IService
     
     private readonly IMcsInternalMapVoteControllerApi _voteController = provider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
     
+    private readonly IMcsPluginConfigProvider _mcsPluginConfigProvider = provider.GetRequiredService<IMcsPluginConfigProvider>();
+    
     private readonly Dictionary<int, List<ChatMenuOption>> _chachedMenuOptions = new();
+    
+    public McsSupportedMenuType McsMenuType { get; } = McsSupportedMenuType.BuiltInHtml;
 
     public int VoteOptionCount => _voteOptions.Count;
 
@@ -112,6 +117,47 @@ public class McsBuiltInHtmlVoteUi(CCSPlayerController playerController, IService
     public void SetMenuOption(IMcsGeneralMenuOption option)
     {
         _mcsGeneralMenuOption = option;
+    }
+
+    
+    public void RefreshTitleCountdown(int count)
+    {
+        _debugLogger.LogDebug($"WHAT{_mcsPluginConfigProvider.PluginConfig.VoteConfig.ShouldPrintVoteRemainingTime}");
+        // Return because this is intended to refresh countdown title.
+        if (!_mcsPluginConfigProvider.PluginConfig.VoteConfig.ShouldPrintVoteRemainingTime)
+            return;
+        
+        
+        // This feature requires cached menu
+        if (!_chachedMenuOptions.TryGetValue(playerController.Slot, out var menuOps))
+            return;
+        
+        
+        if (_voteController.CurrentVoteState != McsMapVoteState.Voting && _voteController.CurrentVoteState != McsMapVoteState.RunoffVoting)
+            return;
+
+        // Unused variable, but it required to decide what language should use in menu.
+        using var tempLang = new WithTemporaryCulture(playerController.GetLanguage());
+        
+        StringBuilder menuTitle = new();
+        
+        if (_mcsGeneralMenuOption != null && _mcsGeneralMenuOption.MenuTitle != string.Empty)
+        {
+            menuTitle.Append(_plugin.LocalizeStringForPlayer(playerController, _mcsGeneralMenuOption.MenuTitle + ".Html"));
+        }
+        else
+        {
+            menuTitle.Append(_plugin.LocalizeStringForPlayer(playerController,"General.Menu.Title" + ".Html"));
+        }
+        
+        menuTitle.Append(" | " + _plugin.LocalizeStringForPlayer(playerController,"MapVote.Broadcast.Voting.VoteEndCountdown.Html", count));
+        
+        CenterHtmlMenu menu = new(menuTitle.ToString(), _plugin);
+        
+        menu.MenuOptions.Clear();
+        menu.MenuOptions.AddRange(menuOps);
+        MenuManager.OpenCenterHtmlMenu(_plugin, playerController, menu);
+
     }
 
     public void SetRandomShuffle(bool enableShuffle)

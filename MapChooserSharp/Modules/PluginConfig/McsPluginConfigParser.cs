@@ -196,6 +196,11 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         {
             throw new InvalidOperationException("MapVote.ShouldPrintVoteToChat is not found or invalid");
         }
+
+        if (!voteTable.TryGetValue("ShouldPrintVoteRemainingTime", out var shouldPrintVoteRemainingTimeToChatObj) || shouldPrintVoteRemainingTimeToChatObj is not bool shouldPrintVoteRemainingTimeBool)
+        {
+            throw new InvalidOperationException("MapVote.ShouldPrintVoteRemainingTime is not found or invalid");
+        }
         
         var availableMenus =  _avaiableMenuTypes;
 
@@ -203,12 +208,12 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
 
         var soundConfig = ParseVoteSoundConfig(voteTable);
 
-        if (!Enum.TryParse(countdownUiType, true, out McsCountdownType countdownType))
+        if (!Enum.TryParse(countdownUiType, true, out McsCountdownUiType countdownType))
         {
             throw new InvalidOperationException("MapVote.MenCountdownUiTypeuType is invalid");
         }
 
-        return new McsVoteConfig(availableMenus, currentMenuType, (int)maxVoteElementsLong, shouldPrintVoteToChatBool, soundConfig, countdownType);
+        return new McsVoteConfig(availableMenus, currentMenuType, (int)maxVoteElementsLong, shouldPrintVoteToChatBool, shouldPrintVoteRemainingTimeBool, soundConfig, countdownType);
     }
 
     private IMcsVoteSoundConfig ParseVoteSoundConfig(TomlTable tomlModel)
@@ -491,6 +496,9 @@ MaxVoteElements = 5
 
 # Should print vote text to everyone?
 ShouldPrintVoteToChat = true
+
+# Should print the vote remaining time?
+ShouldPrintVoteRemainingTime = true
 
 
 # What countdown ui type should be use?

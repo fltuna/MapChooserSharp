@@ -10,7 +10,7 @@ public class McsCenterHtmlCountdownUi(IServiceProvider provider): IMcsCountdownU
 {
     private readonly TncssPluginBase _plugin = provider.GetRequiredService<TncssPluginBase>();
     
-    public void ShowCountdownToPlayer(CCSPlayerController player, int secondsLeft)
+    public void ShowCountdownToPlayer(CCSPlayerController player, int secondsLeft, McsCountdownType countdownType)
     {
         player.PrintToCenterHtml(_plugin.LocalizeStringForPlayer(player, "MapVote.Broadcast.CenterHtml", secondsLeft));
     }

@@ -10,9 +10,19 @@ public class McsCenterAlertCountdownUi(IServiceProvider provider): IMcsCountdown
 {
     private readonly TncssPluginBase _plugin = provider.GetRequiredService<TncssPluginBase>();
     
-    public void ShowCountdownToPlayer(CCSPlayerController player, int secondsLeft)
+    public void ShowCountdownToPlayer(CCSPlayerController player, int secondsLeft, McsCountdownType countdownType)
     {
-        player.PrintToCenterAlert(_plugin.LocalizeStringForPlayer(player, "MapVote.Broadcast.Countdown", secondsLeft));
+        switch (countdownType)
+        {
+            case McsCountdownType.VoteStart:
+                player.PrintToCenterAlert(_plugin.LocalizeStringForPlayer(player, "MapVote.Broadcast.Countdown", secondsLeft));
+                break;
+                
+            case McsCountdownType.Voting:
+                player.PrintToCenterAlert(_plugin.LocalizeStringForPlayer(player, "MapVote.Broadcast.Voting.VoteEndCountdown", secondsLeft));
+                break;
+        }
+        
     }
 
     public void Close(CCSPlayerController player)

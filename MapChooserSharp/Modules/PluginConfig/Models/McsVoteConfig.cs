@@ -5,13 +5,14 @@ using MapChooserSharp.Modules.PluginConfig.Interfaces;
 
 namespace MapChooserSharp.Modules.PluginConfig.Models;
 
-internal class McsVoteConfig(List<McsSupportedMenuType> availableVoteMenuTypes, McsSupportedMenuType currentMcsVoteMenuType, int maxMenuElements, bool shouldPrintVoteToChat, IMcsVoteSoundConfig voteSoundConfig, McsCountdownType currentCountdownType)
+internal class McsVoteConfig(List<McsSupportedMenuType> availableVoteMenuTypes, McsSupportedMenuType currentMcsVoteMenuType, int maxMenuElements, bool shouldPrintVoteToChat, bool shouldPrintVoteRemainingTime, IMcsVoteSoundConfig voteSoundConfig, McsCountdownUiType currentCountdownUiType)
     : IMcsVoteConfig
 {
     public List<McsSupportedMenuType> AvailableMenuTypes { get; } = availableVoteMenuTypes;
     public McsSupportedMenuType CurrentMenuType { get; } = currentMcsVoteMenuType;
-    public McsCountdownType CurrentCountdownType { get; } = currentCountdownType;
+    public McsCountdownUiType CurrentCountdownUiType { get; } = currentCountdownUiType;
     public int MaxMenuElements { get; } = maxMenuElements;
     public bool ShouldPrintVoteToChat { get; } = shouldPrintVoteToChat;
+    public bool ShouldPrintVoteRemainingTime { get; } = shouldPrintVoteRemainingTime;
     public IMcsVoteSoundConfig VoteSoundConfig { get; } = voteSoundConfig;
 }

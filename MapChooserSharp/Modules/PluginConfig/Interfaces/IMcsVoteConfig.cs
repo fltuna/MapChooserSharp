@@ -10,11 +10,13 @@ internal interface IMcsVoteConfig
     
     internal McsSupportedMenuType CurrentMenuType { get; }
     
-    internal McsCountdownType CurrentCountdownType { get; }
+    internal McsCountdownUiType CurrentCountdownUiType { get; }
     
     internal int MaxMenuElements { get; }
     
     internal bool ShouldPrintVoteToChat { get; }
+    
+    internal bool ShouldPrintVoteRemainingTime { get; }
     
     internal IMcsVoteSoundConfig VoteSoundConfig { get; }
 }

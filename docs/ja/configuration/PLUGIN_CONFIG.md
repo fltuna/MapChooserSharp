@@ -114,6 +114,9 @@ MaxVoteElements = 5
 # Should print vote text to everyone?
 ShouldPrintVoteToChat = true
 
+# Should print the vote remaining time?
+ShouldPrintVoteRemainingTime = true
+
 
 # What countdown ui type should be use?
 #
@@ -146,6 +149,10 @@ CountdownUiType = "CenterHtml"
 ### ShouldPrintVoteToChat
 
 プレイヤーの投票時に、チャットに投票先を表示するかを指定できます。
+
+### ShouldPrintVoteRemainingTime
+
+投票中に残り時間を表示するかを指定できます。
 
 ### CountdownUiType
 

@@ -12,7 +12,7 @@ public class McsChatCountdownUi(IServiceProvider provider): IMcsCountdownUi
 
     private bool _isFirstNotificationNotified = false;
     
-    public void ShowCountdownToPlayer(CCSPlayerController player, int secondsLeft)
+    public void ShowCountdownToPlayer(CCSPlayerController player, int secondsLeft, McsCountdownType countdownType)
     {
         if (!_isFirstNotificationNotified || secondsLeft <= 10)
         {

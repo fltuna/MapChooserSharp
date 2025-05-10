@@ -32,6 +32,8 @@ public class McsCs2ScreenMenuApiUi(CCSPlayerController playerController, IServic
 
     private Menu? _currentMenu;
 
+    public McsSupportedMenuType McsMenuType { get; } = McsSupportedMenuType.Cs2ScreenMenuApi;
+    
     public int VoteOptionCount => _voteOptions.Count;
     
     public void OpenMenu()
@@ -129,6 +131,10 @@ public class McsCs2ScreenMenuApiUi(CCSPlayerController playerController, IServic
     {
         _mcsGeneralMenuOption = option;
     }
+
+    
+    // We don't implement this feature in this type, due to lack of UX
+    public void RefreshTitleCountdown(int count) {}
 
     public void SetRandomShuffle(bool enableShuffle)
     {

@@ -19,9 +19,9 @@ internal sealed class McsCountdownUiController(IServiceProvider serviceProvider,
 
     
     // player slot - Countdown type
-    private readonly Dictionary<int, McsCountdownType> _mcsCountdownTypes = new();
+    private readonly Dictionary<int, McsCountdownUiType> _mcsCountdownTypes = new();
     
-    private readonly Dictionary<McsCountdownType, IMcsCountdownUi> _countdownUis = new();
+    private readonly Dictionary<McsCountdownUiType, IMcsCountdownUi> _countdownUis = new();
     
     private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     
@@ -33,10 +33,10 @@ internal sealed class McsCountdownUiController(IServiceProvider serviceProvider,
     protected override void OnInitialize()
     {
         Plugin.RegisterEventHandler<EventPlayerConnectFull>(OnPlayerConnectFull);
-        _countdownUis[McsCountdownType.CenterHud] = new McsCenterHudCountdownUi(ServiceProvider);
-        _countdownUis[McsCountdownType.CenterAlert] = new McsCenterAlertCountdownUi(ServiceProvider);
-        _countdownUis[McsCountdownType.CenterHtml] = new McsCenterHtmlCountdownUi(ServiceProvider);
-        _countdownUis[McsCountdownType.Chat] = new McsChatCountdownUi(ServiceProvider);
+        _countdownUis[McsCountdownUiType.CenterHud] = new McsCenterHudCountdownUi(ServiceProvider);
+        _countdownUis[McsCountdownUiType.CenterAlert] = new McsCenterAlertCountdownUi(ServiceProvider);
+        _countdownUis[McsCountdownUiType.CenterHtml] = new McsCenterHtmlCountdownUi(ServiceProvider);
+        _countdownUis[McsCountdownUiType.Chat] = new McsChatCountdownUi(ServiceProvider);
 
         _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         
@@ -71,18 +71,18 @@ internal sealed class McsCountdownUiController(IServiceProvider serviceProvider,
 
     private void PlayerConnectFull(CCSPlayerController player)
     {
-        McsCountdownType type = _mcsPluginConfigProvider.PluginConfig.VoteConfig.CurrentCountdownType;
+        McsCountdownUiType uiType = _mcsPluginConfigProvider.PluginConfig.VoteConfig.CurrentCountdownUiType;
             
         // TODO() Player preference from DB
         
-        UpdateCountdownType(player, type);
+        UpdateCountdownType(player, uiType);
     }
     
     
 
-    private void UpdateCountdownType(CCSPlayerController player, McsCountdownType type)
+    private void UpdateCountdownType(CCSPlayerController player, McsCountdownUiType uiType)
     {
-        _mcsCountdownTypes[player.Slot] = type;
+        _mcsCountdownTypes[player.Slot] = uiType;
     }
 
     internal void CloseCountdownUiAll()
@@ -96,81 +96,90 @@ internal sealed class McsCountdownUiController(IServiceProvider serviceProvider,
         }
     }
 
-    internal void ShowCountdownToAll(int secondsLeft)
+    internal void ShowCountdownToAll(int secondsLeft, McsCountdownType countdownType)
     {
         foreach (CCSPlayerController player in Utilities.GetPlayers())
         {
             if (player.IsBot || player.IsHLTV)
                 continue;
 
-            ShowCountdown(player, secondsLeft);
+            ShowCountdown(player, secondsLeft, countdownType);
         }
     }
 
-    private void ShowCountdown(CCSPlayerController player, int secondsLeft)
+    private void ShowCountdown(CCSPlayerController player, int secondsLeft, McsCountdownType countdownType)
     {
-        var type = GetPlayerCountdownType(player);
-        ShowCountdown(player, secondsLeft, type);
+        var type = GetPlayerCountdownUiType(player);
+        ShowCountdown(player, secondsLeft, type, countdownType);
     }
 
-    private void ShowCountdown(CCSPlayerController player, int secondsLeft ,McsCountdownType type)
+    private void ShowCountdown(CCSPlayerController player, int secondsLeft ,McsCountdownUiType uiType, McsCountdownType countdownType)
     {
-        if (type.HasFlag(McsCountdownType.CenterHud))
+        switch (countdownType)
         {
-            _countdownUis[McsCountdownType.CenterHud].ShowCountdownToPlayer(player, secondsLeft);
-        }
+            case McsCountdownType.VoteStart:
+                if (uiType.HasFlag(McsCountdownUiType.CenterHud))
+                {
+                    _countdownUis[McsCountdownUiType.CenterHud].ShowCountdownToPlayer(player, secondsLeft, countdownType);
+                }
         
-        if (type.HasFlag(McsCountdownType.CenterAlert))
-        {
-            _countdownUis[McsCountdownType.CenterAlert].ShowCountdownToPlayer(player, secondsLeft);
-        }
+                if (uiType.HasFlag(McsCountdownUiType.CenterAlert))
+                {
+                    _countdownUis[McsCountdownUiType.CenterAlert].ShowCountdownToPlayer(player, secondsLeft, countdownType);
+                }
         
-        if (type.HasFlag(McsCountdownType.CenterHtml))
-        {
-            _countdownUis[McsCountdownType.CenterHtml].ShowCountdownToPlayer(player, secondsLeft);
-        }
+                if (uiType.HasFlag(McsCountdownUiType.CenterHtml))
+                {
+                    _countdownUis[McsCountdownUiType.CenterHtml].ShowCountdownToPlayer(player, secondsLeft, countdownType);
+                }
         
-        if (type.HasFlag(McsCountdownType.Chat))
-        {
-            _countdownUis[McsCountdownType.Chat].ShowCountdownToPlayer(player, secondsLeft);
+                if (uiType.HasFlag(McsCountdownUiType.Chat))
+                {
+                    _countdownUis[McsCountdownUiType.Chat].ShowCountdownToPlayer(player, secondsLeft, countdownType);
+                }
+                break;
+            
+            case McsCountdownType.Voting:
+                _countdownUis[McsCountdownUiType.CenterAlert].ShowCountdownToPlayer(player, secondsLeft, countdownType);
+                break;
         }
     }
 
     private void CloseCountdownUi(CCSPlayerController player)
     {
-        var type = GetPlayerCountdownType(player);
+        var type = GetPlayerCountdownUiType(player);
         CloseCountdownUi(player, type);
     }
 
-    private void CloseCountdownUi(CCSPlayerController player, McsCountdownType type)
+    private void CloseCountdownUi(CCSPlayerController player, McsCountdownUiType uiType)
     {
-        if (type.HasFlag(McsCountdownType.CenterHud))
+        if (uiType.HasFlag(McsCountdownUiType.CenterHud))
         {
-            _countdownUis[McsCountdownType.CenterHud].Close(player);
+            _countdownUis[McsCountdownUiType.CenterHud].Close(player);
         }
         
-        if (type.HasFlag(McsCountdownType.CenterAlert))
+        if (uiType.HasFlag(McsCountdownUiType.CenterAlert))
         {
-            _countdownUis[McsCountdownType.CenterAlert].Close(player);
+            _countdownUis[McsCountdownUiType.CenterAlert].Close(player);
         }
         
-        if (type.HasFlag(McsCountdownType.CenterHtml))
+        if (uiType.HasFlag(McsCountdownUiType.CenterHtml))
         {
-            _countdownUis[McsCountdownType.CenterHtml].Close(player);
+            _countdownUis[McsCountdownUiType.CenterHtml].Close(player);
         }
         
-        if (type.HasFlag(McsCountdownType.Chat))
+        if (uiType.HasFlag(McsCountdownUiType.Chat))
         {
-            _countdownUis[McsCountdownType.Chat].Close(player);
+            _countdownUis[McsCountdownUiType.Chat].Close(player);
         }
     }
 
 
-    private McsCountdownType GetPlayerCountdownType(CCSPlayerController player)
+    private McsCountdownUiType GetPlayerCountdownUiType(CCSPlayerController player)
     {
         if (!_mcsCountdownTypes.TryGetValue(player.Slot, out var type))
         {
-            type = McsCountdownType.CenterHtml;
+            type = McsCountdownUiType.CenterHtml;
         }
 
         return type;
