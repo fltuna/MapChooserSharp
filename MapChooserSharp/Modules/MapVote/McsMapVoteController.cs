@@ -646,6 +646,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             {
                 _mapVoteTimer?.Kill();
                 EndRunoffVote();
+                return;
             }
             
             if (_mcsPluginConfigProvider.PluginConfig.VoteConfig.ShouldPrintVoteRemainingTime)
