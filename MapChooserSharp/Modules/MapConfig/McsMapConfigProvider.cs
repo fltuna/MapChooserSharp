@@ -15,7 +15,7 @@ public sealed class McsMapConfigProvider: IMcsInternalMapConfigProviderApi
 
 
         _mapConfigs = mapConfigs
-            .OrderBy(pair => pair.Key, StringComparer.Ordinal)
+            .OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(StringComparer.OrdinalIgnoreCase);
     }
     
