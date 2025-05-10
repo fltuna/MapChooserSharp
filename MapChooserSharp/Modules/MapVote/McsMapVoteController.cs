@@ -519,6 +519,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         FireVoteFinishedEvent();
         FireNextMapConfirmedEvent(winMap.MapConfig);
+
+        SetChangeMapOnNextRoundEnd(_mapVoteContent.IsRtvVote);
+        
         EndVotePostInitialization();
         CurrentVoteState = McsMapVoteState.NextMapConfirmed;
     }
@@ -742,6 +745,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         FireVoteFinishedEvent();
         FireNextMapConfirmedEvent(winMap.MapConfig);
+
+        SetChangeMapOnNextRoundEnd(_mapVoteContent.IsRtvVote);
         
         EndVotePostInitialization();
         CurrentVoteState = McsMapVoteState.NextMapConfirmed;
@@ -867,6 +872,14 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         {
             voteUi.OpenMenu();
         }
+    }
+
+    private void SetChangeMapOnNextRoundEnd(bool isRtv)
+    {
+        if (!isRtv)
+            return;
+        
+        _mapCycleController.ChangeMapOnNextRoundEnd = true;
     }
     
     

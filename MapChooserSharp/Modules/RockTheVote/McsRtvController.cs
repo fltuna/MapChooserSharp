@@ -260,8 +260,6 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
     {
         ResetRtvStatus();
         CreateRtvCommandUnlockTimer(RtvCommandUnlockTimeOverride.NextMapConfirm);
-        
-        _mcsMapCycleController.ChangeMapOnNextRoundEnd = true;
     }
 
     private void OnMapNotChanged(McsMapNotChangedEvent @event)
