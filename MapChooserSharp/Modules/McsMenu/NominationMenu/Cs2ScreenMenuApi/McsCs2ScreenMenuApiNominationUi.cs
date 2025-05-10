@@ -86,7 +86,6 @@ public class McsCs2ScreenMenuApiNominationUi(CCSPlayerController playerControlle
         
         _currentMenu.Options.Clear();
         _currentMenu.Options.AddRange(menuOptions);
-        _currentMenu._config.Settings.FreezePlayer = false;
         
         _currentMenu.Display();
         

@@ -110,7 +110,6 @@ public class McsCs2ScreenMenuApiUi(CCSPlayerController playerController, IServic
         _chachedMenuOptions.TryAdd(playerController.Slot, menuOptions);
         _currentMenu.ShowResolutionOption = false;
         _currentMenu._config.Settings.ShowPageCount = false;
-        _currentMenu._config.Settings.FreezePlayer = false;
         _currentMenu.Display();
         
         
