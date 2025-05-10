@@ -30,6 +30,8 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
     
     private readonly Dictionary<int, List<ItemOption>> _chachedMenuOptions = new();
 
+    public McsSupportedMenuType McsMenuType { get; } = McsSupportedMenuType.Cs2MenuManagerScreen;
+
     public int VoteOptionCount => _voteOptions.Count;
     public void OpenMenu()
     {
@@ -129,6 +131,9 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
     {
         _mcsGeneralMenuOption = option;
     }
+
+    // We don't implement this feature in this type, due to lack of UX
+    public void RefreshTitleCountdown(int count) {}
 
     public void SetRandomShuffle(bool enableShuffle)
     {

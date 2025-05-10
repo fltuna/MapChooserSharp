@@ -113,6 +113,9 @@ MaxVoteElements = 5
 # Should print vote text to everyone?
 ShouldPrintVoteToChat = true
 
+# Should print the vote remaining time?
+ShouldPrintVoteRemainingTime = true
+
 
 # What countdown ui type should be use?
 #
@@ -145,6 +148,10 @@ Specifies the number of maps that appear in one vote. In reality, because `Exten
 ### ShouldPrintVoteToChat
 
 You can specify whether to display the vote destination in chat when a player votes.
+
+### ShouldPrintVoteRemainingTime
+
+You can specify wheter to display the vote remaining time while voting.
 
 ### CountdownUiType
 
