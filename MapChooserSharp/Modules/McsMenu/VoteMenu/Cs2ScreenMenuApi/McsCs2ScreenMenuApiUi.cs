@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Menu;
@@ -106,6 +107,9 @@ public class McsCs2ScreenMenuApiUi(CCSPlayerController playerController, IServic
         _currentMenu.Options.AddRange(menuOptions);
         _chachedMenuOptions.TryAdd(playerController.Slot, menuOptions);
         _currentMenu.ShowResolutionOption = false;
+        _currentMenu._config.Settings.ShowPageCount = false;
+        _currentMenu._config.Settings.FreezePlayer = false;
+        _currentMenu.Display();
         
         
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Menu init completed, opening...");
