@@ -318,7 +318,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         }
     }
 
-    private NominationCheck PlayerCanNominateMap(CCSPlayerController player, IMapConfig mapConfig)
+    public NominationCheck PlayerCanNominateMap(CCSPlayerController player, IMapConfig mapConfig)
     {
         if (_mcsMapCycleController.CurrentMap?.MapName == mapConfig.MapName)
             return NominationCheck.SameMap;
@@ -401,7 +401,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             
             case NominationCheck.NotEnoughPlayers:
                 playerCountCurrently = Utilities.GetPlayers().Select(p => p is { IsBot: false, IsHLTV: false }).Count();
-                int minPlayers = mapConfig.NominationConfig.MaxPlayers;
+                int minPlayers = mapConfig.NominationConfig.MinPlayers;
                 player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.NotEnoughPlayers", _mcsInternalMapConfigProviderApi.GetMapName(mapConfig), playerCountCurrently, minPlayers));
                 return false;
             
@@ -464,7 +464,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         NominatedMaps.Clear();
     }
 
-    private enum NominationCheck
+    internal enum NominationCheck
     {
         Success,
         Failed,

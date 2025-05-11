@@ -13,6 +13,8 @@ using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle.Interfaces;
 using MapChooserSharp.Modules.McsDatabase.Interfaces;
+using MapChooserSharp.Modules.Nomination;
+using MapChooserSharp.Modules.Nomination.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -31,6 +33,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     private ITimeLeftUtil _timeLeftUtil = null!;
     private IMcsDatabaseProvider _mcsDatabaseProvider = null!;
     private IMcsInternalEventManager _mcsInternalEventManager = null!;
+    private IMcsInternalNominationApi _mcsInternalNominationApi = null!;
 
 
     protected override void OnAllPluginsLoaded()
@@ -40,6 +43,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         _mcsDatabaseProvider = ServiceProvider.GetRequiredService<IMcsDatabaseProvider>();
         _mcsInternalEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
+        _mcsInternalNominationApi = ServiceProvider.GetRequiredService<IMcsInternalNominationApi>();
         
         Plugin.AddCommand("css_timeleft", "Show timeleft", CommandTimeLeft);
         Plugin.AddCommand("css_nextmap", "Show next map", CommandNextMap);
@@ -333,23 +337,47 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo", mapConfig.MapName));
         
         if (mapConfig.MapNameAlias != String.Empty)
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.AliasName", mapConfig.MapNameAlias));
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.AliasName", mapConfig.MapNameAlias));
         
         if (mapConfig.MapDescription != String.Empty)
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.Description", mapConfig.MapDescription));
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.Description", mapConfig.MapDescription));
         
         if (mapConfig.MaxExtends > 0)
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MaxExtends", mapConfig.MaxExtends));
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.MaxExtends", mapConfig.MaxExtends));
         
         if (mapConfig.WorkshopId > 0)
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.WorkshopId", mapConfig.WorkshopId));
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.WorkshopId", mapConfig.WorkshopId));
         
         if (mapConfig.NominationConfig.DaysAllowed.Any())
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.DaysAllowed", string.Join(", ", mapConfig.NominationConfig.DaysAllowed)));
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.DaysAllowed", string.Join(", ", mapConfig.NominationConfig.DaysAllowed)));
         
         if (mapConfig.NominationConfig.AllowedTimeRanges.Any())
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.AllowedTimeRanges", string.Join(", ", mapConfig.NominationConfig.AllowedTimeRanges)));
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.AllowedTimeRanges", string.Join(", ", mapConfig.NominationConfig.AllowedTimeRanges)));
 
+        if (mapConfig.NominationConfig.MaxPlayers > 0)
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.MaxPlayers", mapConfig.NominationConfig.MaxPlayers));
+
+        if (mapConfig.NominationConfig.MinPlayers > 0)
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.MinPlayers", mapConfig.NominationConfig.MinPlayers));
+
+        if (mapConfig.MapCooldown.CurrentCooldown > 0 ||
+            mapConfig.GroupSettings.Count(g => g.GroupCooldown.CurrentCooldown > 0) > 0)
+        {
+            var maxGroupCooldown = mapConfig.GroupSettings
+                .Where(g => g.GroupCooldown.CurrentCooldown > 0)
+                .Max(g => g.GroupCooldown.CurrentCooldown);
+            
+            int cooldown = Math.Max(mapConfig.MapCooldown.CurrentCooldown, maxGroupCooldown);
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.Cooldown", cooldown));
+        }
+
+        var canNominate = _mcsInternalNominationApi.PlayerCanNominateMap(player, mapConfig);
+
+        string yesOrNo = canNominate == McsMapNominationController.NominationCheck.Success
+            ? LocalizeStringForPlayer(player, "Word.Yes")
+            : LocalizeStringForPlayer(player, "Word.No");
+        
+        player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.YouCanNominate", yesOrNo));
 
         var infoCommandExecutedEvent = new McsMapInfoCommandExecutedEvent(GetTextWithPluginPrefixForPlayer(player, ""), player, mapConfig);
         _mcsInternalEventManager.FireEventNoResult(infoCommandExecutedEvent);
