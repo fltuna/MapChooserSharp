@@ -298,25 +298,14 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             
             var numToPick = Math.Min(mapSlotsRemaining, unusedMapPool.Count);
             DebugLogger.LogDebug($"{numToPick} maps will be chosen randomely");
-            var unusedMapList = unusedMapPool.ToList();
-            var pickedMaps = unusedMapList
-                .OrderBy(_ => _random.Next())
-                .Where(map => map.Value.MapCooldown.CurrentCooldown <= 0)
-                .Where(map => !map.Value.GroupSettings.Any() || map.Value.GroupSettings.Count(setting => setting.GroupCooldown.CurrentCooldown > 0) == 0)
-                .Where(map => !map.Value.OnlyNomination)
-                .Where(map => !map.Value.NominationConfig.RestrictToAllowedUsersOnly)
-                .Where(map => map.Value.NominationConfig.MinPlayers == 0 || map.Value.NominationConfig.MinPlayers <= Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }))
-                .Where(map => map.Value.NominationConfig.MaxPlayers == 0 || map.Value.NominationConfig.MaxPlayers > Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }))
-                .Where(map => !map.Value.NominationConfig.RequiredPermissions.Any())
-                .Where(map => !map.Value.NominationConfig.DaysAllowed.Any() || map.Value.NominationConfig.DaysAllowed.Contains(DateTime.Today.DayOfWeek) )
-                .Where(map => !map.Value.NominationConfig.AllowedTimeRanges.Any() || map.Value.NominationConfig.AllowedTimeRanges.Count(range => range.IsInRange(TimeOnly.FromDateTime(DateTime.Now))) >= 1 )
-                .Where(map => !map.Value.MapName.Equals(_mapCycleController.CurrentMap?.MapName))
-                .Take(numToPick);
+            var unusedMapList = unusedMapPool.Values.ToList();
 
-            foreach (var (key, value) in pickedMaps)
+            var pickedMaps = PickRandomFilteredMaps(unusedMapList, numToPick);
+
+            foreach (var map in pickedMaps)
             {
-                DebugLogger.LogTrace($"Adding random map: {key}");
-                AddToVotingMaps(key);
+                DebugLogger.LogTrace($"Adding random map: {map.MapName}");
+                AddToVotingMaps(map.MapName);
             }
         }
 
@@ -1043,6 +1032,62 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         DebugLogger.LogDebug($"Trying to remove player vote for slot: {slot}");
         var mapVoteData = GetPlayerVotedMap(slot);
         mapVoteData?.RemoveVoter(slot);
+    }
+
+
+    private List<IMapConfig> PickRandomFilteredMaps(List<IMapConfig> unusedMapList, int numToPick)
+    {
+        // This method will not use Linq to make debug logging easier
+        var shuffledMaps = unusedMapList
+            .OrderBy(_ => _random.Next()).ToList();
+
+        
+        var cooldownEndedMaps = shuffledMaps.Where(map => map.MapCooldown.CurrentCooldown <= 0).ToList();
+        DebugLogger.LogTrace($"[Filter | Map Cooldown] {cooldownEndedMaps.Count} maps found.");
+
+        
+        var alsoGroupCooldownEnded = cooldownEndedMaps.Where(map =>
+            !map.GroupSettings.Any() ||
+            map.GroupSettings.Count(setting => setting.GroupCooldown.CurrentCooldown > 0) == 0).ToList();
+        DebugLogger.LogTrace($"[Filter | Gorup Cooldown] {cooldownEndedMaps.Count} maps found.");
+        
+
+        var notRestrectedToNominationOnly = alsoGroupCooldownEnded.Where(map => !map.OnlyNomination).ToList();
+        DebugLogger.LogTrace($"[Filter | No Nomination Restriction] {notRestrectedToNominationOnly.Count} maps found.");
+        
+
+        var notRestrictedToCertainUsers = notRestrectedToNominationOnly.Where(map => !map.NominationConfig.RestrictToAllowedUsersOnly).ToList();
+        DebugLogger.LogTrace($"[Filter | Not Restricted Certain users] {notRestrictedToCertainUsers.Count} maps found.");
+        
+
+        var greaterThanMinPlayers = notRestrictedToCertainUsers.Where(map => map.NominationConfig.MinPlayers == 0 || map.NominationConfig.MinPlayers <= Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false })).ToList();
+        DebugLogger.LogTrace($"[Filter | Greater Than Min Players] {greaterThanMinPlayers.Count} maps found.");
+        
+
+        var lowerThanMaxPlayers = greaterThanMinPlayers.Where(map => map.NominationConfig.MaxPlayers == 0 || map.NominationConfig.MaxPlayers > Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false })).ToList();
+        DebugLogger.LogTrace($"[Filter | Lower Than Max Players] {lowerThanMaxPlayers.Count} maps found.");
+        
+
+        var notRequiresPermission = lowerThanMaxPlayers.Where(map => !map.NominationConfig.RequiredPermissions.Any()).ToList();
+        DebugLogger.LogTrace($"[Filter | Not Requires Permission] {notRequiresPermission.Count} maps found.");
+        
+
+        var withinAllowedDays = notRequiresPermission.Where(map => !map.NominationConfig.DaysAllowed.Any() || map.NominationConfig.DaysAllowed.Contains(DateTime.Today.DayOfWeek)).ToList();
+        DebugLogger.LogTrace($"[Filter | Within Allowed Days] {withinAllowedDays.Count} maps found.");
+        
+
+        var whithinAllowedTimeRange = withinAllowedDays.Where(map => !map.NominationConfig.AllowedTimeRanges.Any() || map.NominationConfig.AllowedTimeRanges.Count(range => range.IsInRange(TimeOnly.FromDateTime(DateTime.Now))) >= 1).ToList();
+        DebugLogger.LogTrace($"[Filter | Within Allowed Time Range] {whithinAllowedTimeRange.Count} maps found.");
+        
+
+        var withoutCurrentMap = whithinAllowedTimeRange.Where(map => !map.MapName.Equals(_mapCycleController.CurrentMap?.MapName)).ToList();
+        DebugLogger.LogTrace($"[Filter | Without Current Map] {withoutCurrentMap.Count} maps found.");
+        
+
+        var pickedMaps = whithinAllowedTimeRange.Take(numToPick).ToList();
+        DebugLogger.LogTrace($"[Filter | Finally] {pickedMaps.Count} maps picked.");
+        
+        return pickedMaps;
     }
 
 
