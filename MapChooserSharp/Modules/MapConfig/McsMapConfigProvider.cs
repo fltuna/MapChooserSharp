@@ -10,13 +10,13 @@ public sealed class McsMapConfigProvider: IMcsInternalMapConfigProviderApi
     
     public McsMapConfigProvider(Dictionary<string, IMapConfig> mapConfigs, Dictionary<string, IMapGroupSettings> groupConfigs)
     {
-        _mapConfigs = mapConfigs;
-        _groupConfigs = groupConfigs;
-
-
         _mapConfigs = mapConfigs
             .OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(StringComparer.OrdinalIgnoreCase);
+            .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase);
+
+        _groupConfigs = groupConfigs
+            .OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase);
     }
     
     public IReadOnlyDictionary<string, IMapGroupSettings> GetGroupSettings()
