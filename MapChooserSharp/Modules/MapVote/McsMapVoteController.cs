@@ -1058,7 +1058,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         DebugLogger.LogTrace($"[Filter | Greater Than Min Players] {greaterThanMinPlayers.Count} maps found.");
         
 
-        var lowerThanMaxPlayers = greaterThanMinPlayers.Where(map => map.NominationConfig.MaxPlayers == 0 || map.NominationConfig.MaxPlayers > Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false })).ToList();
+        var lowerThanMaxPlayers = greaterThanMinPlayers.Where(map => map.NominationConfig.MaxPlayers == 0 || map.NominationConfig.MaxPlayers >= Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false })).ToList();
         DebugLogger.LogTrace($"[Filter | Lower Than Max Players] {lowerThanMaxPlayers.Count} maps found.");
         
 
