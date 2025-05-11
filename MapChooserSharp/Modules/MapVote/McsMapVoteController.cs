@@ -388,9 +388,13 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         ShowVoteMenu();
 
-        int count = (int)Math.Round(MapVoteEndTime.Value);
+        // +1 seconds for get actual seconds
+        int count = (int)Math.Round(MapVoteEndTime.Value) + 1;
         _mapVoteTimer = Plugin.AddTimer(1.0F, () =>
         {
+            // Decrement first for avoid bug and make sure timer is end.
+            count--;
+            
             DebugLogger.LogTrace($"Vote ending timer is ticking... {count} seconds left");
             if (count <= 0)
             {
@@ -401,27 +405,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
             if (_mcsPluginConfigProvider.PluginConfig.VoteConfig.ShouldPrintVoteRemainingTime)
             {
-                foreach (CCSPlayerController player in Utilities.GetPlayers()
-                             .Where(p => p is { IsBot: false, IsHLTV: false }))
-                {
-                    if(!_mapVoteContent!.IsPlayerInVoteParticipant(player.Slot))
-                        continue;
-                    
-                    if(IsPlayerVotedToAnyMap(player))
-                        continue;
-
-                    if (_mapVoteContent!.VoteUi[player.Slot].McsMenuType == McsSupportedMenuType.BuiltInHtml)
-                    {
-                        _mapVoteContent!.VoteUi[player.Slot].RefreshTitleCountdown(count);
-                    }
-                    else
-                    {
-                        _countdownUiController.ShowCountdownToAll(count, McsCountdownType.Voting);
-                    }
-                }
+                ShowVoteEndingCountdown(count);
             }
-            
-            count--;
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
 
         _mapVoteSoundPlayer.PlayVoteStartSoundToAll(false);
@@ -627,9 +612,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         ShowVoteMenu();
 
-        int count = (int)Math.Round(MapVoteEndTime.Value);
+        // +1 seconds for get actual seconds
+        int count = (int)Math.Round(MapVoteEndTime.Value) + 1;
         _mapVoteTimer = Plugin.AddTimer(1.0F, () =>
         {
+            // Decrement first for avoid bug and make sure timer is end.
+            count--;
             DebugLogger.LogTrace($"Vote ending timer is ticking... {count} seconds left");
             if (count <= 0)
             {
@@ -640,30 +628,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             
             if (_mcsPluginConfigProvider.PluginConfig.VoteConfig.ShouldPrintVoteRemainingTime)
             {
-                foreach (CCSPlayerController player in Utilities.GetPlayers()
-                             .Where(p => p is { IsBot: false, IsHLTV: false }))
-                {
-                    if(_mapVoteContent!.IsPlayerInVoteParticipant(player.Slot))
-                        continue;
-                    
-                    if(IsPlayerVotedToAnyMap(player))
-                        continue;
-
-                    if (!_mapVoteContent!.VoteUi.TryGetValue(player.Slot, out var voteInterface))
-                        continue;
-                    
-                    if (voteInterface.McsMenuType == McsSupportedMenuType.BuiltInHtml)
-                    {
-                        voteInterface.RefreshTitleCountdown(count);
-                    }
-                    else
-                    {
-                        _countdownUiController.ShowCountdownToAll(count, McsCountdownType.Voting);
-                    }
-                }
+                ShowVoteEndingCountdown(count);
             }
-            
-            count--;
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
 
         _mapVoteSoundPlayer.PlayVoteStartSoundToAll(true);
@@ -864,6 +830,31 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         foreach (var (key, voteUi) in _mapVoteContent.VoteUi)
         {
             voteUi.OpenMenu();
+        }
+    }
+
+    private void ShowVoteEndingCountdown(int count)
+    {
+        foreach (CCSPlayerController player in Utilities.GetPlayers()
+                     .Where(p => p is { IsBot: false, IsHLTV: false }))
+        {
+            if(!_mapVoteContent!.IsPlayerInVoteParticipant(player.Slot))
+                continue;
+                    
+            if(IsPlayerVotedToAnyMap(player))
+                continue;
+
+            if (!_mapVoteContent!.VoteUi.TryGetValue(player.Slot, out var voteInterface))
+                continue;
+                    
+            if (voteInterface.McsMenuType == McsSupportedMenuType.BuiltInHtml)
+            {
+                voteInterface.RefreshTitleCountdown(count);
+            }
+            else
+            {
+                _countdownUiController.ShowCountdownToAll(count, McsCountdownType.Voting);
+            }
         }
     }
 
