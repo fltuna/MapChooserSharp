@@ -112,7 +112,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
 
         var mapConfigs = _mcsInternalMapConfigProviderApi.GetMapConfigs();
 
-        var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).Select(kv => kv.Value) .ToList();
+        var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName, StringComparison.OrdinalIgnoreCase)).Select(kv => kv.Value) .ToList();
 
         List<IMapConfig> filteredMaps = new();
 
@@ -189,7 +189,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         
         var mapConfigs = _mcsInternalMapConfigProviderApi.GetMapConfigs();
 
-        var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).ToDictionary();
+        var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName, StringComparison.OrdinalIgnoreCase)).ToDictionary();
         
         if (!matchedMaps.Any())
         {
@@ -257,7 +257,7 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         string mapName = info.ArgByIndex(1);
         var mapConfigs = _mapNominationController.NominatedMaps;
 
-        var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName)).ToDictionary();
+        var matchedMaps = mapConfigs.Where(mp => mp.Key.Contains(mapName, StringComparison.OrdinalIgnoreCase)).ToDictionary();
         
         if (!matchedMaps.Any())
         {
