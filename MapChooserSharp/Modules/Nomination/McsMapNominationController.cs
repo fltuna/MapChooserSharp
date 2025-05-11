@@ -365,7 +365,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         if (nominationConfig.MaxPlayers > 0 && nominationConfig.MaxPlayers < Utilities.GetPlayers().Count(p => p is {IsBot: false ,IsHLTV: false}))
             return NominationCheck.TooMuchPlayers;
         
-        if (nominationConfig.MaxPlayers > 0 && nominationConfig.MinPlayers > Utilities.GetPlayers().Count(p => p is {IsBot: false ,IsHLTV: false}))
+        if (nominationConfig.MinPlayers > 0 && nominationConfig.MinPlayers > Utilities.GetPlayers().Count(p => p is {IsBot: false ,IsHLTV: false}))
             return NominationCheck.NotEnoughPlayers;
 
 
