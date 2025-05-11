@@ -649,9 +649,12 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
                     if(IsPlayerVotedToAnyMap(player))
                         continue;
 
-                    if (_mapVoteContent!.VoteUi[player.Slot].McsMenuType == McsSupportedMenuType.BuiltInHtml)
+                    if (!_mapVoteContent!.VoteUi.TryGetValue(player.Slot, out var voteInterface))
+                        continue;
+                    
+                    if (voteInterface.McsMenuType == McsSupportedMenuType.BuiltInHtml)
                     {
-                        _mapVoteContent!.VoteUi[player.Slot].RefreshTitleCountdown(count);
+                        voteInterface.RefreshTitleCountdown(count);
                     }
                     else
                     {
