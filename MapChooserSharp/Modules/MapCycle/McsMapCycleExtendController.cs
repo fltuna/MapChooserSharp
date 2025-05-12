@@ -47,7 +47,6 @@ internal class McsMapCycleExtendController(IServiceProvider serviceProvider) : P
                 break;
             
             case McsMapExtendType.Rounds:
-                Server.PrintToChatAll($"{_timeLeftUtil.RoundsLeft + extendTime}  < 1");
                 if (_timeLeftUtil.RoundsLeft + extendTime < 1)
                     return McsMapCycleExtendResult.FailedTimeCannotBeZeroOrNegative;
 
