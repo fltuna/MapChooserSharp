@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Cvars;
+using CounterStrikeSharp.API.Modules.Cvars.Validators;
 using CounterStrikeSharp.API.Modules.Entities;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Interfaces;
@@ -17,6 +18,10 @@ internal sealed class TimeLeftUtil(IServiceProvider serviceProvider, bool hotRel
     public override string PluginModuleName => "TimeleftUtil";
     public override string ModuleChatPrefix => "unused";
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
+    
+    public readonly FakeConVar<int> MapTimeTypeOverride = new("mcs_map_time_type_override",
+        "Override map time type. 0 = automatic detection, 1 = mp_timelimit, 2 = mp_maxrounds, 3 = mp_roundtime", 0,
+        ConVarFlags.FCVAR_NONE, new RangeValidator<int>(0, 3));
 
     public override void RegisterServices(IServiceCollection services)
     {
@@ -25,6 +30,7 @@ internal sealed class TimeLeftUtil(IServiceProvider serviceProvider, bool hotRel
 
     protected override void OnInitialize()
     {
+        TrackConVar(MapTimeTypeOverride);
         if (hotReload)
         {
             ReDetermineExtendType();
@@ -145,7 +151,7 @@ internal sealed class TimeLeftUtil(IServiceProvider serviceProvider, bool hotRel
 
     public bool ExtendTimeLimit(int minutes)
     {
-        if (TimeLimit < 1)
+        if (TimeLimit < 1 && MapTimeTypeOverride.Value == 0)
         {
             DebugLogger.LogWarning("TimeLeft util tried to extend a time limit, but looks like current game mode is not a time limit based! aborting...");
             return false;
@@ -173,7 +179,7 @@ internal sealed class TimeLeftUtil(IServiceProvider serviceProvider, bool hotRel
 
     public bool ExtendRounds(int rounds)
     {
-        if (RoundsLeft < 1)
+        if (RoundsLeft < 1 && MapTimeTypeOverride.Value == 0)
         {
             DebugLogger.LogWarning("TimeLeft util tried to extend a max rounds, but looks like current game mode is not a round based! aborting...");
             return false;
@@ -201,7 +207,7 @@ internal sealed class TimeLeftUtil(IServiceProvider serviceProvider, bool hotRel
 
     public bool ExtendRoundTime(int minutes)
     {
-        if (RoundTimeLeft < 1)
+        if (RoundTimeLeft < 1 && MapTimeTypeOverride.Value == 0)
         {
             DebugLogger.LogWarning("TimeLeft util tried to extend a round time limit, but looks like current game mode is not a round time limit based! aborting...");
             return false;
@@ -313,6 +319,9 @@ internal sealed class TimeLeftUtil(IServiceProvider serviceProvider, bool hotRel
     
     private McsMapExtendType DetermineExtendType()
     {
+        if (MapTimeTypeOverride.Value > 0)
+            return (McsMapExtendType)MapTimeTypeOverride.Value - 1;
+        
         if (TimeLimit > 0)
             return McsMapExtendType.TimeLimit;
         

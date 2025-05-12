@@ -44,3 +44,10 @@ ConVarのコンフィグファイルは `game/csgo/cfg/MapChooserSharp/convars.c
 | mcs_rtv_command_unlock_time_map_start          | マップがスタートしてからRTV出来るようになるまでの秒数         | 300.0         | 有効な範囲: 0.0 - 1200.0          |
 | mcs_rtv_vote_start_threshold                   | RTV投票を始めるために必要な投票率                   | 0.5           | 有効な範囲: 0.0 - 1.0             |
 | mcs_rtv_map_change_timing                      | RTV完了後にマップを変更するまでの時間 (秒で指定)          | 3.0           | 有効な範囲: 0.0 - 60.0            |
+
+
+## Timeleft Util
+
+| ConVar                      | Description                                                                   | Default Value | note                                                              |
+|-----------------------------|-------------------------------------------------------------------------------|---------------|-------------------------------------------------------------------|
+| mcs_map_time_type_override  | マップタイプを上書きします. 0 = 自動検出, 1 = mp_timelimit, 2 = mp_maxrounds, 3 = mp_roundtime | 0             | オーバーライドを使用する際は対応するCVarを正しく設定する必要があります。正しく設定されていない場合、プラグインは動作しません。 |
