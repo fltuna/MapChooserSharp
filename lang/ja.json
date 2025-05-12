@@ -115,5 +115,14 @@
     "MapCycle.Command.Notification.TimeLeft.TimeFormat.Hours": "{0} 時間 {1} 分 {2} 秒",
     "MapCycle.Command.Notification.TimeLeft.TimeFormat.Minutes": "{0} 分 {1} 秒",
     "MapCycle.Command.Notification.TimeLeft.TimeFormat.Seconds": "{0} 秒",
-    "MapCycle.Command.Notification.TimeLeft.TimeFormat.Rounds": "{0} ラウンド"
+    "MapCycle.Command.Notification.TimeLeft.TimeFormat.Rounds": "{0} ラウンド",
+    "MapCycleExtend.Command.Admin.Notification.MapExtended.Usage": "使い方: !extend <分|ラウンド>",
+    "MapCycleExtend.Command.Admin.Notification.MapExtended.FailedToExtend": "現在のマップの延長に失敗しました! 詳細はサーバーログをご確認ください!",
+    "MapCycleExtend.Command.Admin.Notification.MapExtended.FailedToExtend.FailedTimeCannotBeZeroOrNegative": "マップの時間は0とマイナスには設定できません!",
+    "MapCycleExtend.Command.Admin.Broadcast.MapExtended.TimeLeft": "管理者 {lime}{0}{default} がマップの時間を {lime}{1}{default} 分延長しました",
+    "MapCycleExtend.Command.Admin.Broadcast.MapExtended.Rounds": "管理者 {lime}{0}{default} がラウンドを {lime}{1}{default} ラウンド延長しました",
+    "MapCycleExtend.Command.Admin.Broadcast.MapExtended.RoundTime": "管理者 {lime}{0}{default} がラウンドの時間を {lime}{1}{default} 分延長しました",
+    "MapCycleExtend.Command.Admin.Broadcast.MapShortened.TimeLeft": "管理者 {lime}{0}{default} がマップの時間を {lime}{1}{default} 分短縮しました",
+    "MapCycleExtend.Command.Admin.Broadcast.MapShortened.Rounds": "管理者 {lime}{0}{default} がラウンドを {lime}{1}{default} ラウンド短縮しました",
+    "MapCycleExtend.Command.Admin.Broadcast.MapShortened.RoundTime": "管理者 {lime}{0}{default} がラウンドの時間を {lime}{1}{default} 分短縮しました"
 }

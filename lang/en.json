@@ -81,8 +81,8 @@
     "MapVote.Broadcast.VoteResult.NextMapConfirmed": "Next map is {lime}{0}{default} ({1}% of {2} votes)",
     "MapVote.Broadcast.VoteResult.NotChanging": "Map is not changing ({0}% of {1} votes)",
     "MapVote.Broadcast.VoteResult.Extend": "Map will extend ({0}% of {1} votes)",
-    "MapVote.Broadcast.VoteResult.ExtendForTime": "Map is extended for {lime}{0}{default} minuets",
-    "MapVote.Broadcast.VoteResult.ExtendForRound": "Map is extended for {lime}{0}{default} rounds",
+    "MapVote.Broadcast.VoteResult.ExtendForTime": "Map is extended by {lime}{0}{default} minuets",
+    "MapVote.Broadcast.VoteResult.ExtendForRound": "Map is extended by {lime}{0}{default} rounds",
     "MapCycle.Broadcast.Admin.SetNextMap": "Admin {lime}{0}{default} set next map to {lime}{1}{default}",
     "MapCycle.Broadcast.Admin.ChangedNextMap": "Admin {lime}{0}{default} changed next map to {lime}{1}{default}",
     "MapCycle.Command.Admin.Notification.SetNextMap.Usage": "Usage: !setnextmap <MapName>",
@@ -115,5 +115,14 @@
     "MapCycle.Command.Notification.TimeLeft.TimeFormat.Hours": "{0} hours {1} minutes {2} seconds",
     "MapCycle.Command.Notification.TimeLeft.TimeFormat.Minutes": "{0} minutes {1} seconds",
     "MapCycle.Command.Notification.TimeLeft.TimeFormat.Seconds": "{0} seconds",
-    "MapCycle.Command.Notification.TimeLeft.TimeFormat.Rounds": "{0} rounds"
+    "MapCycle.Command.Notification.TimeLeft.TimeFormat.Rounds": "{0} rounds",
+    "MapCycleExtend.Command.Admin.Notification.MapExtended.Usage": "Usage: !extend <minutes|rounds>",
+    "MapCycleExtend.Command.Admin.Notification.MapExtended.FailedToExtend": "Failed to extend current map! check server logs for details!",
+    "MapCycleExtend.Command.Admin.Notification.MapExtended.FailedToExtend.FailedTimeCannotBeZeroOrNegative": "Map time cannot be zero or negative!",
+    "MapCycleExtend.Command.Admin.Broadcast.MapExtended.TimeLeft": "Admin {lime}{0}{default} has extended map time by {lime}{1}{default} minutes",
+    "MapCycleExtend.Command.Admin.Broadcast.MapExtended.Rounds": "Admin {lime}{0}{default} has extended round by {lime}{1}{default} rounds",
+    "MapCycleExtend.Command.Admin.Broadcast.MapExtended.RoundTime": "Admin {lime}{0}{default} has extended round time by {lime}{1}{default} minutes",
+    "MapCycleExtend.Command.Admin.Broadcast.MapShortened.TimeLeft": "Admin {lime}{0}{default} shortened map by {lime}{1}{default} minutes",
+    "MapCycleExtend.Command.Admin.Broadcast.MapShortened.Rounds": "Admin {lime}{0}{default} shortened round by {lime}{1}{default} rounds",
+    "MapCycleExtend.Command.Admin.Broadcast.MapShortened.RoundTime": "Admin {lime}{0}{default} shortened round time by {lime}{1}{default} minutes"
 }
