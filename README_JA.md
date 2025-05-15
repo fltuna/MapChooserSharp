@@ -23,6 +23,7 @@ CounterStrikeSharpで実装された強力なAPIとカスタマイズ性を備�
 - 管理者コマンド `!cancelvote` での投票のキャンセル
 - 複数のUIサポート
    - 現在は次をサポートしてます: BuiltInHtml, CS2ScreenMenuAPI, CS2MenuManager(Screen)
+- カウントダウン開始、カウントダウン、投票開始、投票完了での音声の再生
 
 ### ノミネート
 

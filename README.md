@@ -24,6 +24,7 @@ This plugin is supported `mp_maxrounds` and `mp_roundtime` based gamemode, such 
 - Admin command to cancel vote `!cancelvote`
 - Multiple UI support
    - Currently supports: BuiltInHtml, CS2ScreenMenuAPI, CS2MenuManager(Screen)
+- Play sounds when countdown start, countdown, vote start, vote finish
 
 ### Nomination
 
