@@ -993,7 +993,10 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
         if (_mcsPluginConfigProvider.PluginConfig.VoteConfig.ShouldPrintVoteToChat)
         {
-            PrintLocalizedChatToAll("MapVote.Broadcast.VoteCast", player.PlayerName, GetMapName(votedMap, player).ToString());
+            foreach (CCSPlayerController cl in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
+            {
+                cl.PrintToChat(LocalizeWithPluginPrefixForPlayer(cl, "MapVote.Broadcast.VoteCast", player.PlayerName, GetMapName(votedMap, player).ToString()));
+            }
         }
         
         
