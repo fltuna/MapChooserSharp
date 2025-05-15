@@ -8,8 +8,53 @@ CounterStrikeSharpで実装された強力なAPIとカスタマイズ性を備�
 
 [English](README.md)
 
+## 留意事項
+
+このプラグインはZombieEscapeやMinigame等の`mp_timelimit`ベースのゲームモードを主軸として開発しています。
+
+このプラグインは、SurfやTTTのような`mp_maxrounds` と `mp_roundtime`のゲームモードもサポートしていますが、動作の保証はありません。
 
 ## 機能
+
+### マップ投票
+
+- 基本的な投票機能
+- !revote での再投票
+- 管理者コマンド `!cancelvote` での投票のキャンセル
+- 複数のUIサポート
+   - 現在は次をサポートしてます: BuiltInHtml, CS2ScreenMenuAPI, CS2MenuManager(Screen)
+
+### ノミネート
+
+- 名前の部分マッチ機能を含んだマップのノミネート
+- コンフィグによるたくさんのノミネーションの制御設定
+- 見やすい `!nomlist` を使用したノミネーションリスト
+- 管理者コマンド `!nominate_addmap <MapName>`, `!nominate_removemap <MapName>` での、ノミネートへのマップの追加、削除のサポート
+- 複数のUIサポート
+   - 現在は次をサポートしてます: BuiltInHtml, CS2ScreenMenuAPI, CS2MenuManager(Screen)
+
+### RTV
+
+- `!rtv` コマンドと `rtv` チャットトリガー
+- `!forcertv` を使用した強制的なRTVの開始機能
+- `!enablertv` と `!disablertv` でのRTV有効無効の切り替え
+
+### マップサイクル
+
+- `!nextmap` コマンドと `nextmap` チャットトリガー
+- `!currentmap` コマンドと `currentmap` チャットトリガー
+- `!timeleft` コマンドと `timeleft` チャットトリガー
+- `!mapinfo` コマンドでのマップ情報の表示
+- `!extends` コマンドでの残り延長回数の表示
+- ユーザーによる `!ext` コマンドを使用した延長投票
+   - `!ext` を管理者コマンド `!setext <count>` を使用して変更できる機能
+   - `!ext` を管理者コマンド `!enableext` と `!disableext` を使用して有効無効の切り替えが行える機能
+- 管理者コマンド `!extend` と `!extendvote`(CS2の投票UI) を使用したマップの延長
+- 管理者コマンド `!setnextmap <MapName>` と `!removenextmap` によるマップサイクルの管理
+- マップの時間タイプの自動検出 (下にあるのでその情報を確認してください)
+- データベースによるグループとマップのクールダウンの管理
+   - 次のDBを現在サポートしてます: SQLite
+- 管理コマンド `!setmapcooldown` と `!setgroupcooldown` を使用したクールダウンの管理
 
 ### 豊富なカスタマイズ項目
 

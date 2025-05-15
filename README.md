@@ -9,7 +9,53 @@ CounterStrikeSharp implmentation of map chooser plugin with powerful API and con
 
 [日本語](README_JA.md)
 
+## NOTE
+
+This plugin is mainly intended for `mp_timelimit` based gamemode, such as ZombieEscape, Minigame.
+
+This plugin is supported `mp_maxrounds` and `mp_roundtime` based gamemode, such as surf, TTT, etc... But there is no gurantee to work properly.
+
 ## Features
+
+### Map Vote
+
+- Basic map voting
+- !revote support
+- Admin command to cancel vote `!cancelvote`
+- Multiple UI support
+   - Currently supports: BuiltInHtml, CS2ScreenMenuAPI, CS2MenuManager(Screen)
+
+### Nomination
+
+- Map nomination with partial name match
+- Much much nomination restriction settings with map config
+- Very clear nomination list with `!nomlist`
+- Admin map nomination and removal with `!nominate_addmap <MapName>`, `!nominate_removemap <MapName>`
+- Multiple UI support
+   - Currently supports: BuiltInHtml, CS2ScreenMenuAPI, CS2MenuManager(Screen)
+
+### RTV
+
+- !rtv and rtv chat trigger
+- Force activate RTV with command `!forcertv`
+- Toggle RTV by `!enablertv` and `!disablertv`
+
+### Map Cycle
+
+- `!nextmap` and `nextmap` chat trigger
+- `!currentmap` and `currentmap` chat trigger
+- `!timeleft` and `timeleft` chat trigger
+- `!mapinfo` command to show map's information
+- `!extends` command to check remaining extends
+- User extend vote command with `!ext`
+    - Admin command to manipulate `!ext` counts with `!setext <count>`
+    - Admin command to toggle `!ext` command with `!enableext` and `!disableext`
+- Admin extend command with `!extend` and `!extendvote`(with native vote UI)
+- Admin map cycle manipulation with `!setnextmap <MapName>` and `!removenextmap`
+- Automatic Detection of Map Time Type (See below for details)
+- Database cooldown management for Map and Group
+  - Databases currently supports: SQLite
+- Admin cooldown manipulation command `!setmapcooldown`, `!setgroupcooldown`
 
 ### Abundant Customization Options
 
@@ -31,7 +77,7 @@ Also, for `mp_roundtime`-based servers like surf servers, the round time is dire
 
 See [MCS API document](docs/en/development/USING_MCS_API.md)
 
-## A handy commands
+### A handy commands
 
 See [Commands Document](docs/en/COMMANDS.md)
 
