@@ -18,6 +18,12 @@ ConVar configuration file is located in `game/csgo/cfg/MapChooserSharp/convars.c
 | mcs_vote_start_timing_time   | When should vote started if map is based on mp_timelimit or mp_roundtime? (seconds) | 180           | Valid Range is 0 - 600 |
 | mcs_vote_start_timing_round  | When should vote started if map is based on mp_maxrounds? (rounds)                  | 2             | Valid Range is 2 - 15  |
 
+## Map Cycle Extend Controller
+
+| ConVar                       | Description                                         | Default Value | note                      |
+|------------------------------|-----------------------------------------------------|---------------|---------------------------|
+| mcs_ext_user_vote_threshold  | How many percent to require extend a map by users?  | 0.5           | Valid Range is 0.0 - 1.0  |
+
 ## Vote Controller
 
 | ConVar                               | Description                                                                                                                               | Default Value | note                               |

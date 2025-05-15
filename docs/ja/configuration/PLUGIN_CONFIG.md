@@ -74,6 +74,9 @@ MapInformationTableName = "McsMapInformation"
 # How many extends allowed if map is not in map config.
 FallbackMaxExtends = 3
 
+# How many times allowed to extend a map using !ext command
+FallbackMaxExtCommandUses = 1
+
 # How long to extend when map is extended in time left/ round time based game?
 FallbackExtendTimePerExtends = 15
 
@@ -84,6 +87,10 @@ FallbackExtendRoundsPerExtends = 5
 ### FallbackMaxExtends
 
 コンフィグに存在しないマップを遊んでいる際のデフォルトの最大延長回数を指定できます。
+
+### FallbackMaxExtCommandUses
+
+コンフィグに存在しないマップを遊んでいる際の`!ext`コマンドによる延長のデフォルトの最大延長回数を指定できます。
 
 ### FallbackExtendTimePerExtends
 

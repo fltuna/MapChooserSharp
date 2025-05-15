@@ -125,6 +125,7 @@ internal class MapConfigParser(string configPath)
                     Cooldown = defaultConfig.Cooldown,
                     MapTime = defaultConfig.MapTime,
                     MaxExtends = defaultConfig.MaxExtends,
+                    MaxExtCommandUses = defaultConfig.MaxExtCommandUses,
                     ExtendTimePerExtends = defaultConfig.ExtendTimePerExtends,
                     MapRounds = defaultConfig.MapRounds,
                     ExtendRoundsPerExtends = defaultConfig.ExtendRoundsPerExtends,
@@ -232,6 +233,7 @@ internal class MapConfigParser(string configPath)
                 config.WorkshopId!.Value,
                 config.OnlyNomination!.Value,
                 config.MaxExtends!.Value,
+                config.MaxExtCommandUses!.Value,
                 config.MapTime!.Value,
                 config.ExtendTimePerExtends!.Value,
                 config.MapRounds!.Value,
@@ -254,6 +256,7 @@ internal class MapConfigParser(string configPath)
         if (defaultConfig.Cooldown == null) missingSettings.Add("Cooldown");
         if (defaultConfig.MapTime == null) missingSettings.Add("MapTime");
         if (defaultConfig.MaxExtends == null) missingSettings.Add("MaxExtends");
+        if (defaultConfig.MaxExtCommandUses == null) missingSettings.Add("MaxExtCommandUses");
         if (defaultConfig.ExtendTimePerExtends == null) missingSettings.Add("ExtendTimePerExtends");
         if (defaultConfig.MapRounds == null) missingSettings.Add("MapRounds");
         if (defaultConfig.ExtendRoundsPerExtends == null) missingSettings.Add("ExtendRoundsPerExtends");
@@ -354,6 +357,10 @@ internal class MapConfigParser(string configPath)
                 case "MaxExtends":
                     if (value is long extendsValue)
                         config.MaxExtends = (int)extendsValue;
+                    break;
+                case "MaxExtCommandUses":
+                    if (value is long maxExtCmdUsesValue)
+                        config.MaxExtCommandUses = (int)maxExtCmdUsesValue;
                     break;
                 case "MapTime":
                     if (value is long mapTimeValue)
@@ -634,6 +641,7 @@ WorkshopId = 0
 OnlyNomination = false
 Cooldown = 0
 MaxExtends = 3
+MaxExtCommandUses = 1
 ExtendTimePerExtends = 15
 MapTime = 20
 ExtendRoundsPerExtends = 5
@@ -681,6 +689,9 @@ Cooldown = 60
 
 # Max extends
 MaxExtends = 3
+
+# Max !ext command uses
+MaxExtCommandUses = 1
 
 # Extend time per extend (minutes)
 ExtendTimePerExtends = 15
@@ -817,6 +828,7 @@ internal class NullableMapConfig
     public long? WorkshopId { get; set; }
     public bool? OnlyNomination { get; set; }
     public int? MaxExtends { get; set; }
+    public int? MaxExtCommandUses { get; set; }
     public int? MapTime { get; set; }
     public int? ExtendTimePerExtends { get; set; }
     public int? MapRounds { get; set; }

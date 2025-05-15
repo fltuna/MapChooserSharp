@@ -124,5 +124,21 @@
     "MapCycleExtend.Command.Admin.Broadcast.MapExtended.RoundTime": "管理者 {lime}{0}{default} がラウンドの時間を {lime}{1}{default} 分延長しました",
     "MapCycleExtend.Command.Admin.Broadcast.MapShortened.TimeLeft": "管理者 {lime}{0}{default} がマップの時間を {lime}{1}{default} 分短縮しました",
     "MapCycleExtend.Command.Admin.Broadcast.MapShortened.Rounds": "管理者 {lime}{0}{default} がラウンドを {lime}{1}{default} ラウンド短縮しました",
-    "MapCycleExtend.Command.Admin.Broadcast.MapShortened.RoundTime": "管理者 {lime}{0}{default} がラウンドの時間を {lime}{1}{default} 分短縮しました"
+    "MapCycleExtend.Command.Admin.Broadcast.MapShortened.RoundTime": "管理者 {lime}{0}{default} がラウンドの時間を {lime}{1}{default} 分短縮しました",
+    "MapCycleExtend.ExtCommand.Admin.Broadcast.EnabledExt": "管理者 {lime}{0}{default} が ext を有効化しました",
+    "MapCycleExtend.ExtCommand.Admin.Broadcast.DisabledExt": "管理者 {lime}{0}{default} が ext を無効化しました",
+    "MapCycleExtend.ExtCommand.Admin.Broadcast.ChangeExtCount.Usage": "使い方: !setext <延長回数>",
+    "MapCycleExtend.ExtCommand.Admin.Broadcast.ChangeExtCount.ChangedExtCount": "管理者 {lime}{0}{default} がextの残り回数を {lime}{1}{default} 回に設定しました",
+    "MapCycleExtend.ExtCommand.Broadcast.MapExtended.TimeLeft": "マップが {lime}{0}{default} 分延長されました",
+    "MapCycleExtend.ExtCommand.Broadcast.MapExtended.Rounds": "ラウンドが {lime}{0}{default} ラウンド延長されました",
+    "MapCycleExtend.ExtCommand.Broadcast.MapExtended.RoundTime": "ラウンドの時間が {lime}{0}{default} 分延長されました",
+    "MapCycleExtend.ExtCommand.Broadcast.MapExtended.ExtsRemain": "残り延長回数 {lime}{0}{default} 回",
+    "MapCycleExtend.ExtCommand.Broadcast.MapExtended.NoExtsRemain": "延長回数の上限に達しました",
+    "MapCycleExtend.ExtCommand.Broadcast.VoteCast": "{lime}{0}{default} が現在のマップの延長を希望しています! (チャットに {lime}!ext{default} で賛同) ({1}/{2})",
+    "MapCycleExtend.ExtCommand.Notification.AlreadyVoted": "既に現在のマップを延長に投票しています!",
+    "MapCycleExtend.ExtCommand.Notification.InCooldown": "extは現在クールダウン中です",
+    "MapCycleExtend.ExtCommand.Notification.InCooldown.Verbose": "extは現在クールダウン中です。 残り {lime}{0}{default} 秒",
+    "MapCycleExtend.ExtCommand.Notification.Disabled": "!ext は現在無効化されています",
+    "MapCycleExtend.ExtCommand.Notification.NotAllowed": "投票は許可されていません",
+    "MapCycleExtend.ExtCommand.Notification.NoExtsRemain": "延長回数の上限に達しました"
 }

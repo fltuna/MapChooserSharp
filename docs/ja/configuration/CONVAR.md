@@ -18,6 +18,12 @@ ConVarのコンフィグファイルは `game/csgo/cfg/MapChooserSharp/convars.c
 | mcs_vote_start_timing_time   | mp_timelimit か mp_roundtime ベースのマップでいつごろ投票を始めるか (秒で指定) | 180           | 有効な範囲: 0 - 600          |
 | mcs_vote_start_timing_round  | mp_maxrounds ベースのマップでいつごろ投票を始めるか (ラウンド数で指定)            | 2             | 有効な範囲: 2 - 15           |
 
+## Map Cycle Extend Controller
+
+| ConVar                       | Description           | Default Value | note             |
+|------------------------------|-----------------------|---------------|------------------|
+| mcs_ext_user_vote_threshold  | ユーザーによる延長を行うために必要な投票率 | 0.5           | 有効な範囲: 0.0 - 1.0 |
+
 ## Vote Controller
 
 | ConVar                               | Description                                                              | Default Value | note                                |

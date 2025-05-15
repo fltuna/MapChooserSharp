@@ -221,6 +221,7 @@ WorkshopId = 1234567891234
 OnlyNomination = false
 Cooldown = 60
 MaxExtends = 3
+MaxExtCommandUses = 1
 ExtendTimePerExtends = 15
 MapTime = 20
 ExtendRoundsPerExtends = 5
@@ -275,6 +276,10 @@ cost = 100
 ### MaxExtends
 
 マップの最大延長回数を指定します。
+
+### MaxExtCommandUses
+
+`!ext`コマンドで行えるマップの最大延長回数を指定します。
 
 ### ExtendTimePerExtends
 

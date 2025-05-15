@@ -6,6 +6,7 @@ using MapChooserSharp.API.MapCycleController;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapCycle.Interfaces;
+using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -20,21 +21,108 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
     private IMcsInternalMapCycleExtendControllerApi _mcsInternalMapCycleExtendController = null!;
+    private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
 
     protected override void OnAllPluginsLoaded()
     {
         _mcsInternalMapCycleExtendController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleExtendControllerApi>();
+        _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         
+        
+        Plugin.AddCommand("css_ext", "Vote to extend", CommandExtendMapUser);
+        
         Plugin.AddCommand("css_extend", "Extend a current map", CommandExtendMap);
+        Plugin.AddCommand("css_enableext", "Enable !ext command", CommandEnableExt);
+        Plugin.AddCommand("css_disableext", "Disable !ext command", CommandDisableExt);
+        
+        Plugin.AddCommand("css_setext", "Set ext count", CommandSetExtCounts);
     }
 
     protected override void OnUnloadModule()
     {
+        Plugin.RemoveCommand("css_ext", CommandExtendMapUser);
+        
         Plugin.RemoveCommand("css_extend", CommandExtendMap);
+        Plugin.RemoveCommand("css_enableext", CommandEnableExt);
+        Plugin.RemoveCommand("css_disableext", CommandDisableExt);
+        
+        Plugin.RemoveCommand("css_setext", CommandSetExtCounts);
     }
 
+
+    private void CommandExtendMapUser(CCSPlayerController? player, CommandInfo info)
+    {
+        if (player == null)
+        {
+            Server.PrintToConsole("You cannot use this command from console, use css_extend instead.");
+            return;
+        }
+        
+        
+        PlayerExtResult result = _mcsInternalMapCycleExtendController.CastPlayerExtVote(player);
+
+
+        switch (result)
+        {
+            case PlayerExtResult.Success:
+                break;
+            
+            case PlayerExtResult.AlreadyVoted:
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.AlreadyVoted"));
+                break;
+            
+            case PlayerExtResult.CommandInCooldown:
+                if (_mcsPluginConfigProvider.PluginConfig.GeneralConfig.VerboseCooldownPrint)
+                {
+                    player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.InCooldown.Verbose"));
+                }
+                else
+                {
+                    player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.InCooldown"));
+                }
+                break;
+            
+            case PlayerExtResult.CommandDisabled:
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.Disabled"));
+                break;
+            
+            case PlayerExtResult.NotAllowed:
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.NotAllowed"));
+                break;
+            
+            case PlayerExtResult.ReachedLimit:
+                NotifyNoExtsLeft(player);
+                break;
+        }
+    }
+
+
+    [RequiresPermissions("css/map")]
+    private void CommandEnableExt(CCSPlayerController? player, CommandInfo info)
+    {
+        if (_mcsInternalMapCycleExtendController.UserExtsRemaining <= 0)
+        {
+            NotifyNoExtsLeft(player);
+            return;
+        }
+        
+        _mcsInternalMapCycleExtendController.EnablePlayerExtendCommand(player);
+    }
+
+
+    [RequiresPermissions("css/map")]
+    private void CommandDisableExt(CCSPlayerController? player, CommandInfo info)
+    {
+        if (_mcsInternalMapCycleExtendController.UserExtsRemaining <= 0)
+        {
+            NotifyNoExtsLeft(player);
+            return;
+        }
+        
+        _mcsInternalMapCycleExtendController.DisablePlayerExtendCommand(player);
+    }
 
     [RequiresPermissions("css/root")]
     private void CommandExtendMap(CCSPlayerController? player, CommandInfo info)
@@ -142,6 +230,61 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
                     Logger.LogInformation($"Admin {executorName} shortened mp_roundtime by {extendTimeAbs} minutes");
                 }
                 break;
+        }
+    }
+
+
+    [RequiresPermissions(@"css/root")]
+    private void CommandSetExtCounts(CCSPlayerController? player, CommandInfo info)
+    {
+        if (info.ArgCount < 2)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("MapCycleExtend.ExtCommand.Admin.Broadcast.ChangeExtCount.Usage"));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Admin.Broadcast.ChangeExtCount.Usage"));
+            }
+            return;
+        }
+        
+        
+        string arg1 = info.ArgByIndex(1);
+
+        if (!int.TryParse(arg1, out int count))
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("General.Notification.InvalidArgument.WithParam", arg1));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.InvalidArgument.WithParam", arg1));
+            }
+            return;
+        }
+
+
+        _mcsInternalMapCycleExtendController.SetUserExtsRemaining(count);
+
+        string executorName = PlayerUtil.GetPlayerName(player);
+        
+        PrintLocalizedChatToAll("MapCycleExtend.ExtCommand.Admin.Broadcast.ChangeExtCount.ChangedExtCount", executorName, count);
+    }
+    
+    
+
+    private void NotifyNoExtsLeft(CCSPlayerController? player)
+    {
+        if (player == null)
+        {
+            Server.PrintToConsole(LocalizeString("MapCycleExtend.ExtCommand.Notification.NoExtsRemain"));
+        }
+        else
+        {
+            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.NoExtsRemain"));
         }
     }
 }

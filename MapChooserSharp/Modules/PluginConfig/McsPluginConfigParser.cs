@@ -118,7 +118,7 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         {
             throw new InvalidOperationException("MapCycle section is not found");
         }
-
+        
         if (!mapCycleTable.TryGetValue("FallbackMaxExtends", out var defaultMaxExtendsObj) || 
             defaultMaxExtendsObj is not long defaultMaxExtendsLong)
         {
@@ -126,6 +126,15 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         }
 
         int defaultMaxExtends = (int)defaultMaxExtendsLong;
+
+        
+        if (!mapCycleTable.TryGetValue("FallbackMaxExtCommandUses", out var defaultExtCmdUsesObj) || 
+            defaultExtCmdUsesObj is not long defaultExtCmdUsesLong)
+        {
+            throw new InvalidOperationException("MapCycle.FallbackMaxExtCommandUses is not found or invalid");
+        }
+
+        int defaultExtCmdUses = (int)defaultExtCmdUsesLong;
         
 
         if (!mapCycleTable.TryGetValue("FallbackExtendTimePerExtends", out var defaultExtendsTime) || 
@@ -147,7 +156,7 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         
         
         
-        return new McsMapCycleConfig(defaultMaxExtends, fallbackExtendTimePerExtends, fallbackExtendRoundsPerExtends);
+        return new McsMapCycleConfig(defaultMaxExtends, defaultExtCmdUses, fallbackExtendTimePerExtends, fallbackExtendRoundsPerExtends);
     }
 
     private IMcsNominationConfig ParseNominationConfig(TomlTable tomlModel)
@@ -470,6 +479,9 @@ MapInformationTableName = ""McsMapInformation""
 
 # How many extends allowed if map is not in map config.
 FallbackMaxExtends = 3
+
+# How many times allowed to extend a map using !ext command
+FallbackMaxExtCommandUses = 1
 
 # How long to extend when map is extended in time left/ round time based game?
 FallbackExtendTimePerExtends = 15
