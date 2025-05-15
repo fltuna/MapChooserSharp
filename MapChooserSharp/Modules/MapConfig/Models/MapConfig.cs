@@ -10,6 +10,7 @@ public sealed class MapConfig(
     long workshopId,
     bool onlyNomination,
     int maxExtends,
+    int maxExtCommandUses,
     int mapTime,
     int extendTimePerExtends,
     int mapRounds,
@@ -17,8 +18,7 @@ public sealed class MapConfig(
     INominationConfig nominationConfig,
     IMapCooldown mapCooldown,
     Dictionary<string, Dictionary<string, string>> extraConfiguration,
-    List<IMapGroupSettings> groupSettings
-    )
+    List<IMapGroupSettings> groupSettings)
     : IMapConfig
 {
     public string MapName { get; } = mapName;
@@ -28,6 +28,7 @@ public sealed class MapConfig(
     public long WorkshopId { get; } = workshopId;
     public bool OnlyNomination { get; } = onlyNomination;
     public int MaxExtends { get; } = maxExtends;
+    public int MaxExtCommandUses { get; } = maxExtCommandUses;
     public int MapTime { get; } = mapTime;
     public int ExtendTimePerExtends { get; } = extendTimePerExtends;
     public int MapRounds { get; } = mapRounds;

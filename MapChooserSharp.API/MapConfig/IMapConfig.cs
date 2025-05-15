@@ -42,6 +42,11 @@ public interface IMapConfig
     public int MaxExtends { get; }
     
     /// <summary>
+    /// How many times allow the !ext command in this map?
+    /// </summary>
+    public int MaxExtCommandUses { get; }
+    
+    /// <summary>
     /// Map's default mp_timelimit value
     /// </summary>
     public int MapTime { get; }

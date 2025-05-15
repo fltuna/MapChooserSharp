@@ -86,7 +86,7 @@ public sealed class MapChooserSharp: TncssPluginBase
         
         RegisterModule<McsMapCycleController>(hotReload);
         RegisterModule<McsMapCycleCommands>();
-        RegisterModule<McsMapCycleExtendController>();
+        RegisterModule<McsMapCycleExtendController>(hotReload);
         RegisterModule<McsMapCycleExtendCommands>();
         
         #if DEBUG

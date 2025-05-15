@@ -7,4 +7,6 @@ internal interface IMcsMapCycleConfig
     internal int FallbackExtendTimePerExtends { get; }
     
     internal int FallbackExtendRoundsPerExtends { get; }
+    
+    internal int FallbackMaxExtCommandUses { get; }
 }

@@ -73,6 +73,9 @@ You can specify the table name for map information.
 # How many extends allowed if map is not in map config.
 FallbackMaxExtends = 3
 
+# How many times allowed to extend a map using !ext command
+FallbackMaxExtCommandUses = 1
+
 # How long to extend when map is extended in time left/ round time based game?
 FallbackExtendTimePerExtends = 15
 
@@ -83,6 +86,10 @@ FallbackExtendRoundsPerExtends = 5
 ### FallbackMaxExtends
 
 You can specify the default maximum number of extensions when playing a map that doesn't exist in the config.
+
+### FallbackMaxExtCommandUses
+
+You can specify the default maximum number of extensions by `!ext` command when playing a map that doesn't exist in the config.
 
 ### FallbackExtendTimePerExtends
 

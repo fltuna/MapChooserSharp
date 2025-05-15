@@ -222,6 +222,7 @@ WorkshopId = 1234567891234
 OnlyNomination = false
 Cooldown = 60
 MaxExtends = 3
+MaxExtCommandUses = 1
 ExtendTimePerExtends = 15
 MapTime = 20
 ExtendRoundsPerExtends = 5
@@ -276,6 +277,10 @@ Please note this is separate from group cooldowns.
 ### MaxExtends
 
 Specifies the maximum number of times a map can be extended.
+
+### MaxExtCommandUses
+
+Specifies the maximum number of times a map can be extended by `!ext` command.
 
 ### ExtendTimePerExtends
 
