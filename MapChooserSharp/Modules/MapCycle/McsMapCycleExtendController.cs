@@ -167,6 +167,20 @@ internal class McsMapCycleExtendController(IServiceProvider serviceProvider, boo
                     break;
             }
         }
+        else
+        {
+            switch (extendType)
+            {
+                case McsMapExtendType.Rounds:
+                    timesToExtend = currentMap.ExtendRoundsPerExtends;
+                    break;
+                    
+                case McsMapExtendType.RoundTime:
+                case McsMapExtendType.TimeLimit:
+                    timesToExtend = currentMap.ExtendTimePerExtends;
+                    break;
+            }
+        }
             
         // Ignore status return value, because shouldn't be failed.
         ExtendCurrentMap(timesToExtend);
