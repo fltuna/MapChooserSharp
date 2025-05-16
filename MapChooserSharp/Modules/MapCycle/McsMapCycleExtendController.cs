@@ -53,9 +53,12 @@ internal class McsMapCycleExtendController(IServiceProvider serviceProvider, boo
         UserExtsRemaining = userExtsRemaining;
         ExtCommandStatus = ExtStatus.Enabled;
     }
-    
-    
-    
+
+    protected override void OnInitialize()
+    {
+        TrackConVar(ExtUserVoteStartThreshold);
+    }
+
     public override void RegisterServices(IServiceCollection services)
     {
         services.AddSingleton<IMcsInternalMapCycleExtendControllerApi>(this);

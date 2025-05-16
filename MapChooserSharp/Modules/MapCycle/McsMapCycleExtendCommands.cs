@@ -21,12 +21,14 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
     protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
     private IMcsInternalMapCycleExtendControllerApi _mcsInternalMapCycleExtendController = null!;
+    private IMcsInternalMapCycleExtendVoteControllerApi _mcsInternalExtendVoteController = null!;
     private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
 
     protected override void OnAllPluginsLoaded()
     {
         _mcsInternalMapCycleExtendController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleExtendControllerApi>();
+        _mcsInternalExtendVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleExtendVoteControllerApi>();
         _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         
@@ -38,6 +40,9 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
         Plugin.AddCommand("css_disableext", "Disable !ext command", CommandDisableExt);
         
         Plugin.AddCommand("css_setext", "Set ext count", CommandSetExtCounts);
+        
+        Plugin.AddCommand("css_ve", "Starts a vote extend", CommandVoteExtend);
+        Plugin.AddCommand("css_voteextend", "Starts a vote extend", CommandVoteExtend);
     }
 
     protected override void OnUnloadModule()
@@ -49,6 +54,9 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
         Plugin.RemoveCommand("css_disableext", CommandDisableExt);
         
         Plugin.RemoveCommand("css_setext", CommandSetExtCounts);
+        
+        Plugin.RemoveCommand("css_ve", CommandVoteExtend);
+        Plugin.RemoveCommand("css_voteextend", CommandVoteExtend);
     }
 
 
@@ -272,6 +280,58 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
         string executorName = PlayerUtil.GetPlayerName(player);
         
         PrintLocalizedChatToAll("MapCycleExtend.ExtCommand.Admin.Broadcast.ChangeExtCount.ChangedExtCount", executorName, count);
+    }
+
+    [RequiresPermissions(@"css/root")]
+    private void CommandVoteExtend(CCSPlayerController? player, CommandInfo info)
+    {
+        if (info.ArgCount < 2)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("MapCycleVoteExtend.Command.Notification.Usage"));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleVoteExtend.Command.Notification.Usage"));
+            }
+            return;
+        }
+        
+        
+        string arg1 = info.ArgByIndex(1);
+
+        if (!int.TryParse(arg1, out int count))
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("General.Notification.InvalidArgument.WithParam", arg1));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.InvalidArgument.WithParam", arg1));
+            }
+            return;
+        }
+
+
+        if (count < 1)
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole(LocalizeString("MapCycleVoteExtend.Command.Notification.CannotBeZeroOrNegative"));
+            }
+            else
+            {
+                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleVoteExtend.Command.Notification.CannotBeZeroOrNegative"));
+            }
+            return;
+        }
+        
+        _mcsInternalExtendVoteController.StartExtendVote(player, count);
+
+        string executorName = PlayerUtil.GetPlayerName(player);
+        Logger.LogInformation($"Admin {executorName} executed vote extend");
     }
     
     

@@ -19,6 +19,7 @@
     <PackageReference Include="CS2ScreenMenuAPI" Version="3.0.4" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
+    <PackageReference Include="NativeVoteAPI-CS2" Version="0.2.4" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" />
     <PackageReference Include="TNCSSPluginFoundation" Version="0.3.1" />
