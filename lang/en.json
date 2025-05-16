@@ -140,5 +140,18 @@
     "MapCycleExtend.ExtCommand.Notification.InCooldown.Verbose": "Ext is in cooldown {lime}{0}{default} seconds left",
     "MapCycleExtend.ExtCommand.Notification.Disabled": "!ext is disabled currently",
     "MapCycleExtend.ExtCommand.Notification.NotAllowed": "You are not allowed to use this command",
-    "MapCycleExtend.ExtCommand.Notification.NoExtsRemain": "No exts remaining"
+    "MapCycleExtend.ExtCommand.Notification.NoExtsRemain": "No exts remaining",
+    "MapCycleVoteExtend.Command.Notification.Usage": "Usage: !ve <minutes|rounds>",
+    "MapCycleVoteExtend.Command.Notification.CannotBeZeroOrNegative": "Extend time is cannot be zero or negative!",
+    "MapCycleVoteExtend.Command.Notification.AnotherVoteInProgress": "Another vote is in progress!",
+    "MapCycleVoteExtend.Command.Notification.FailedToInitiateVote": "Failed to initiate vote!",
+    "MapCycleVoteExtend.Vote.DetailsString.TimeLeft": "Extend a map time by {0} minutes?",
+    "MapCycleVoteExtend.Vote.DetailsString.Rounds": "Extend a round by {0} rounds?",
+    "MapCycleVoteExtend.Vote.DetailsString.RoundTime": "Extend a round time by {0} minutes?",
+    "MapCycleVoteExtend.Vote.Broadcast.VoteInitiated": "Extend vote initiated by {lime}{0}{default}!",
+    "MapCycleVoteExtend.Vote.Broadcast.VoteFailed": "{red}Vote failed{default}! Nothing extended!",
+    "MapCycleVoteExtend.Vote.Broadcast.Extended.TimeLeft": "{lime}Vote success{default}! Extended map time by {lime}{0}{default} minutes",
+    "MapCycleVoteExtend.Vote.Broadcast.Extended.Rounds": "{lime}Vote success{default}! Extended round by {lime}{0}{default} rounds",
+    "MapCycleVoteExtend.Vote.Broadcast.Extended.RoundTime": "{lime}Vote success{default}! Extended round time by {lime}{0}{default} minutes",
+    "MapCycleVoteExtend.Vote.Broadcast.ExtendFailed": "{red}Unknown error occured! Failed to extend a map!"
 }

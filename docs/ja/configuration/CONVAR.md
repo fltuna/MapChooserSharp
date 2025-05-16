@@ -24,6 +24,13 @@ ConVarのコンフィグファイルは `game/csgo/cfg/MapChooserSharp/convars.c
 |------------------------------|-----------------------|---------------|------------------|
 | mcs_ext_user_vote_threshold  | ユーザーによる延長を行うために必要な投票率 | 0.5           | 有効な範囲: 0.0 - 1.0 |
 
+## Map Cycle Extend Vote Controller
+
+| ConVar                            | Description         | Default Value | note               |
+|-----------------------------------|---------------------|---------------|--------------------|
+| mcs_vote_extend_success_threshold | 投票による延長を行うために必要な投票率 | 0.5           | 有効な範囲: 0.0 - 1.0   |
+| mcs_vote_extend_vote_time         | 投票終了まで何秒待つか         | 15.0          | 有効な範囲: 10.0 - 60.0 |
+
 ## Vote Controller
 
 | ConVar                               | Description                                                              | Default Value | note                                |

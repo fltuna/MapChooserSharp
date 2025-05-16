@@ -24,6 +24,13 @@ ConVar configuration file is located in `game/csgo/cfg/MapChooserSharp/convars.c
 |------------------------------|-----------------------------------------------------|---------------|---------------------------|
 | mcs_ext_user_vote_threshold  | How many percent to require extend a map by users?  | 0.5           | Valid Range is 0.0 - 1.0  |
 
+## Map Cycle Extend Vote Controller
+
+| ConVar                            | Description                                        | Default Value | note                       |
+|-----------------------------------|----------------------------------------------------|---------------|----------------------------|
+| mcs_vote_extend_success_threshold | How many percent to require extend a map by votes? | 0.5           | Valid Range is 0.0 - 1.0   |
+| mcs_vote_extend_vote_time         | How many seconds to wait vote ends                 | 15.0          | Valid Range is 10.0 - 60.0 |
+
 ## Vote Controller
 
 | ConVar                               | Description                                                                                                                               | Default Value | note                               |

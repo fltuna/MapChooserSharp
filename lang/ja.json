@@ -140,5 +140,18 @@
     "MapCycleExtend.ExtCommand.Notification.InCooldown.Verbose": "extは現在クールダウン中です。 残り {lime}{0}{default} 秒",
     "MapCycleExtend.ExtCommand.Notification.Disabled": "!ext は現在無効化されています",
     "MapCycleExtend.ExtCommand.Notification.NotAllowed": "投票は許可されていません",
-    "MapCycleExtend.ExtCommand.Notification.NoExtsRemain": "延長回数の上限に達しました"
+    "MapCycleExtend.ExtCommand.Notification.NoExtsRemain": "延長回数の上限に達しました",
+    "MapCycleVoteExtend.Command.Notification.Usage": "使い方: !ve <分|ラウンド>",
+    "MapCycleVoteExtend.Command.Notification.CannotBeZeroOrNegative": "延長時間は0とマイナスには設定できません!",
+    "MapCycleVoteExtend.Command.Notification.AnotherVoteInProgress": "現在他の投票が行われています!",
+    "MapCycleVoteExtend.Command.Notification.FailedToInitiateVote": "投票の初期化に失敗しました!",
+    "MapCycleVoteExtend.Vote.DetailsString.TimeLeft": "現在のマップを {0} 分延長しますか?",
+    "MapCycleVoteExtend.Vote.DetailsString.Rounds": "現在のマップを {0} ラウンド延長しますか?",
+    "MapCycleVoteExtend.Vote.DetailsString.RoundTime": "現在のラウンドを {0} 分延長しますか?",
+    "MapCycleVoteExtend.Vote.Broadcast.VoteInitiated": "{lime}{0}{default} により延長投票が開始されました!",
+    "MapCycleVoteExtend.Vote.Broadcast.VoteFailed": "投票が{red}否決{default}されました! 延長は行われません!",
+    "MapCycleVoteExtend.Vote.Broadcast.Extended.TimeLeft": "投票が{lime}可決{default}されました! 現在のマップが {lime}{0}{default} 分延長されました",
+    "MapCycleVoteExtend.Vote.Broadcast.Extended.Rounds": "投票が{lime}可決{default}されました! 現在のマップが {lime}{0}{default} ラウンド延長されました",
+    "MapCycleVoteExtend.Vote.Broadcast.Extended.RoundTime": "投票が{lime}可決{default}されました! 現在のラウンドが {lime}{0}{default} 分延長されました",
+    "MapCycleVoteExtend.Vote.Broadcast.ExtendFailed": "{red}不明なエラーが発生し延長に失敗しました!"
 }

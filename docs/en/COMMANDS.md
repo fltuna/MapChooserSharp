@@ -20,19 +20,20 @@
 ## For Admins
 
 
-| Command                                     | Description                       | note                                                                                        |
-|---------------------------------------------|-----------------------------------|---------------------------------------------------------------------------------------------|
-| css_setnextmap <MapName>                    | Set next map                      |                                                                                             |
-| css_removenextmap                           | Remove next map                   |                                                                                             |
-| css_setmapcooldown <MapName> <Cooldown>     | Set specified map's cooldown      |                                                                                             |
-| css_setgroupcooldown <GroupName> <Cooldown> | Set specified group's cooldown    |                                                                                             |
-| css_cancelvote                              | Cancel the current vote           |                                                                                             |
-| css_nominate_addmap [MapName]               | Insert a map to nomination        | If you don't specify the map name, then nomination menu will open.                          |
-| css_nominate_removemap [MapName]            | Remove a map from nomination      | If you don't specify the map name, and nominated map exists, then nomination menu will open |
-| css_enablertv                               | Enable RTV                        |                                                                                             |
-| css_disablertv                              | Disable RTV                       |                                                                                             |
-| css_forcertv                                | Force RTV                         |                                                                                             |
-| css_extend <time>                           | Extends a current map             | This extend command follows map time type.                                                  |
-| css_setext <count>                          | Set remaining `!ext` command uses |                                                                                             |
-| css_enableext                               | Enable `!ext` command use         |                                                                                             |
-| css_disableext                              | Disable `!ext` command use        |                                                                                             |
+| Command                                                | Description                       | note                                                                                        |
+|--------------------------------------------------------|-----------------------------------|---------------------------------------------------------------------------------------------|
+| css_setnextmap <MapName>                               | Set next map                      |                                                                                             |
+| css_removenextmap                                      | Remove next map                   |                                                                                             |
+| css_setmapcooldown <MapName> <Cooldown>                | Set specified map's cooldown      |                                                                                             |
+| css_setgroupcooldown <GroupName> <Cooldown>            | Set specified group's cooldown    |                                                                                             |
+| css_cancelvote                                         | Cancel the current vote           |                                                                                             |
+| css_nominate_addmap [MapName]                          | Insert a map to nomination        | If you don't specify the map name, then nomination menu will open.                          |
+| css_nominate_removemap [MapName]                       | Remove a map from nomination      | If you don't specify the map name, and nominated map exists, then nomination menu will open |
+| css_enablertv                                          | Enable RTV                        |                                                                                             |
+| css_disablertv                                         | Disable RTV                       |                                                                                             |
+| css_forcertv                                           | Force RTV                         |                                                                                             |
+| css_extend <time>                                      | Extends a current map             | This extend command follows map time type.                                                  |
+| css_ve <minutes/round>/ css_voteextend <minutes/round> | Starts a extend vote              | This extend command follows map time type.                                                  |
+| css_setext <count>                                     | Set remaining `!ext` command uses |                                                                                             |
+| css_enableext                                          | Enable `!ext` command use         |                                                                                             |
+| css_disableext                                         | Disable `!ext` command use        |                                                                                             |

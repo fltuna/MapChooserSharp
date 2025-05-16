@@ -72,9 +72,8 @@ public sealed class McsMapVoteCommands(IServiceProvider serviceProvider) : Plugi
             return;
         }
 
-        if (_mcsMapVoteController.CurrentVoteState != McsMapVoteState.Voting && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.RunoffVoting && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.Initializing)
+        if (_mcsMapVoteController.CurrentVoteState != McsMapVoteState.Voting && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.RunoffVoting && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.Initializing && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.Finalizing)
         {
-            Server.PrintToChatAll($"AA {_mcsMapVoteController.CurrentVoteState}");
             if (player == null)
             {
                 Server.PrintToConsole(LocalizeString("MapVote.Command.Notification.Revote.NoActiveVote"));
