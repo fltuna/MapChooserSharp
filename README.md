@@ -94,7 +94,10 @@ See [Commands Document](docs/en/COMMANDS.md)
 
 ### Dependency
 
+These dependencies are already packed in to `MapChooserSharp-osname-with-dependencies.zip`, so you don't need to download them manually.
+
 - [TNCSSPluginFoundation](https://github.com/fltuna/TNCSSPluginFoundation/releases/latest)
+- [NativeVoteAPI](https://github.com/fltuna/NativeVoteAPI-CS2/releases/latest)
 
 ### Optional Dependency
 

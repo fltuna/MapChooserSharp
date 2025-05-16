@@ -93,7 +93,10 @@ Map Configについては [Configドキュメント](docs/ja/configuration/MAP_C
 
 ### 必要な依存関係
 
+これらの依存関係は`MapChooserSharp-osname-with-dependencies.zip`に含まれているため手動でDLする必要はありません。
+
 - [TNCSSPluginFoundation](https://github.com/fltuna/TNCSSPluginFoundation/releases/latest)
+- [NativeVoteAPI](https://github.com/fltuna/NativeVoteAPI-CS2/releases/latest)
 
 ### 依存関係 (オプション)
 
