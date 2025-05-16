@@ -17,6 +17,10 @@ This plugin is supported `mp_maxrounds` and `mp_roundtime` based gamemode, such 
 
 ## Features
 
+### General
+
+- Full translation support (Except Native Vote UI)
+
 ### Map Vote
 
 - Basic map voting
@@ -51,7 +55,7 @@ This plugin is supported `mp_maxrounds` and `mp_roundtime` based gamemode, such 
 - User extend vote command with `!ext`
     - Admin command to manipulate `!ext` counts with `!setext <count>`
     - Admin command to toggle `!ext` command with `!enableext` and `!disableext`
-- Admin extend command with `!extend` and `!extendvote`(with native vote UI)
+- Admin extend command with `!extend` and `!voteextend`, `!ve` (with native vote UI)
 - Admin map cycle manipulation with `!setnextmap <MapName>` and `!removenextmap`
 - Automatic Detection of Map Time Type (See below for details)
 - Database cooldown management for Map and Group
