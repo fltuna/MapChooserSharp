@@ -112,6 +112,17 @@ jobs:
         run: |
           Copy-Item -Path "TNCSSPluginFoundation-Extracted\*" -Destination "artifacts-windows-x64-with-dependencies\" -Force -Recurse
           Copy-Item -Path "TNCSSPluginFoundation-Extracted\*" -Destination "artifacts-linux-x64-with-dependencies\" -Force  -Recurse
+
+      - name: NativeVoteAPI Download from GitHub
+        run: Invoke-WebRequest https://github.com/fltuna/NativeVoteAPI-CS2/releases/latest/download/NativeVoteAPI.zip -OutFile NativeVoteAPI.zip
+
+      - name: NativeVoteAPI Extract ZIP and put into artifacts
+        run: Expand-Archive -Path NativeVoteAPI.zip -DestinationPath NativeVoteAPI-Extracted\
+
+      - name: Copy NativeVoteAPI to with dependencies artifacts
+        run: |
+          Copy-Item -Path "NativeVoteAPI-Extracted\*" -Destination "artifacts-windows-x64-with-dependencies\" -Force -Recurse
+          Copy-Item -Path "NativeVoteAPI-Extracted\*" -Destination "artifacts-linux-x64-with-dependencies\" -Force  -Recurse
           
           
       - name: Compress artifacts
