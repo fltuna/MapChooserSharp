@@ -105,7 +105,7 @@ Groups can be used as follows:
 
 ```toml
 [ze_example_789]
-GroupSettings = ["Group1", "Group2", "Group3", ......]
+GroupSettings = ["Group1", "Group2", "Group3"]
 ```
 
 In this case, Group1 has the highest priority among Group settings, so it overwrites values applied by Group2 or Group3.
@@ -150,6 +150,31 @@ The following values are integrated rather than overwritten:
 - DisallowedSteamIds
 - Extra settings
 
+### 4-2. About Cooldown
+
+Cooldown settings are handled differently for maps and groups, and are applied separately.
+
+For example, let's say that `Group1` has a cooldown of `15`, and `ze_example_xyz` has a cooldown of `20`.
+
+And let's assume that `ze_example_xyz` and `ze_example_abc` belong to the same group.
+
+```toml
+[ze_example_xyz]
+Cooldown = 20
+GroupSettings = ["Group1"]
+
+[ze_example_abc]
+Cooldown = 0
+GroupSettings = ["Group1"]
+
+[MapChooserSharpSettings.Groups.Group1]
+Cooldown = 15
+```
+
+In this case, when `ze_example_xyz` is played, a cooldown of `15` is applied to the group, and a cooldown of `20` is applied to the map separately.
+
+And this group cooldown is also applied to other maps belonging to the same group. In this case, `ze_example_abc` is also affected by the group cooldown, which effectively gives it a cooldown of `15`.
+
 ---
 
 For example, let's say there are configs like these:
@@ -181,8 +206,8 @@ Map Setting
 ```toml
 [ze_example_xyz]
 MinPlayers = 40
-AllowedSteamIds = [000000]
-DisallowedSteamIds = [000000]
+AllowedSteamIds = [0]
+DisallowedSteamIds = [0]
 GroupSettings = ["Group1", "Group2"]
 
 [ze_example_xyz.extra.ExternalShop]
@@ -194,8 +219,8 @@ These will ultimately look like this:
 ```toml
 [ze_example_xyz]
 MinPlayers = 40
-AllowedSteamIds = [000000, 123012301230, 123456789]
-DisallowedSteamIds = [000000, 987654321]
+AllowedSteamIds = [0, 123012301230, 123456789]
+DisallowedSteamIds = [0, 987654321]
 
 [ze_example_xyz.extra.ExternalShop]
 cost = 10000

@@ -104,7 +104,7 @@ GroupSettings = ["Group1"]
 
 ```toml
 [ze_example_789]
-GroupSettings = ["Group1", "Group2", "Group3", ......]
+GroupSettings = ["Group1", "Group2", "Group3"]
 ```
 
 この際、Group設定の中ではGroup1が一番優先度が高いため、Group2やGroup3で適用された値を上書きします。
@@ -149,6 +149,31 @@ OnlyNomination = true
 - DisallowedSteamIds
 - Extra設定
 
+### 4-2. クールダウンについて
+
+クールダウンの設定は、マップとグループで別の扱いになっており、別々に適用されます。
+
+例えば、`Group1`のクールダウンが`15`で、`ze_example_xyz`のクールダウンが`20`だったとします。
+
+そして、`ze_example_xyz`と`ze_example_abc`が同じグループを持っていたとします。
+
+```toml
+[ze_example_xyz]
+Cooldown = 20
+GroupSettings = ["Group1"]
+
+[ze_example_abc]
+Cooldown = 0
+GroupSettings = ["Group1"]
+
+[MapChooserSharpSettings.Groups.Group1]
+Cooldown = 15
+```
+
+そうなると、`ze_example_xyz`がプレイされた際は、グループに対して`15`のクールダウンと、マップに対して`10`のクールダウンが別々に適用されます。
+
+そして、このグループのクールダウンは、他の同一グループに所属しているマップにも適用され、この場合は`ze_example_abc`もグループクールダウンの影響を受けるため、実質的に`15`のクールダウンを持つことになります。
+
 ---
 
 例えば、以下のようなコンフィグがあったとします。
@@ -180,8 +205,8 @@ cost = 999
 ```toml
 [ze_example_xyz]
 MinPlayers = 40
-AllowedSteamIds = [000000]
-DisallowedSteamIds = [000000]
+AllowedSteamIds = [0]
+DisallowedSteamIds = [0]
 GroupSettings = ["Group1", "Group2"]
 
 [ze_example_xyz.extra.ExternalShop]
@@ -193,8 +218,8 @@ cost = 10000
 ```toml
 [ze_example_xyz]
 MinPlayers = 40
-AllowedSteamIds = [000000, 123012301230, 123456789]
-DisallowedSteamIds = [000000, 987654321]
+AllowedSteamIds = [0, 123012301230, 123456789]
+DisallowedSteamIds = [0, 987654321]
 
 [ze_example_xyz.extra.ExternalShop]
 cost = 10000
