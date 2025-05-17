@@ -208,6 +208,10 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             // If map is already added to voting maps
             if (!unusedMapPool.TryGetValue(mapName, out var mapConfig))
                 return;
+            
+            // If there is no slot to add maps, then skip it.
+            if (maxMenuElements - mapsToVote.Count <= 0)
+                return;
 
             string menuName = _mcsInternalMapConfigProviderApi.GetMapName(mapConfig);
 
