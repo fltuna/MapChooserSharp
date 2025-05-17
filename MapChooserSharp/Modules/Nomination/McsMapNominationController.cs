@@ -67,6 +67,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         _mcsEventManager.RegisterEventHandler<McsMapExtendEvent>(OnMapExtended);
         
         Plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);
+        Plugin.RegisterListener<Listeners.OnClientDisconnect>(OnClientDisconnect);
     }
 
     protected override void OnUnloadModule()
@@ -110,6 +111,15 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     private void OnMapStart(string mapName)
     {
         ResetNominations();
+    }
+
+
+    private void OnClientDisconnect(int slot)
+    {
+        foreach (IMcsNominationData data in NominatedMaps.Values)
+        {
+            data.NominationParticipants.Remove(slot);
+        }
     }
     
 
