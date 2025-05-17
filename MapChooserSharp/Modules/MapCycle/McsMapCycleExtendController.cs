@@ -43,14 +43,14 @@ internal class McsMapCycleExtendController(IServiceProvider serviceProvider, boo
     
     private readonly HashSet<int> _extCommandVoteParticipants = new();
 
-    public int UserExtsRemaining { get; private set; }
+    public int ExtUsageRemaining { get; private set; }
 
-    public void SetUserExtsRemaining(int userExtsRemaining)
+    public void SetExtUsageRemaining(int userExtsRemaining)
     {
         if (userExtsRemaining < 0)
             return;
 
-        UserExtsRemaining = userExtsRemaining;
+        ExtUsageRemaining = userExtsRemaining;
         ExtCommandStatus = ExtStatus.Enabled;
     }
 
@@ -119,7 +119,7 @@ internal class McsMapCycleExtendController(IServiceProvider serviceProvider, boo
         if (ExtCommandStatus == ExtStatus.InCooldown)
             return PlayerExtResult.CommandInCooldown;
 
-        if (ExtCommandStatus == ExtStatus.ReachedLimit || UserExtsRemaining <= 0)
+        if (ExtCommandStatus == ExtStatus.ReachedLimit || ExtUsageRemaining <= 0)
             return PlayerExtResult.ReachedLimit;
             
         if (!_extCommandVoteParticipants.Add(player.Slot))
@@ -184,7 +184,7 @@ internal class McsMapCycleExtendController(IServiceProvider serviceProvider, boo
             
         // Ignore status return value, because shouldn't be failed.
         ExtendCurrentMap(timesToExtend);
-        UserExtsRemaining--;
+        ExtUsageRemaining--;
 
         switch (extendType)
         {
@@ -204,14 +204,14 @@ internal class McsMapCycleExtendController(IServiceProvider serviceProvider, boo
         ResetExtCmdStatus();
             
             
-        if (UserExtsRemaining <= 0)
+        if (ExtUsageRemaining <= 0)
         {
             ExtCommandStatus = ExtStatus.ReachedLimit;
             PrintLocalizedChatToAll("MapCycleExtend.ExtCommand.Broadcast.MapExtended.NoExtsRemain");
         }
         else
         {
-            PrintLocalizedChatToAll("MapCycleExtend.ExtCommand.Broadcast.MapExtended.ExtsRemain", UserExtsRemaining);
+            PrintLocalizedChatToAll("MapCycleExtend.ExtCommand.Broadcast.MapExtended.ExtsRemain", ExtUsageRemaining);
         }
     }
 
@@ -251,7 +251,7 @@ internal class McsMapCycleExtendController(IServiceProvider serviceProvider, boo
         return McsMapCycleExtendResult.FailedToExtend;
     }
 
-    public void EnablePlayerExtendCommand(CCSPlayerController? player = null, bool silently = false)
+    public void EnablePlayerExtCommand(CCSPlayerController? player = null, bool silently = false)
     {
         ExtCommandStatus = ExtStatus.Enabled;
         
@@ -263,7 +263,7 @@ internal class McsMapCycleExtendController(IServiceProvider serviceProvider, boo
         Logger.LogInformation($"Admin {executorName} is enabled !ext command");
     }
 
-    public void DisablePlayerExtendCommand(CCSPlayerController? player = null, bool silently = false)
+    public void DisablePlayerExtCommand(CCSPlayerController? player = null, bool silently = false)
     {
         ExtCommandStatus = ExtStatus.Disabled;
         
@@ -297,11 +297,11 @@ internal class McsMapCycleExtendController(IServiceProvider serviceProvider, boo
 
         if (currentMap != null)
         {
-            UserExtsRemaining = currentMap.MaxExtCommandUses;
+            ExtUsageRemaining = currentMap.MaxExtCommandUses;
         }
         else
         {
-            UserExtsRemaining = _pluginConfigProvider.PluginConfig.MapCycleConfig.FallbackMaxExtCommandUses;
+            ExtUsageRemaining = _pluginConfigProvider.PluginConfig.MapCycleConfig.FallbackMaxExtCommandUses;
         }
     }
 }

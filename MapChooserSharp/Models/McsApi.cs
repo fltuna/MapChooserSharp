@@ -11,6 +11,8 @@ namespace MapChooserSharp.Models;
 public sealed class McsApi(
     IMcsEventSystem eventSystem,
     IMcsMapCycleControllerApi mcsMapCycleController,
+    IMcsMapCycleExtendControllerApi mcsMapCycleExtendController,
+    IMcsMapCycleExtendVoteControllerApi mcsMapCycleExtendVoteController,
     IMcsNominationApi mcsNominationApi,
     IMcsMapVoteControllerApi mcsMapVoteControllerApi,
     IMcsRtvControllerApi mcsRtvControllerApi,
@@ -18,6 +20,8 @@ public sealed class McsApi(
 {
     public IMcsEventSystem EventSystem { get; } = eventSystem;
     public IMcsMapCycleControllerApi McsMapCycleController { get; } = mcsMapCycleController;
+    public IMcsMapCycleExtendControllerApi McsMapCycleExtendController { get; } = mcsMapCycleExtendController;
+    public IMcsMapCycleExtendVoteControllerApi McsMapCycleExtendVoteController { get; } = mcsMapCycleExtendVoteController;
     public IMcsNominationApi McsNominationApi { get; } = mcsNominationApi;
     public IMcsMapVoteControllerApi McsMapVoteControllerApi { get; } = mcsMapVoteControllerApi;
     public IMcsRtvControllerApi McsRtvControllerApi { get; } = mcsRtvControllerApi;

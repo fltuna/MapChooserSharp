@@ -188,28 +188,42 @@ EventはAPIの[Eventsパッケージ](../../../MapChooserSharp.API/Events) に�
 
 ## MapCycle Controller APIを活用する
 
-Map Cycle Controllerでは次のマップの変更や、次のマップへの移動、残りの延長回数等を取得することができます。
+Map Cycle Controllerでは、次のマップの変更や、次のマップへの移動、残りの延長回数等を取得することができます。
 
 詳細は [IMcsMapCycleControllerApi.cs](../../../MapChooserSharp.API/MapCycleController/IMcsMapCycleControllerApi.cs) を確認してください。
 
 
+## MapCycle Extend Controller APIを活用する
+
+MapCycle Extend Controllerでは、現在のマップの延長、`!ext`コマンドの使用可能回数の入手, 変更、 そして`!ext`コマンドの使用制限をかけることが可能です。
+
+詳細は [IMcsMapCycleExtendControllerApi.cs](../../../MapChooserSharp.API/MapCycleController/IMcsMapCycleExtendControllerApi.cs) を確認してください。
+
+
+## MapCycle Extend Vote Controller APIを活用する
+
+MapCycle Extend Vote Controllerでは、 CS2の投票UIを使用して延長投票を開始することができます。
+
+詳細は [IMcsMapCycleExtendVoteControllerApi.cs](../../../MapChooserSharp.API/MapCycleController/IMcsMapCycleExtendVoteControllerApi.cs) を確認してください。
+
+
 ## MapVote Controller APIを活用する
 
-MapVote Controller APIでは投票の開始、キャンセル等を行うことができます。
+MapVote Controller APIでは、投票の開始、キャンセル等を行うことができます。
 
 詳細は [IMcsMapVoteControllerApi.cs](../../../MapChooserSharp.API/MapVoteController/IMcsMapVoteControllerApi.cs) を確認してください。
 
 
 ## Nomination APIを活用する
 
-Nomination APIではノミネートされたマップの確認、マップのノミネート、ノミネートの削除等が行えます。
+Nomination APIでは、ノミネートされたマップの確認、マップのノミネート、ノミネートの削除等が行えます。
 
 詳細は [IMcsNominationApi.cs](../../../MapChooserSharp.API/Nomination/IMcsNominationApi.cs) を確認してください。
 
 
 ## RTV Controller API を活用する
 
-RTV Controller APIではプレイヤーをRTVに参加させたり、FoceRTV等を行うことができます。
+RTV Controller APIでは、プレイヤーをRTVに参加させたり、FoceRTV等を行うことができます。
 
 詳細は [IMcsRtvControllerApi.cs](../../../MapChooserSharp.API/RtvController/IMcsRtvControllerApi.cs) を確認してください。
 
