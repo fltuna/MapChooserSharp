@@ -149,31 +149,6 @@ OnlyNomination = true
 - DisallowedSteamIds
 - Extra設定
 
-### 4-2. クールダウンについて
-
-クールダウンの設定は、マップとグループで別の扱いになっており、別々に適用されます。
-
-例えば、`Group1`のクールダウンが`15`で、`ze_example_xyz`のクールダウンが`20`だったとします。
-
-そして、`ze_example_xyz`と`ze_example_abc`が同じグループを持っていたとします。
-
-```toml
-[ze_example_xyz]
-Cooldown = 20
-GroupSettings = ["Group1"]
-
-[ze_example_abc]
-Cooldown = 0
-GroupSettings = ["Group1"]
-
-[MapChooserSharpSettings.Groups.Group1]
-Cooldown = 15
-```
-
-そうなると、`ze_example_xyz`がプレイされた際は、グループに対して`15`のクールダウンと、マップに対して`10`のクールダウンが別々に適用されます。
-
-そして、このグループのクールダウンは、他の同一グループに所属しているマップにも適用され、この場合は`ze_example_abc`もグループクールダウンの影響を受けるため、実質的に`15`のクールダウンを持つことになります。
-
 ---
 
 例えば、以下のようなコンフィグがあったとします。
@@ -230,6 +205,32 @@ cost = 999
 [ze_example_xyz.extra.extra.shop]
 cost = 100
 ```
+
+### 4-2. クールダウンについて
+
+クールダウンの設定は、マップとグループで別の扱いになっており、別々に適用されます。
+
+例えば、`Group1`のクールダウンが`15`で、`ze_example_xyz`のクールダウンが`20`だったとします。
+
+そして、`ze_example_xyz`と`ze_example_abc`が同じグループを持っていたとします。
+
+```toml
+[ze_example_xyz]
+Cooldown = 20
+GroupSettings = ["Group1"]
+
+[ze_example_abc]
+Cooldown = 0
+GroupSettings = ["Group1"]
+
+[MapChooserSharpSettings.Groups.Group1]
+Cooldown = 15
+```
+
+そうなると、`ze_example_xyz`がプレイされた際は、グループに対して`15`のクールダウンと、マップに対して`10`のクールダウンが別々に適用されます。
+
+そして、このグループのクールダウンは、他の同一グループに所属しているマップにも適用され、この場合は`ze_example_abc`もグループクールダウンの影響を受けるため、実質的に`15`のクールダウンを持つことになります。
+
 
 このような仕組みでMapChooserSharpはコンフィグの柔軟性を実現しています。
 
