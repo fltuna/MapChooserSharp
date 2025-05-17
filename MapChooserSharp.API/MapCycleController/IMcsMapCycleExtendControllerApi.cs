@@ -15,13 +15,13 @@ public interface IMcsMapCycleExtendControllerApi
     /// <summary>
     /// How many user exts remaining in this map
     /// </summary>
-    public int UserExtsRemaining { get; }
+    public int ExtUsageRemaining { get; }
     
     /// <summary>
     /// Set remainig ext count
     /// </summary>
     /// <param name="userExtsRemaining">exts count to set</param>
-    public void SetUserExtsRemaining(int userExtsRemaining);
+    public void SetExtUsageRemaining(int userExtsRemaining);
     
     /// <summary>
     /// Extends a current map by specified time.
@@ -43,12 +43,12 @@ public interface IMcsMapCycleExtendControllerApi
     /// </summary>
     /// <param name="player">Player who enabled. it will treated as CONSOLE when null</param>
     /// <param name="silently">if true, change is not notified to players.</param>
-    public void EnablePlayerExtendCommand(CCSPlayerController? player = null, bool silently = false);
+    public void EnablePlayerExtCommand(CCSPlayerController? player = null, bool silently = false);
 
     /// <summary>
     /// Disables player !ext command
     /// </summary>
     /// <param name="player">Player who disabled. it will treated as CONSOLE when null</param>
     /// <param name="silently">if true, change is not notified to players.</param>
-    public void DisablePlayerExtendCommand(CCSPlayerController? player = null, bool silently = false);
+    public void DisablePlayerExtCommand(CCSPlayerController? player = null, bool silently = false);
 }

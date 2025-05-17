@@ -181,9 +181,11 @@ For cancellable type events, if cancelled, all subsequent tasks are cancelled, s
 
 To avoid confusing players, always make sure to notify the player when cancelling.
 
+
 ### How to Find Events
 
 Events are stored in the API's [Events package](../../../MapChooserSharp.API/Events), so please look there.
+
 
 ## Utilizing the MapCycle Controller API
 
@@ -191,17 +193,34 @@ With the Map Cycle Controller, you can change the next map, move to the next map
 
 For details, please check [IMcsMapCycleControllerApi.cs](../../../MapChooserSharp.API/MapCycleController/IMcsMapCycleControllerApi.cs).
 
+
+## Utilizing the MapCycle Extend Controller API
+
+With the MapCycle Extend Controller, you can Extend a current map, and change and get `!ext` command remaining counts. Also, can toggle `!ext` command usage,
+
+For details, please check [IMcsMapCycleExtendControllerApi.cs](../../../MapChooserSharp.API/MapCycleController/IMcsMapCycleExtendControllerApi.cs).
+
+
+## Utilizing the MapCycle Extend Vote Controller API
+
+With the MapCycle Extend Vote Controller, you can start extend vote with using CS2's Native Vote UI.
+
+For details, please check [IMcsMapCycleExtendVoteControllerApi.cs](../../../MapChooserSharp.API/MapCycleController/IMcsMapCycleExtendVoteControllerApi.cs).
+
+
 ## Utilizing the MapVote Controller API
 
 With the MapVote Controller API, you can start, cancel, etc. votes.
 
 For details, please check [IMcsMapVoteControllerApi.cs](../../../MapChooserSharp.API/MapVoteController/IMcsMapVoteControllerApi.cs).
 
+
 ## Utilizing the Nomination API
 
 With the Nomination API, you can check nominated maps, nominate maps, delete nominations, etc.
 
 For details, please check [IMcsNominationApi.cs](../../../MapChooserSharp.API/Nomination/IMcsNominationApi.cs).
+
 
 ## Utilizing the RTV Controller API
 

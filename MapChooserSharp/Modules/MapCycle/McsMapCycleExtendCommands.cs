@@ -110,26 +110,26 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
     [RequiresPermissions("css/map")]
     private void CommandEnableExt(CCSPlayerController? player, CommandInfo info)
     {
-        if (_mcsInternalMapCycleExtendController.UserExtsRemaining <= 0)
+        if (_mcsInternalMapCycleExtendController.ExtUsageRemaining <= 0)
         {
             NotifyNoExtsLeft(player);
             return;
         }
         
-        _mcsInternalMapCycleExtendController.EnablePlayerExtendCommand(player);
+        _mcsInternalMapCycleExtendController.EnablePlayerExtCommand(player);
     }
 
 
     [RequiresPermissions("css/map")]
     private void CommandDisableExt(CCSPlayerController? player, CommandInfo info)
     {
-        if (_mcsInternalMapCycleExtendController.UserExtsRemaining <= 0)
+        if (_mcsInternalMapCycleExtendController.ExtUsageRemaining <= 0)
         {
             NotifyNoExtsLeft(player);
             return;
         }
         
-        _mcsInternalMapCycleExtendController.DisablePlayerExtendCommand(player);
+        _mcsInternalMapCycleExtendController.DisablePlayerExtCommand(player);
     }
 
     [RequiresPermissions("css/root")]
@@ -275,7 +275,7 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
         }
 
 
-        _mcsInternalMapCycleExtendController.SetUserExtsRemaining(count);
+        _mcsInternalMapCycleExtendController.SetExtUsageRemaining(count);
 
         string executorName = PlayerUtil.GetPlayerName(player);
         

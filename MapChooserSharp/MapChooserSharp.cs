@@ -113,10 +113,12 @@ public sealed class MapChooserSharp: TncssPluginBase
         var rtvApi = provider.GetRequiredService<IMcsInternalRtvControllerApi>();
         var eventManager = provider.GetRequiredService<IMcsInternalEventManager>();
         var mcsMapCycle = provider.GetRequiredService<IMcsInternalMapCycleControllerApi>();
+        var mcsMapCycleExtend = provider.GetRequiredService<IMcsInternalMapCycleExtendControllerApi>();
+        var mcsMapCycleVoteExtend = provider.GetRequiredService<IMcsInternalMapCycleExtendVoteControllerApi>();
         var mcsMapConfig = provider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         
         
-        var mcsApi = new McsApi(eventManager, mcsMapCycle, nominationApi, mapVoteApi, rtvApi, mcsMapConfig);
+        var mcsApi = new McsApi(eventManager, mcsMapCycle, mcsMapCycleExtend, mcsMapCycleVoteExtend, nominationApi, mapVoteApi, rtvApi, mcsMapConfig);
         
         Capabilities.RegisterPluginCapability(IMapChooserSharpApi.Capability, () => mcsApi);
     }

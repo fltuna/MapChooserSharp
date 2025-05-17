@@ -29,6 +29,16 @@ public interface IMapChooserSharpApi
     public IMcsMapCycleControllerApi McsMapCycleController { get; }
     
     /// <summary>
+    /// MapCycleExtendController API, You can manipulate map extend system
+    /// </summary>
+    public IMcsMapCycleExtendControllerApi McsMapCycleExtendController { get; }
+    
+    /// <summary>
+    /// McsMapCycleExtendVoteController API, You can manipulate vote map extend system
+    /// </summary>
+    public IMcsMapCycleExtendVoteControllerApi McsMapCycleExtendVoteController { get; }
+    
+    /// <summary>
     /// Nomination API, You can manipulate nomination system
     /// </summary>
     public IMcsNominationApi McsNominationApi { get; }
