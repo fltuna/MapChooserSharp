@@ -343,9 +343,9 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
             return HookResult.Continue;
         
 
-        ConVar? mp_round_restart_delay = ConVar.Find("mp_round_restart_delay");
+        ConVar? mp_competitive_endofmatch_extra_time = ConVar.Find("mp_competitive_endofmatch_extra_time");
 
-        float delay = mp_round_restart_delay?.GetPrimitiveValue<float>() ?? DefaultRoundRestartDelay;
+        float delay = mp_competitive_endofmatch_extra_time?.GetPrimitiveValue<float>() ?? DefaultRoundRestartDelay;
         
         ChangeToNextMap(delay-1);
         
