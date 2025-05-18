@@ -999,7 +999,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         {
             foreach (CCSPlayerController cl in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
             {
-                cl.PrintToChat(LocalizeWithPluginPrefixForPlayer(cl, "MapVote.Broadcast.VoteCast", player.PlayerName, GetMapName(votedMap, player).ToString()));
+                cl.PrintToChat(LocalizeWithPluginPrefixForPlayer(cl, "MapVote.Broadcast.VoteCast", player.PlayerName, GetMapName(votedMap, cl).ToString()));
             }
         }
         
