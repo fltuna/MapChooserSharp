@@ -59,7 +59,7 @@ This plugin is supported `mp_maxrounds` and `mp_roundtime` based gamemode, such 
 - Admin map cycle manipulation with `!setnextmap <MapName>` and `!removenextmap`
 - Automatic Detection of Map Time Type (See below for details)
 - Database cooldown management for Map and Group
-  - Databases currently supports: SQLite
+  - Databases currently supports: SQLite, MySQL, PostgreSQL
 - Admin cooldown manipulation command `!setmapcooldown`, `!setgroupcooldown`
 
 ### Abundant Customization Options
