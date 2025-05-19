@@ -39,6 +39,7 @@
     "Nomination.Notification.Failure.SpectatorsCannotNominate": "このサーバーは観戦状態でのノミネートを禁止しています",
     "Nomination.Notification.Failure.SameMap": "現在プレイ中のマップをノミネートすることはできません!",
     "Nomination.Notification.Failure.Generic.WithMapName": "{lime}{0}{default} のノミネートに失敗しました",
+    "Nomination.Notification.Failure.GroupLimitReached": "同一グループのノミネート制限に達しました! {lime}{0}{default} マップまでが同一グループのマップをノミネート可能な範囲です",
     "Nomination.Notification.Failure.NotEnoughPermission": "{lime}{0}{default} をノミネートするための権限が足りません",
     "Nomination.Notification.Failure.TooMuchPlayers": "{lime}{0}{default} をノミネートするには人数が多すぎます! (現在: {1} > {2})",
     "Nomination.Notification.Failure.NotEnoughPlayers": "{lime}{0}{default} をノミネートするには人数が足りません! (現在: {1} < {2})",

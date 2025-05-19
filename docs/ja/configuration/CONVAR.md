@@ -49,6 +49,12 @@ ConVarのコンフィグファイルは `game/csgo/cfg/MapChooserSharp/convars.c
 | mcs_nomination_command_cooldown            | ノミネートコマンドのクールダウン | 10.0          | Specify with seconds |
 | mcs_nomination_command_prevent_spectators  | 観戦者のノミネートを禁止するか  | false         |                      |
 
+## Nomination Controller
+
+| ConVar                          | Description                                | Default Value | note |
+|---------------------------------|--------------------------------------------|---------------|------|
+| mcs_nomination_per_group_limit  | 同一グループに所属しているマップの同時zノミネート可能な数を制限します。 0で無効化 | 0             |      |
+
 ## RTV Controller
 
 | ConVar                                         | Description                          | Default Value | note                         |

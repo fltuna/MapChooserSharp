@@ -49,6 +49,12 @@ ConVar configuration file is located in `game/csgo/cfg/MapChooserSharp/convars.c
 | mcs_nomination_command_cooldown            | Cooldown for nomination command | 10.0          | Specify with seconds |
 | mcs_nomination_command_prevent_spectators  | Prevent spectators nomination   | false         |                      |
 
+## Nomination Controller
+
+| ConVar                          | Description                                                                                              | Default Value | note |
+|---------------------------------|----------------------------------------------------------------------------------------------------------|---------------|------|
+| mcs_nomination_per_group_limit  | Maximum number of maps that can be nominated from the same group. Set to 0 to disable group limitations  | 0             |      |
+
 ## RTV Controller
 
 | ConVar                                         | Description                                                                         | Default Value | note                        |

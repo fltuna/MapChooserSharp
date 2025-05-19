@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.Events;
@@ -40,8 +41,12 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     private IMcsNominationMenuProvider _mcsNominationMenuProvider = null!;
     private IMcsInternalMapCycleControllerApi _mcsMapCycleController = null!;
     
-    private readonly Dictionary<int, IMcsNominationUserInterface> _mcsActiveUserNominationMenu = new();
     
+
+    public readonly FakeConVar<int> PerGroupNominationLimit = new("mcs_nomination_per_group_limit", "Maximum number of maps that can be nominated from the same group. Set to 0 to disable group limitations.", 0);
+    
+    
+    private readonly Dictionary<int, IMcsNominationUserInterface> _mcsActiveUserNominationMenu = new();
     
     public Dictionary<string, IMcsNominationData> NominatedMaps { get; } = new();
 
@@ -356,6 +361,9 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             if (nominated.IsForceNominated)
                 return NominationCheck.NominatedByAdmin;
         }
+
+        if (IsReachedGroupNominationLimit(mapConfig))
+            return NominationCheck.GroupNominationLimitReached;
         
         if (_mcsMapVoteController.CurrentVoteState != McsMapVoteState.NoActiveVote)
             return NominationCheck.DisabledAtThisTime;
@@ -463,6 +471,10 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             case NominationCheck.SameMap:
                 player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.SameMap"));
                 return false;
+            
+            case NominationCheck.GroupNominationLimitReached:
+                player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.GroupLimitReached", PerGroupNominationLimit.Value));
+                return false;
         }
         
         return false;
@@ -482,6 +494,34 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         }
 
         return highestCooldown;
+    }
+
+    private bool IsReachedGroupNominationLimit(IMapConfig mapConfig)
+    {
+        if (PerGroupNominationLimit.Value == 0)
+            return false;
+
+        Dictionary<string, int> groupsNominatedCount = new(StringComparer.OrdinalIgnoreCase);
+        foreach (IMcsNominationData data in NominatedMaps.Values)
+        {
+            foreach (IMapGroupSettings groupSetting in data.MapConfig.GroupSettings)
+            {
+                if (!groupsNominatedCount.TryGetValue(groupSetting.GroupName, out int count))
+                {
+                    groupsNominatedCount.Add(groupSetting.GroupName, 0);
+                }
+                
+                groupsNominatedCount[groupSetting.GroupName]++;
+            }
+        }
+        
+        foreach (IMapGroupSettings groupSetting in mapConfig.GroupSettings)
+        {
+            if (groupsNominatedCount[groupSetting.GroupName] >= PerGroupNominationLimit.Value)
+                return true;
+        }
+        
+        return false;
     }
     
     private void ResetNominations()
@@ -504,5 +544,6 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         AlreadyNominated,
         NominatedByAdmin,
         SameMap,
+        GroupNominationLimitReached,
     }
 }
