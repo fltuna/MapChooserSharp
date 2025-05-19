@@ -15,6 +15,14 @@ This plugin is mainly intended for `mp_timelimit` based gamemode, such as Zombie
 
 This plugin is supported `mp_maxrounds` and `mp_roundtime` based gamemode, such as surf, TTT, etc... But there is no gurantee to work properly.
 
+
+## Special Thanks
+
+- [Lupercalia Server](https://steamcommunity.com/groups/lupercalia) (ZombieEscape/Minigame) - for a lot of live testing.
+
+- [Spitice](https://github.com/spitice) - for vote controller code contribution
+- [Uru](https://github.com/2vg) - for hunting bugs
+
 ## Features
 
 ### General

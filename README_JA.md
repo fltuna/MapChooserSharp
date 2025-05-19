@@ -14,6 +14,13 @@ CounterStrikeSharpで実装された強力なAPIとカスタマイズ性を備�
 
 このプラグインは、SurfやTTTのような`mp_maxrounds` と `mp_roundtime`のゲームモードもサポートしていますが、動作の保証はありません。
 
+## Special Thanks
+
+- [Lupercalia Server](https://steamcommunity.com/groups/lupercalia) (ZombieEscape/Minigame) - 64人等、実際のサーバー環境でのテスト
+
+- [Spitice](https://github.com/spitice) - 投票コントローラーの一部コード提供
+- [Uru](https://github.com/2vg) - バグの発見
+
 ## 機能
 
 ### 全般
