@@ -6,6 +6,7 @@ using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Cvars.Validators;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Timers;
+using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.Events.MapCycle;
 using MapChooserSharp.API.Events.MapVote;
 using MapChooserSharp.API.MapConfig;
@@ -121,6 +122,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
 
     public int MaxVoteMenuElements => _mcsPluginConfigProvider.PluginConfig.VoteConfig.MaxMenuElements;
+    public readonly FakeConVar<bool> ExcludeSpectatorsFromVote = new("mcs_vote_exclude_spectators", "Should exclude spectators from vote?", false);
+    
     public readonly FakeConVar<bool> ShouldShuffleVoteMenu = new("mcs_vote_shuffle_menu", "Should vote menu elements is shuffled per player?", false);
     
     public readonly FakeConVar<float> MapVoteEndTime = new("mcs_vote_end_time", "How long to take vote ends in seconds?", 15.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(5.0F, 120.0F));
@@ -137,6 +140,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
     private void TrackVoteSettingsConVar()
     {
+        TrackConVar(ExcludeSpectatorsFromVote);
         TrackConVar(ShouldShuffleVoteMenu);
         TrackConVar(MapVoteEndTime);
         TrackConVar(VoteStartCountDownTime);
@@ -284,7 +288,19 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
 
         DebugLogger.LogDebug("Collecting possible vote participates");
-        HashSet<int> voteParticipants = Utilities.GetPlayers().Where(p => p is { IsHLTV: false, IsBot: false }).Select(p => p.Slot).ToHashSet();
+        List<CCSPlayerController> voteParticipantsCandinate = Utilities.GetPlayers().Where(p => p is { IsHLTV: false, IsBot: false }).ToList();
+
+        foreach (CCSPlayerController controller in voteParticipantsCandinate.ToList())
+        {
+            if (controller.Team == CsTeam.Spectator || controller.Team == CsTeam.None)
+            {
+                controller.PrintToChat(LocalizeWithPluginPrefixForPlayer(controller, "MapVote.Notification.SpectatorIsExcluded"));
+                voteParticipantsCandinate.Remove(controller);
+            }
+        }
+
+        HashSet<int> voteParticipants = voteParticipantsCandinate.Select(p => p.Slot).ToHashSet();
+        
         DebugLogger.LogDebug($"Possible participants count: {voteParticipants.Count}");
         
 

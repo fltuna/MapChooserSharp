@@ -71,6 +71,7 @@
     "MapVote.Broadcast.Voting.VoteEndCountdown.Html": "{0} sec",
     "MapVote.Menu.MenuTitleWithCountDown.Html": "Map Vote | {0} seconds remaining",
     "MapVote.Command.Notification.Revote.NoActiveVote": "There is no active vote!",
+    "MapVote.Notification.SpectatorIsExcluded": "This server has disabled vote while in spectator, so you cannot participate this vote!",
     "MapVote.Broadcast.Countdown": "Vote starting in {lime}{0}{default} seconds",
     "MapVote.Broadcast.CenterHtml": "Vote starting in {0} seconds",
     "MapVote.Broadcast.NotEnoughMapsToStartVote": "There is no enough maps to initiate vote! please contact to server admin!",

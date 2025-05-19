@@ -73,6 +73,7 @@
     "MapVote.Broadcast.Countdown": "投票が {lime}{0}{default} 秒で始まります",
     "MapVote.Broadcast.CenterHtml": "投票が {0} 秒で始まります",
     "MapVote.Command.Notification.Revote.NoActiveVote": "現在投票は行われていません!",
+    "MapVote.Notification.SpectatorIsExcluded": "観戦者の投票がサーバーにより無効化されているため、この投票には参加できません!",
     "MapVote.Broadcast.NotEnoughMapsToStartVote": "マップ投票を開始するために十分なマップが存在しません! サーバー管理者にお問い合わせください!",
     "MapVote.Broadcast.VoteFinished": "投票が完了しました! {1}/{0} ({2}%)",
     "MapVote.Broadcast.VoteCast": "{lime}{0}{default} が {lime}{1}{default} に投票しました",
