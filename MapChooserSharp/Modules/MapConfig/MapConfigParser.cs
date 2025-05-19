@@ -53,10 +53,10 @@ internal class MapConfigParser(string configPath)
         
         TomlTable toml = Toml.ToModel(configText);
         
-        // 1. まずDefault設定を読み込む
+        
         NullableMapConfig? defaultConfig = null;
         
-        // TomlTableの階層構造にアクセス
+        
         if (toml.TryGetValue("MapChooserSharpSettings", out var defaultSettingsObj) && defaultSettingsObj is TomlTable defaultSettings)
         {
             if (defaultSettings.TryGetValue("Default", out var defaultObj) && defaultObj is TomlTable defaultTable)
@@ -66,7 +66,7 @@ internal class MapConfigParser(string configPath)
             }
         }
         
-        // 2. Default設定が存在するか、および必須フィールドが設定されているかを検証
+        
         if (defaultConfig == null)
         {
             throw new InvalidOperationException("Default settings section is missing");
@@ -74,11 +74,11 @@ internal class MapConfigParser(string configPath)
         
         VerifyRequiredDefaultSettings(defaultConfig);
         
-        // 3. Default設定が正しく設定されていた場合のみ、グループとマップコンフィグの処理に進む
+        
         Dictionary<string, NullableMapConfig> groupConfigs = new Dictionary<string, NullableMapConfig>();
         Dictionary<string, IMapGroupSettings> groupSettings = new Dictionary<string, IMapGroupSettings>();
         
-        // グループ設定を処理
+        // process group settings
         if (toml.TryGetValue("MapChooserSharpSettings", out var groupSettingsObj) && groupSettingsObj is TomlTable groupSection)
         {
             if (groupSection.TryGetValue("Groups", out var groupsObj) && groupsObj is TomlTable groups)
@@ -104,12 +104,12 @@ internal class MapConfigParser(string configPath)
             }
         }
         
-        // マップ設定を処理
+        // process map settings
         Dictionary<string, NullableMapConfig> mapConfigs = new Dictionary<string, NullableMapConfig>();
         
         foreach (var (key, value) in toml)
         {
-            // MapChooserSharpSettings は特別な設定セクションなのでスキップ
+            // Skip MapChooserSharpSettings because spectial settings
             if (key == "MapChooserSharpSettings")
             {
                 continue;
@@ -145,9 +145,17 @@ internal class MapConfigParser(string configPath)
                     DaysAllowed = defaultConfig.DaysAllowed?.ToList(),
                     AllowedTimeRanges = defaultConfig.AllowedTimeRanges?.ToList()
                 };
+
+
+                NullableMapConfig actualMapConfig = new NullableMapConfig();
                 
-                // Parse map-specific settings
+                
+                // HACK: Parsed map config 2 times to create actual map config value for map settings override after group settings is applied.
+                // HACK: But this is so redulant and inefficient, We need fix this in the future.
                 ParseTomlTable(mapTable, mapConfig);
+                // Create actual map config cache for value override after group settings loaded.
+                ParseTomlTable(mapTable, actualMapConfig);
+                
                 
                 // Apply group settings if specified
                 if (mapConfig.GroupSettingsArray != null && mapConfig.GroupSettingsArray.Count > 0)
@@ -176,6 +184,9 @@ internal class MapConfigParser(string configPath)
                 
                 // Process extra sections for this map
                 ProcessExtraSections(toml, key, mapConfig);
+                
+                
+                ApplyNonCooldownSettings(actualMapConfig, mapConfig);
                 
                 mapConfigs[key] = mapConfig;
             }
@@ -512,7 +523,7 @@ internal class MapConfigParser(string configPath)
         return result;
     }
     
-    private void ApplyNonCooldownSettings(NullableMapConfig groupConfig, NullableMapConfig mapConfig)
+    private void ApplyNonCooldownSettings(NullableMapConfig sourceConfig, NullableMapConfig targetConfig)
     {
         // if (groupConfig.MapNameAlias != null)
         //     mapConfig.MapNameAlias = groupConfig.MapNameAlias;
@@ -521,57 +532,57 @@ internal class MapConfigParser(string configPath)
         // if (groupConfig.MapDescription != null)
         //     mapConfig.MapDescription = groupConfig.MapDescription;
             
-        if (groupConfig.IsDisabled != null)
-            mapConfig.IsDisabled = groupConfig.IsDisabled;
+        if (sourceConfig.IsDisabled != null)
+            targetConfig.IsDisabled = sourceConfig.IsDisabled;
             
-        if (groupConfig.WorkshopId != null)
-            mapConfig.WorkshopId = groupConfig.WorkshopId;
+        if (sourceConfig.WorkshopId != null)
+            targetConfig.WorkshopId = sourceConfig.WorkshopId;
             
-        if (groupConfig.OnlyNomination != null)
-            mapConfig.OnlyNomination = groupConfig.OnlyNomination;
+        if (sourceConfig.OnlyNomination != null)
+            targetConfig.OnlyNomination = sourceConfig.OnlyNomination;
             
-        if (groupConfig.MaxExtends != null)
-            mapConfig.MaxExtends = groupConfig.MaxExtends;
+        if (sourceConfig.MaxExtends != null)
+            targetConfig.MaxExtends = sourceConfig.MaxExtends;
             
-        if (groupConfig.MapTime != null)
-            mapConfig.MapTime = groupConfig.MapTime;
+        if (sourceConfig.MapTime != null)
+            targetConfig.MapTime = sourceConfig.MapTime;
             
-        if (groupConfig.ExtendTimePerExtends != null)
-            mapConfig.ExtendTimePerExtends = groupConfig.ExtendTimePerExtends;
+        if (sourceConfig.ExtendTimePerExtends != null)
+            targetConfig.ExtendTimePerExtends = sourceConfig.ExtendTimePerExtends;
             
-        if (groupConfig.MapRounds != null)
-            mapConfig.MapRounds = groupConfig.MapRounds;
+        if (sourceConfig.MapRounds != null)
+            targetConfig.MapRounds = sourceConfig.MapRounds;
             
-        if (groupConfig.ExtendRoundsPerExtends != null)
-            mapConfig.ExtendRoundsPerExtends = groupConfig.ExtendRoundsPerExtends;
+        if (sourceConfig.ExtendRoundsPerExtends != null)
+            targetConfig.ExtendRoundsPerExtends = sourceConfig.ExtendRoundsPerExtends;
             
         // Nomination config
-        if (groupConfig.RequiredPermissions != null)
-            mapConfig.RequiredPermissions = groupConfig.RequiredPermissions;
+        if (sourceConfig.RequiredPermissions != null)
+            targetConfig.RequiredPermissions = sourceConfig.RequiredPermissions;
             
-        if (groupConfig.RestrictToAllowedUsersOnly != null)
-            mapConfig.RestrictToAllowedUsersOnly = groupConfig.RestrictToAllowedUsersOnly;
+        if (sourceConfig.RestrictToAllowedUsersOnly != null)
+            targetConfig.RestrictToAllowedUsersOnly = sourceConfig.RestrictToAllowedUsersOnly;
             
-        if (groupConfig.AllowedSteamIds != null)
-            mapConfig.AllowedSteamIds?.AddRange(groupConfig.AllowedSteamIds);
+        if (sourceConfig.AllowedSteamIds != null)
+            targetConfig.AllowedSteamIds?.AddRange(sourceConfig.AllowedSteamIds);
             
-        if (groupConfig.DisallowedSteamIds != null)
-            mapConfig.DisallowedSteamIds?.AddRange(groupConfig.DisallowedSteamIds);
+        if (sourceConfig.DisallowedSteamIds != null)
+            targetConfig.DisallowedSteamIds?.AddRange(sourceConfig.DisallowedSteamIds);
             
-        if (groupConfig.MaxPlayers != null)
-            mapConfig.MaxPlayers = groupConfig.MaxPlayers;
+        if (sourceConfig.MaxPlayers != null)
+            targetConfig.MaxPlayers = sourceConfig.MaxPlayers;
             
-        if (groupConfig.MinPlayers != null)
-            mapConfig.MinPlayers = groupConfig.MinPlayers;
+        if (sourceConfig.MinPlayers != null)
+            targetConfig.MinPlayers = sourceConfig.MinPlayers;
             
-        if (groupConfig.ProhibitAdminNomination != null)
-            mapConfig.ProhibitAdminNomination = groupConfig.ProhibitAdminNomination;
+        if (sourceConfig.ProhibitAdminNomination != null)
+            targetConfig.ProhibitAdminNomination = sourceConfig.ProhibitAdminNomination;
             
-        if (groupConfig.DaysAllowed != null)
-            mapConfig.DaysAllowed = [..groupConfig.DaysAllowed];
+        if (sourceConfig.DaysAllowed != null)
+            targetConfig.DaysAllowed = [..sourceConfig.DaysAllowed];
             
-        if (groupConfig.AllowedTimeRanges != null)
-            mapConfig.AllowedTimeRanges = [..groupConfig.AllowedTimeRanges];
+        if (sourceConfig.AllowedTimeRanges != null)
+            targetConfig.AllowedTimeRanges = [..sourceConfig.AllowedTimeRanges];
     }
     
     private void MergeExtraConfiguration(NullableMapConfig sourceConfig, NullableMapConfig targetConfig)

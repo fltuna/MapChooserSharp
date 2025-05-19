@@ -154,6 +154,20 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
         {
             info.ReplyToCommand("None");
         }
+        
+        info.ReplyToCommand("");
+        info.ReplyToCommand("=============== EXTRA SETTINGS ===============");
+        info.ReplyToCommand("");
+        
+        foreach (var (key, value) in mapCfg.ExtraConfiguration)
+        {
+            info.ReplyToCommand($"=== Section: {key}");
+
+            foreach (var (s, value1) in value)
+            {
+                info.ReplyToCommand($"Key: {s}, Value: {value1}");
+            }
+        }
     }
     
     
