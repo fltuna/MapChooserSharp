@@ -67,11 +67,7 @@ jobs:
 
       - name: Build
         run: dotnet publish -c Release -p:DebugType=None -p:DebugSymbols=false
-
-
-      # TODO! Create additional taks to pack required dependency assemblies when database support is added
-      # - MySqlConnector.dll
-      # - Npgsql.dll
+          
       - name: Create release artifacts
         run: |
           mkdir artifacts
@@ -80,7 +76,7 @@ jobs:
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\MapChooserSharp.dll" -Destination "artifacts\plugins\MapChooserSharp\MapChooserSharp.dll" -Force
           Copy-Item -Path "MapChooserSharp.API\bin\Release\*\MapChooserSharp.API.dll" -Destination "artifacts\shared\MapChooserSharp.API\MapChooserSharp.API.dll" -Force
           Copy-Item -Path "lang\" -Destination "artifacts\plugins\MapChooserSharp\" -Recurse -Force
-
+          
       - name: Copy and create linux x64 artifact
         run: |
           mkdir artifacts-linux-x64\
@@ -96,6 +92,10 @@ jobs:
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\Dapper.dll" -Destination "artifacts-linux-x64-with-dependencies\plugins\MapChooserSharp\Dapper.dll" -Force
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\System.Data.SQLite.dll" -Destination "artifacts-windows-x64-with-dependencies\plugins\MapChooserSharp\System.Data.SQLite.dll" -Force
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\System.Data.SQLite.dll" -Destination "artifacts-linux-x64-with-dependencies\plugins\MapChooserSharp\System.Data.SQLite.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\MySqlConnector.dll" -Destination "artifacts-windows-x64-with-dependencies\plugins\MapChooserSharp\MySqlConnector.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\MySqlConnector.dll" -Destination "artifacts-linux-x64-with-dependencies\plugins\MapChooserSharp\MySqlConnector.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\Npgsql.dll" -Destination "artifacts-windows-x64-with-dependencies\plugins\MapChooserSharp\Npgsql.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\Npgsql.dll" -Destination "artifacts-linux-x64-with-dependencies\plugins\MapChooserSharp\Npgsql.dll" -Force
           
       - name: Copy runtime artifacts
         run: |
