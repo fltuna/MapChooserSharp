@@ -37,10 +37,13 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
 
     
     public readonly FakeConVar<float> NominationCommandCooldown = new ("mcs_nomination_command_cooldown", "Cooldown for nomination command", 10.0F);
+    
+    public readonly FakeConVar<bool> PreventSpectatorsNomination = new("mcs_nomination_command_prevent_spectators", "Prevent spectators nomination", false);
 
     protected override void OnInitialize()
     {
         TrackConVar(NominationCommandCooldown);
+        TrackConVar(PreventSpectatorsNomination);
     }
 
     protected override void OnAllPluginsLoaded()
@@ -91,6 +94,13 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         }
 
         _playerNextCommandAvaiableTime[player.Slot] = Server.CurrentTime + NominationCommandCooldown.Value;
+        
+        // If spectators nomination is prohibited, and player is not in CT or T.
+        if (PreventSpectatorsNomination.Value && player.Team != CsTeam.CounterTerrorist && player.Team != CsTeam.Terrorist)
+        {
+            player.PrintToChat(LocalizeWithModulePrefixForPlayer(player, "Nomination.Notification.Failure.SpectatorsCannotNominate"));
+            return;
+        }
         
         if (info.ArgCount < 2)
         {
