@@ -33,19 +33,21 @@ ConVar configuration file is located in `game/csgo/cfg/MapChooserSharp/convars.c
 
 ## Vote Controller
 
-| ConVar                               | Description                                                                                                                               | Default Value | note                               |
-|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|---------------|------------------------------------|
-| mcs_vote_shuffle_menu                | Should vote menu elements is shuffled per player?                                                                                         | false         |                                    |
-| mcs_vote_end_time                    | How long to take vote ends in seconds?                                                                                                    | 15.0          | Valid Range is 5.0 - 120.0 seconds |
-| mcs_vote_countdown_time              | How long to take vote starts in seconds                                                                                                   | 13            | Valid Range is 0 - 120 seconds     |
-| mcs_vote_runoff_map_pickup_threshold | If there is no vote that higher than _mapVoteWinnerPickUpThreshold, then it will pick up maps higher than this percentage for runoff vote | 0.3           | Valid Range is 0.0 - 1.0           |
-| mcs_vote_winner_pickup_threshold     | If vote is higher than this percent, it will picked up as winner.                                                                         | 0.7           | Valid Range is 0.0 - 1.0           |
+| ConVar                               | Description                                                                                                                                  | Default Value | note                               |
+|--------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|---------------|------------------------------------|
+| mcs_vote_shuffle_menu                | Should vote menu elements is shuffled per player?                                                                                            | false         |                                    |
+| mcs_vote_end_time                    | How long to take vote ends in seconds?                                                                                                       | 15.0          | Valid Range is 5.0 - 120.0 seconds |
+| mcs_vote_countdown_time              | How long to take vote starts in seconds                                                                                                      | 13            | Valid Range is 0 - 120 seconds     |
+| mcs_vote_runoff_map_pickup_threshold | If there is no vote that higher than mcs_vote_winner_pickup_threshold, then it will pick up maps higher than this percentage for runoff vote | 0.3           | Valid Range is 0.0 - 1.0           |
+| mcs_vote_winner_pickup_threshold     | If vote is higher than this percent, it will picked up as winner.                                                                            | 0.7           | Valid Range is 0.0 - 1.0           |
+| mcs_vote_exclude_spectators          | Should exclude spectators from vote                                                                                                          | false         |                                    |
 
 ## Nomination Command
 
-| ConVar                           | Description                      | Default Value  | note                 |
-|----------------------------------|----------------------------------|----------------|----------------------|
-| mcs_nomination_command_cooldown  | Cooldown for nomination command  | 10.0           | Specify with seconds |
+| ConVar                                     | Description                     | Default Value | note                 |
+|--------------------------------------------|---------------------------------|---------------|----------------------|
+| mcs_nomination_command_cooldown            | Cooldown for nomination command | 10.0          | Specify with seconds |
+| mcs_nomination_command_prevent_spectators  | Prevent spectators nomination   | false         |                      |
 
 ## RTV Controller
 
