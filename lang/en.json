@@ -39,6 +39,7 @@
     "Nomination.Notification.Failure.SpectatorsCannotNominate": "Nomination while spectator is disabled in this server",
     "Nomination.Notification.Failure.SameMap": "You cannot nominate a map that is currently playing!",
     "Nomination.Notification.Failure.Generic.WithMapName": "Failed to nominate {lime}{0}{default}",
+    "Nomination.Notification.Failure.GroupLimitReached": "Group nomination limit reached! You can only nominate up to {lime}{0}{default} maps from the same group.",
     "Nomination.Notification.Failure.NotEnoughPermission": "You don't have enough permissions to nominate {lime}{0}{default}",
     "Nomination.Notification.Failure.TooMuchPlayers": "Too much players to nominate {lime}{0}{default} (currently {1} > {2})",
     "Nomination.Notification.Failure.NotEnoughPlayers": "Not enough players to nominate {lime}{0}{default} ({1} currently < {2})",
