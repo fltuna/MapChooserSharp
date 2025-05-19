@@ -49,19 +49,18 @@ internal sealed class McsDatabaseProvider(IServiceProvider serviceProvider)
     {
         var config = _pluginConfigProvider.PluginConfig;
         
-        // Todo database type from config
         switch (config.GeneralConfig.SqlConfig.DataBaseType)
         {
             case McsSupportedSqlType.MySql:
                 _providerType = McsSupportedSqlType.MySql;    
-                string password = ConvertSecureStringToString(config.GeneralConfig.SqlConfig.Password);
+                string passwordMySql = ConvertSecureStringToString(config.GeneralConfig.SqlConfig.Password);
 
                 try
                 {
                     _connectionString = $"Server={config.GeneralConfig.SqlConfig.Host};" +
                                         $"Database={config.GeneralConfig.SqlConfig.DatabaseName};" +
                                         $"User Id={config.GeneralConfig.SqlConfig.UserName};" +
-                                        $"Password={password};" +
+                                        $"Password={passwordMySql};" +
                                         $"Port={config.GeneralConfig.SqlConfig.Port};";
                     
                     Plugin.Logger.LogInformation($"Using MySQL database at host: {config.GeneralConfig.SqlConfig.Host}, Database Name: {config.GeneralConfig.SqlConfig.DatabaseName}");
@@ -69,15 +68,34 @@ internal sealed class McsDatabaseProvider(IServiceProvider serviceProvider)
                 finally
                 {
                     // Clear password from memory ASAP
-                    SecurelyEraseString(ref password);
+                    SecurelyEraseString(ref passwordMySql);
                 }
                 
                 break;
                 
+            
             case McsSupportedSqlType.PostgreSql:
-                // Plugin.Logger.LogInformation("Using PostgreSQL database");
-                throw new NotImplementedException("PostgreSql support is not implemented yet");
+                _providerType = McsSupportedSqlType.PostgreSql;
+                string passwordPostgreSql = ConvertSecureStringToString(config.GeneralConfig.SqlConfig.Password);
+    
+                try
+                {
+                    _connectionString = $"Host={config.GeneralConfig.SqlConfig.Host};" +
+                                        $"Database={config.GeneralConfig.SqlConfig.DatabaseName};" +
+                                        $"Username={config.GeneralConfig.SqlConfig.UserName};" +
+                                        $"Password={passwordPostgreSql};" +
+                                        $"Port={config.GeneralConfig.SqlConfig.Port};";
+        
+                    Plugin.Logger.LogInformation($"Using PostgreSQL database at {config.GeneralConfig.SqlConfig.Host}");
+                }
+                finally
+                {
+                    SecurelyEraseString(ref passwordPostgreSql);
+                }
                 
+                break;
+                
+            
             case McsSupportedSqlType.Sqlite:
             default:
                 _providerType = McsSupportedSqlType.Sqlite;

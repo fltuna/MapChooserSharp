@@ -58,7 +58,7 @@ CounterStrikeSharpで実装された強力なAPIとカスタマイズ性を備�
 - 管理者コマンド `!setnextmap <MapName>` と `!removenextmap` によるマップサイクルの管理
 - マップの時間タイプの自動検出 (下にあるのでその情報を確認してください)
 - データベースによるグループとマップのクールダウンの管理
-   - 次のDBを現在サポートしてます: SQLite
+   - 次のDBを現在サポートしてます: SQLite, MySQL, PostgreSQL
 - 管理コマンド `!setmapcooldown` と `!setgroupcooldown` を使用したクールダウンの管理
 
 ### 豊富なカスタマイズ項目

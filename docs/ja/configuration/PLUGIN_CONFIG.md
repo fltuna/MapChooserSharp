@@ -38,6 +38,7 @@ RTVコマンドなどがクールダウンのときに秒数を表示するか�
 # Currently Supports:
 # - Sqlite
 # - MySQL
+# - PostgreSQL
 #
 # See GitHub readme for more and updated information.
 Type = "sqlite"

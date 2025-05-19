@@ -37,6 +37,7 @@ Whether to display the number of seconds when RTV commands and other commands ar
 # Currently Supports:
 # - Sqlite
 # - MySQL
+# - PostgreSQL
 #
 # See GitHub readme for more and updated information.
 Type = "sqlite"
