@@ -37,10 +37,13 @@ RTVコマンドなどがクールダウンのときに秒数を表示するか�
 #
 # Currently Supports:
 # - Sqlite
+# - MySQL
 #
 # See GitHub readme for more and updated information.
 Type = "sqlite"
+DatabaseName = "MapChooserSharp.db"
 Address = ""
+Port = ""
 User = ""
 Password = ""
 
@@ -50,9 +53,13 @@ MapInformationTableName = "McsMapInformation"
 
 ### Type
 
-データベースタイプをここで指定します。 現在はSqliteのみサポートしています。
+データベースタイプをここで指定します。
 
-### Address, User, Password
+### DatabaseName
+
+データベース名を指定します。 SQLiteを使用している際は、ここの名前がファイル名になります。
+
+### Address, Port, User, Password
 
 これは将来的にMySQLやPostgreSQLをサポートした際に、データベースに接続するために必要になります。
 

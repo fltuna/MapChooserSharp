@@ -344,9 +344,19 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
             throw new InvalidOperationException("General.Sql.Type is not found or invalid");
         }
         
-        if (!sqlTable.TryGetValue("Address", out var sqlAddressObj) || sqlAddressObj is not string sqlAddress)
+        if (!sqlTable.TryGetValue("Address", out var sqlAddressObj) || sqlAddressObj is not string sqlHost)
         {
             throw new InvalidOperationException("General.Sql.Address is not found or invalid");
+        }
+        
+        if (!sqlTable.TryGetValue("Port", out var sqlPortObj) || sqlPortObj is not string sqlPort)
+        {
+            throw new InvalidOperationException("General.Sql.Port is not found or invalid");
+        }
+        
+        if (!sqlTable.TryGetValue("DatabaseName", out var sqlDbNameObj) || sqlDbNameObj is not string sqlDbName)
+        {
+            throw new InvalidOperationException("General.Sql.DatabaseName is not found or invalid");
         }
         
         if (!sqlTable.TryGetValue("User", out var sqlUserObj) || sqlUserObj is not string sqlUser)
@@ -377,7 +387,7 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
             throw new InvalidOperationException("General.Sql.Type is invalid");
         }
 
-        var sqlConfig = new McsSqlConfig(sqlAddress, sqlUser, ref sqlPassword, groupTableName, mapTableName, type);
+        var sqlConfig = new McsSqlConfig(sqlHost, sqlPort, sqlDbName, sqlUser, ref sqlPassword, groupTableName, mapTableName, type);
         
         return sqlConfig;
     }
@@ -461,10 +471,13 @@ VerboseCooldownPrint = true
 #
 # Currently Supports:
 # - Sqlite
+# - MySQL
 #
 # See GitHub readme for more and updated information.
 Type = ""sqlite""
+DatabaseName = ""MapChooserSharp.db""
 Address = """"
+Port = """"
 User = """"
 Password = """"
 
