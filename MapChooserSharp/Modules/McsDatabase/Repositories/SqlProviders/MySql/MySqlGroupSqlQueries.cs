@@ -6,13 +6,25 @@ internal sealed class MySqlGroupSqlQueries(string tableName) : IMcsGroupSqlQueri
 {
     public string TableName { get; } = tableName;
 
-    public string GetEnsureTableExistsSql() => throw new NotImplementedException("This functionality is not implemented.");
+    public string GetEnsureTableExistsSql() => @$"
+        CREATE TABLE IF NOT EXISTS {TableName} (
+            Id INT AUTO_INCREMENT PRIMARY KEY,
+            GroupName VARCHAR(255) NOT NULL UNIQUE,
+            CooldownRemains INT NOT NULL
+        )";
     
-    public string GetDecrementCooldownsSql() => throw new NotImplementedException("This functionality is not implemented.");
+    public string GetDecrementCooldownsSql() => 
+        $"UPDATE {TableName} SET CooldownRemains = CooldownRemains - 1 WHERE CooldownRemains > 0";
     
-    public string GetUpsertGroupCooldownSql() => throw new NotImplementedException("This functionality is not implemented.");
+    public string GetUpsertGroupCooldownSql() => @$"
+        INSERT INTO {TableName} (GroupName, CooldownRemains) 
+        VALUES (@GroupName, @CooldownValue)
+        ON DUPLICATE KEY UPDATE 
+        CooldownRemains = @CooldownValue";
     
-    public string GetAllGroupInfosSql() => throw new NotImplementedException("This functionality is not implemented.");
+    public string GetAllGroupInfosSql() => 
+        $"SELECT * FROM {TableName}";
     
-    public string GetInsertGroupInfoSql() => throw new NotImplementedException("This functionality is not implemented.");
+    public string GetInsertGroupInfoSql() => 
+        $"INSERT INTO {TableName} (GroupName, CooldownRemains) VALUES (@GroupName, @CooldownRemains)";
 }

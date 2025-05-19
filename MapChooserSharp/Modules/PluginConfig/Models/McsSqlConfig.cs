@@ -7,13 +7,15 @@ namespace MapChooserSharp.Modules.PluginConfig.Models;
 
 public sealed class McsSqlConfig: IMcsSqlConfig
 {
-    public McsSqlConfig(string address, string user, ref string password, string groupSettingsSqlTableName, string mapSettingsSqlTableName, McsSupportedSqlType dataBaseType)
+    public McsSqlConfig(string host, string port, string databaseName, string user, ref string password, string groupSettingsSqlTableName, string mapSettingsSqlTableName, McsSupportedSqlType dataBaseType)
     {
-        Address = address;
-        User = user;
+        Host = host;
+        UserName = user;
         GroupSettingsSqlTableName = groupSettingsSqlTableName;
         MapSettingsSqlTableName = mapSettingsSqlTableName;
         DataBaseType = dataBaseType;
+        Port = port;
+        DatabaseName = databaseName;
 
 
         Password = ConvertToSecureString(password);
@@ -23,8 +25,10 @@ public sealed class McsSqlConfig: IMcsSqlConfig
     }
 
     public McsSupportedSqlType DataBaseType { get; }
-    public string Address { get; }
-    public string User { get; }
+    public string Host { get; }
+    public string Port { get; }
+    public string DatabaseName { get; }
+    public string UserName { get; }
     public SecureString Password { get; }
     public string GroupSettingsSqlTableName { get; }
     public string MapSettingsSqlTableName { get; }

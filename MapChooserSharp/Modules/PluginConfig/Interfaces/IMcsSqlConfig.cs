@@ -7,9 +7,13 @@ public interface IMcsSqlConfig
 {
     internal McsSupportedSqlType DataBaseType { get; }
     
-    internal string Address { get; }
+    internal string Host { get; }
     
-    internal string User { get; }
+    internal string Port { get; }
+    
+    internal string DatabaseName { get; }
+    
+    internal string UserName { get; }
     
     internal SecureString Password { get; }
     

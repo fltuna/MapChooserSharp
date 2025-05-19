@@ -36,10 +36,13 @@ Whether to display the number of seconds when RTV commands and other commands ar
 #
 # Currently Supports:
 # - Sqlite
+# - MySQL
 #
 # See GitHub readme for more and updated information.
 Type = "sqlite"
+DatabaseName = "MapChooserSharp.db"
 Address = ""
+Port = ""
 User = ""
 Password = ""
 
@@ -49,9 +52,13 @@ MapInformationTableName = "McsMapInformation"
 
 ### Type
 
-Specify the database type here. Currently only SQLite is supported.
+Specify the database type here.
 
-### Address, User, Password
+### DatabaseName
+
+Name of database, if database type is SQLite then this name will be a file name.
+
+### Address, Port, User, Password
 
 These will be necessary for connecting to the database when MySQL and PostgreSQL are supported in the future.
 
