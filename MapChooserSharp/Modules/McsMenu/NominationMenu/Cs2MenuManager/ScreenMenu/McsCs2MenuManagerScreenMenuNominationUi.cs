@@ -55,9 +55,11 @@ public class McsCs2MenuManagerScreenMenuNominationUi(CCSPlayerController playerC
             menuTitle.Append(_plugin.LocalizeStringForPlayer(playerController, "General.Menu.Title.Html"));
         }
         
-        CS2MenuManager.API.Menu.ScreenMenu menu = new CS2MenuManager.API.Menu.ScreenMenu(menuTitle.ToString(), _plugin);
-        menu.MenuType = MenuType.Both;
-        menu.ShowResolutionsOption = false;
+        CS2MenuManager.API.Menu.ScreenMenu menu = new CS2MenuManager.API.Menu.ScreenMenu(menuTitle.ToString(), _plugin)
+        {
+            ScreenMenu_MenuType = MenuType.Both,
+            ScreenMenu_ShowResolutionsOption = false
+        };
         
         List<ItemOption> menuOptions = new ();
         

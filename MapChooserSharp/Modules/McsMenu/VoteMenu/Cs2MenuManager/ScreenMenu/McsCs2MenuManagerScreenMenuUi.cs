@@ -56,8 +56,8 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Creating vote menu");
         CS2MenuManager.API.Menu.ScreenMenu menu = new CS2MenuManager.API.Menu.ScreenMenu(menuTitle.ToString(), _plugin)
         {
-            ShowResolutionsOption = false,
-            MenuType = MenuType.Both,
+            ScreenMenu_ShowResolutionsOption = false,
+            ScreenMenu_MenuType = MenuType.Both,
         };
 
         // If menu option is already exists (this is intended for !revote feature)
