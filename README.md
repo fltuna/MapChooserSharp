@@ -115,8 +115,8 @@ Our plugin currently supports 2 plugins for screen menu.
 
 You don't need to install both of them, but you need to install at least one of them for using screen menu.
 
-- [CS2ScreenMenuAPI](https://github.com/T3Marius/CS2ScreenMenuAPI) - To use screen menu
-- [CS2MenuManager](https://github.com/schwarper/CS2MenuManager) - To use screen menu
+- [CS2ScreenMenuAPI](https://github.com/T3Marius/CS2ScreenMenuAPI) - To use screen menu (Version 3.0.4 Required)
+- [CS2MenuManager](https://github.com/schwarper/CS2MenuManager) - To use screen menu (Version 1.0.28 Required)
 
 ### Installation
 
