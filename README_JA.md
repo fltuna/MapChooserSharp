@@ -118,7 +118,7 @@ Map Configについては [Configドキュメント](docs/ja/configuration/MAP_C
 
 ### インストール
 
-1. [リリースページ](https://github.com/fltuna/MapChooserSharp/releases/latest) にアクセスします
+1. [リリースページ](https://github.com/fltuna/MapChooserSharp/releases/latest) にアクセスします。 また、最新の開発バージョンは [GitHub Actionsのアーティファクト](https://github.com/fltuna/MapChooserSharp/actions) からダウンロードできます。(GitHubアカウントが必要です)
 2. 状況に合わせて最適なZIPファイルをダウンロードします
     1. 最初のインストールか、リリースページで再ダウンロードを促されている場合は `MapChooserSharp-osname-with-dependencies.zip` をダウンロードしてください
     2. アップデートだけであれば `MapChooserSharp-osname.zip` をダウンロードしてください

@@ -120,7 +120,7 @@ You don't need to install both of them, but you need to install at least one of 
 
 ### Installation
 
-1. Go to [Latest Release Page](https://github.com/fltuna/MapChooserSharp/releases/latest)
+1. Go to [Latest Release Page](https://github.com/fltuna/MapChooserSharp/releases/latest) | Also, Latest development version is provided in [GitHub Actions Artifacts](https://github.com/fltuna/MapChooserSharp/actions) (Requires GitHub Account)
 2. Download zip files depends on your situation
    1. If you are first time, or release page says redownload, then donwload `MapChooserSharp-osname-with-dependencies.zip`
    2. Just updating, then download `MapChooserSharp-osname.zip`
