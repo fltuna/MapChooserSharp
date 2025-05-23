@@ -119,6 +119,10 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
 
     public void CloseMenu()
     {
+        // Because CS2MenuManager doesn't have foolproof so check here
+        if (!playerController.IsValid)
+            return;
+        
         MenuManager.CloseActiveMenu(playerController);
     }
 
