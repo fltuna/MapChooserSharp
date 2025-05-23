@@ -9,6 +9,7 @@ using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation;
 using TNCSSPluginFoundation.Interfaces;
 
@@ -120,10 +121,15 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
     public void CloseMenu()
     {
         // Because CS2MenuManager doesn't have foolproof so check here
-        if (!playerController.IsValid)
-            return;
-        
-        MenuManager.CloseActiveMenu(playerController);
+        // Also playerController.IsValid is crashes server, so we'll use try catch
+        try
+        {
+            MenuManager.CloseActiveMenu(playerController);
+        }
+        catch (Exception e)
+        {
+            _plugin.Logger.LogError($"CS2MenuManager Screen Menu UI method {nameof(CloseMenu)} has thrown an exception: {e}");
+        }
     }
 
     public void SetVoteOptions(List<IMcsVoteOption> voteOptions)
