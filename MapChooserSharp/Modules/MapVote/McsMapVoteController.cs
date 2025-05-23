@@ -450,7 +450,14 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         foreach (var (key, voteUi) in _mapVoteContent.VoteUi)
         {
-            voteUi.CloseMenu();
+            try
+            {
+                voteUi.CloseMenu();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError($"Error while closing vote menu but ignoreing: {e}");
+            }
         }
         
         foreach (IMapVoteData voteData in _mapVoteContent.GetVotingMaps())
