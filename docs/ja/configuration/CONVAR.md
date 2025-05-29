@@ -57,14 +57,14 @@ ConVarのコンフィグファイルは `game/csgo/cfg/MapChooserSharp/convars.c
 
 ## RTV Controller
 
-| ConVar                                         | Description                          | Default Value | note                         |
-|------------------------------------------------|--------------------------------------|---------------|------------------------------|
-| mcs_rtv_command_unlock_time_next_map_confirmed | 次のマップが決まってからRTV出来るようになるまでの秒数         | 60.0          | 有効な範囲: 0.0 - 1200.0          |
-| mcs_rtv_command_unlock_time_map_dont_change    | RTVでマップを変更しないと決まってからRTV出来るようになるまでの秒数 | 240.0         | 有効な範囲: 0.0 - 1200.0          |
-| mcs_rtv_command_unlock_time_map_extend         | マップの延長が決まってからRTV出来るようになるまでの秒数        | 120.0         | 有効な範囲: 0.0 - 1200.0          |
-| mcs_rtv_command_unlock_time_map_start          | マップがスタートしてからRTV出来るようになるまでの秒数         | 300.0         | 有効な範囲: 0.0 - 1200.0          |
-| mcs_rtv_vote_start_threshold                   | RTV投票を始めるために必要な投票率                   | 0.5           | 有効な範囲: 0.0 - 1.0             |
-| mcs_rtv_map_change_timing                      | RTV完了後にマップを変更するまでの時間 (秒で指定)          | 3.0           | 有効な範囲: 0.0 - 60.0            |
+| ConVar                                         | Description                                    | Default Value | note                         |
+|------------------------------------------------|------------------------------------------------|---------------|------------------------------|
+| mcs_rtv_command_unlock_time_next_map_confirmed | 次のマップが決まってからRTV出来るようになるまでの秒数                   | 60.0          | 有効な範囲: 0.0 - 1200.0          |
+| mcs_rtv_command_unlock_time_map_dont_change    | RTVでマップを変更しないと決まってからRTV出来るようになるまでの秒数           | 240.0         | 有効な範囲: 0.0 - 1200.0          |
+| mcs_rtv_command_unlock_time_map_extend         | マップの延長が決まってからRTV出来るようになるまでの秒数                  | 120.0         | 有効な範囲: 0.0 - 1200.0          |
+| mcs_rtv_command_unlock_time_map_start          | マップがスタートしてからRTV出来るようになるまでの秒数                   | 300.0         | 有効な範囲: 0.0 - 1200.0          |
+| mcs_rtv_vote_start_threshold                   | RTV投票を始めるために必要な投票率                             | 0.5           | 有効な範囲: 0.0 - 1.0             |
+| mcs_rtv_map_change_timing                      | 次のマップが確定している際にRTVが可決された場合にマップを変更するまでの時間 (秒で指定) | 3.0           | 有効な範囲: 0.0 - 60.0            |
 
 
 ## Timeleft Util
