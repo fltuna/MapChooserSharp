@@ -120,10 +120,9 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         {
             _mapVoteContent.GetVoteParticipants().Remove(slot);
             
-            if (_mapVoteContent.VoteUi.TryGetValue(slot, out var vote))
+            if (_mapVoteContent.VoteUi.Remove(slot, out var vote))
             {
                 vote.CloseMenu();
-                _mapVoteContent.VoteUi.Remove(slot);
             }
         }
     }
