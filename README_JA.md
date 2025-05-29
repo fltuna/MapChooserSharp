@@ -114,7 +114,7 @@ Map Configについては [Configドキュメント](docs/ja/configuration/MAP_C
 両方をインストールする必要はありませんが、Screen Menuを使用するにはどちらか一つをインストールする必要があります。
 
 - [CS2ScreenMenuAPI](https://github.com/T3Marius/CS2ScreenMenuAPI) (バージョン 3.0.4 が必要)
-- [CS2MenuManager](https://github.com/schwarper/CS2MenuManager) (バージョン 1.0.28 が必要)
+- [CS2MenuManager](https://github.com/schwarper/CS2MenuManager) (バージョン 1.0.32 が必要)
 
 ### インストール
 
