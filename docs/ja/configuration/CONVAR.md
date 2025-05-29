@@ -33,14 +33,15 @@ ConVarのコンフィグファイルは `game/csgo/cfg/MapChooserSharp/convars.c
 
 ## Vote Controller
 
-| ConVar                               | Description                                                              | Default Value  | note                       |
-|--------------------------------------|--------------------------------------------------------------------------|----------------|----------------------------|
-| mcs_vote_shuffle_menu                | メニューの内容をプレイヤーごとにシャッフルするか否か                                               | false          |                            |
-| mcs_vote_end_time                    | 投票終了まで何秒待つか                                                              | 15.0           | 有効な範囲: 5.0 - 120.0 seconds |
-| mcs_vote_countdown_time              | 投票開始まで何秒カウントダウンするか                                                       | 13             | 有効な範囲: 0 - 120 seconds     |
-| mcs_vote_runoff_map_pickup_threshold | もし、mcs_vote_winner_pickup_thresholdを超えるマップがなかった場合、最終投票を開始する際にピック対象になる投票率 | 0.3            | 有効な範囲: 0.0 - 1.0           |
-| mcs_vote_winner_pickup_threshold     | もし、このパーセントより高い投票を得たマップがある場合そのまま投票を終了します                                  | 0.7            | 有効な範囲: 0.0 - 1.0           |
-| mcs_vote_exclude_spectators          | 観戦者を投票参加者から除外するか                                                         | false          |                            |
+| ConVar                                           | Description                                                              | Default Value | note                       |
+|--------------------------------------------------|--------------------------------------------------------------------------|---------------|----------------------------|
+| mcs_vote_shuffle_menu                            | メニューの内容をプレイヤーごとにシャッフルするか否か                                               | false         |                            |
+| mcs_vote_end_time                                | 投票終了まで何秒待つか                                                              | 15.0          | 有効な範囲: 5.0 - 120.0 seconds |
+| mcs_vote_countdown_time                          | 投票開始まで何秒カウントダウンするか                                                       | 13            | 有効な範囲: 0 - 120 seconds     |
+| mcs_vote_runoff_map_pickup_threshold             | もし、mcs_vote_winner_pickup_thresholdを超えるマップがなかった場合、最終投票を開始する際にピック対象になる投票率 | 0.3           | 有効な範囲: 0.0 - 1.0           |
+| mcs_vote_winner_pickup_threshold                 | もし、このパーセントより高い投票を得たマップがある場合そのまま投票を終了します                                  | 0.7           | 有効な範囲: 0.0 - 1.0           |
+| mcs_vote_exclude_spectators                      | 観戦者を投票参加者から除外するか                                                         | false         |                            |
+| mcs_vote_change_map_immediately_rtv_vote_success | 有効の場合、RTVで次のマップが決まった際即座にマップを変更します                                        | false         |                            |
 
 ## Nomination Command
 
