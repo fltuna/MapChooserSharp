@@ -28,6 +28,8 @@ This plugin is supported `mp_maxrounds` and `mp_roundtime` based gamemode, such 
 ### General
 
 - Full translation support (Except Native Vote UI)
+- Automatically fetch maps from Workshop collections and create map settings
+- Automatically fix Workshop map names at map start
 
 ### Map Vote
 
