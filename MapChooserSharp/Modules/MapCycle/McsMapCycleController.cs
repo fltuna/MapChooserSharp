@@ -203,7 +203,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
     public void ChangeToNextMap(float seconds)
     {
-        if (seconds <= 0)
+        if (seconds < 0.0F)
             seconds = DefaultMapChangeDelay;
         
         _mapChangeTimer = Plugin.AddTimer(seconds, ChangeToNextMapInternal, TimerFlags.STOP_ON_MAPCHANGE);
