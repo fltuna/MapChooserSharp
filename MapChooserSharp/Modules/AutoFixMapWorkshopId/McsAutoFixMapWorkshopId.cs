@@ -7,6 +7,7 @@ using MapChooserSharp.Util;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
+using TNCSSPluginFoundation.Utils.Other;
 
 namespace MapChooserSharp.Modules.AutoFixMapWorkshopId;
 
@@ -19,14 +20,12 @@ internal class McsAutoFixMapWorkshopId(IServiceProvider serviceProvider) : Plugi
     private IMcsPluginConfigProvider _configProvider = null!;
     private IMcsInternalMapConfigProviderApi _mapConfigProvider = null!;
     private MapConfigRepository _mapConfigRepository = null!;
-    private ForceFullUpdate _forceFullUpdate = null!;
 
     protected override void OnAllPluginsLoaded()
     {
         _configProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         _mapConfigProvider = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mapConfigRepository = ServiceProvider.GetRequiredService<MapConfigRepository>();
-        _forceFullUpdate = new ForceFullUpdate();
 
         Plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);
     }
@@ -50,7 +49,7 @@ internal class McsAutoFixMapWorkshopId(IServiceProvider serviceProvider) : Plugi
     {
         try
         {
-            string? workshopId = _forceFullUpdate.GetAddonID();
+            string? workshopId = ForceFullUpdate.GetWorkshopId();
 
             if (string.IsNullOrEmpty(workshopId))
             {
