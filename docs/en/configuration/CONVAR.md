@@ -33,14 +33,15 @@ ConVar configuration file is located in `game/csgo/cfg/MapChooserSharp/convars.c
 
 ## Vote Controller
 
-| ConVar                               | Description                                                                                                                                  | Default Value | note                               |
-|--------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|---------------|------------------------------------|
-| mcs_vote_shuffle_menu                | Should vote menu elements is shuffled per player?                                                                                            | false         |                                    |
-| mcs_vote_end_time                    | How long to take vote ends in seconds?                                                                                                       | 15.0          | Valid Range is 5.0 - 120.0 seconds |
-| mcs_vote_countdown_time              | How long to take vote starts in seconds                                                                                                      | 13            | Valid Range is 0 - 120 seconds     |
-| mcs_vote_runoff_map_pickup_threshold | If there is no vote that higher than mcs_vote_winner_pickup_threshold, then it will pick up maps higher than this percentage for runoff vote | 0.3           | Valid Range is 0.0 - 1.0           |
-| mcs_vote_winner_pickup_threshold     | If vote is higher than this percent, it will picked up as winner.                                                                            | 0.7           | Valid Range is 0.0 - 1.0           |
-| mcs_vote_exclude_spectators          | Should exclude spectators from vote                                                                                                          | false         |                                    |
+| ConVar                                            | Description                                                                                                                                  | Default Value | note                               |
+|---------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|---------------|------------------------------------|
+| mcs_vote_shuffle_menu                             | Should vote menu elements is shuffled per player?                                                                                            | false         |                                    |
+| mcs_vote_end_time                                 | How long to take vote ends in seconds?                                                                                                       | 15.0          | Valid Range is 5.0 - 120.0 seconds |
+| mcs_vote_countdown_time                           | How long to take vote starts in seconds                                                                                                      | 13            | Valid Range is 0 - 120 seconds     |
+| mcs_vote_runoff_map_pickup_threshold              | If there is no vote that higher than mcs_vote_winner_pickup_threshold, then it will pick up maps higher than this percentage for runoff vote | 0.3           | Valid Range is 0.0 - 1.0           |
+| mcs_vote_winner_pickup_threshold                  | If vote is higher than this percent, it will picked up as winner.                                                                            | 0.7           | Valid Range is 0.0 - 1.0           |
+| mcs_vote_exclude_spectators                       | Should exclude spectators from vote                                                                                                          | false         |                                    |
+| mcs_vote_change_map_immediately_rtv_vote_success  | Change to next map immediately when enabled and RTV vote is success                                                                          | false         |                                    |
 
 ## Nomination Command
 
@@ -57,14 +58,14 @@ ConVar configuration file is located in `game/csgo/cfg/MapChooserSharp/convars.c
 
 ## RTV Controller
 
-| ConVar                                         | Description                                                                         | Default Value | note                        |
-|------------------------------------------------|-------------------------------------------------------------------------------------|---------------|-----------------------------|
-| mcs_rtv_command_unlock_time_next_map_confirmed | Seconds to take unlock RTV command after next map confirmed in vote                 | 60.0          | Valid Range is 0.0 - 1200.0 |
-| mcs_rtv_command_unlock_time_map_dont_change    | Seconds to take unlock RTV command after map is not changed in rtv vote             | 240.0         | Valid Range is 0.0 - 1200.0 |
-| mcs_rtv_command_unlock_time_map_extend         | Seconds to take unlock RTV command after map is extended in vote                    | 120.0         | Valid Range is 0.0 - 1200.0 |
-| mcs_rtv_command_unlock_time_map_start          | Seconds to take unlock RTV command after map started                                | 300.0         | Valid Range is 0.0 - 1200.0 |
-| mcs_rtv_vote_start_threshold                   | How many percent to require start rtv vote?                                         | 0.5           | Valid Range is 0.0 - 1.0    |
-| mcs_rtv_map_change_timing                      | Seconds to change map after RTV is success. Set 0.0 to change immediately           | 3.0           | Valid Range is 0.0 - 60.0   |
+| ConVar                                         | Description                                                                                              | Default Value | note                        |
+|------------------------------------------------|----------------------------------------------------------------------------------------------------------|---------------|-----------------------------|
+| mcs_rtv_command_unlock_time_next_map_confirmed | Seconds to take unlock RTV command after next map confirmed in vote                                      | 60.0          | Valid Range is 0.0 - 1200.0 |
+| mcs_rtv_command_unlock_time_map_dont_change    | Seconds to take unlock RTV command after map is not changed in rtv vote                                  | 240.0         | Valid Range is 0.0 - 1200.0 |
+| mcs_rtv_command_unlock_time_map_extend         | Seconds to take unlock RTV command after map is extended in vote                                         | 120.0         | Valid Range is 0.0 - 1200.0 |
+| mcs_rtv_command_unlock_time_map_start          | Seconds to take unlock RTV command after map started                                                     | 300.0         | Valid Range is 0.0 - 1200.0 |
+| mcs_rtv_vote_start_threshold                   | How many percent to require start rtv vote?                                                              | 0.5           | Valid Range is 0.0 - 1.0    |
+| mcs_rtv_map_change_timing                      | Seconds to change map when next map is confirmed and after RTV is success. Set 0.0 to change immediately | 3.0           | Valid Range is 0.0 - 60.0   |
 
 
 ## Timeleft Util

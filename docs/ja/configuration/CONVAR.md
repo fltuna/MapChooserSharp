@@ -33,14 +33,15 @@ ConVarのコンフィグファイルは `game/csgo/cfg/MapChooserSharp/convars.c
 
 ## Vote Controller
 
-| ConVar                               | Description                                                              | Default Value  | note                       |
-|--------------------------------------|--------------------------------------------------------------------------|----------------|----------------------------|
-| mcs_vote_shuffle_menu                | メニューの内容をプレイヤーごとにシャッフルするか否か                                               | false          |                            |
-| mcs_vote_end_time                    | 投票終了まで何秒待つか                                                              | 15.0           | 有効な範囲: 5.0 - 120.0 seconds |
-| mcs_vote_countdown_time              | 投票開始まで何秒カウントダウンするか                                                       | 13             | 有効な範囲: 0 - 120 seconds     |
-| mcs_vote_runoff_map_pickup_threshold | もし、mcs_vote_winner_pickup_thresholdを超えるマップがなかった場合、最終投票を開始する際にピック対象になる投票率 | 0.3            | 有効な範囲: 0.0 - 1.0           |
-| mcs_vote_winner_pickup_threshold     | もし、このパーセントより高い投票を得たマップがある場合そのまま投票を終了します                                  | 0.7            | 有効な範囲: 0.0 - 1.0           |
-| mcs_vote_exclude_spectators          | 観戦者を投票参加者から除外するか                                                         | false          |                            |
+| ConVar                                           | Description                                                              | Default Value | note                       |
+|--------------------------------------------------|--------------------------------------------------------------------------|---------------|----------------------------|
+| mcs_vote_shuffle_menu                            | メニューの内容をプレイヤーごとにシャッフルするか否か                                               | false         |                            |
+| mcs_vote_end_time                                | 投票終了まで何秒待つか                                                              | 15.0          | 有効な範囲: 5.0 - 120.0 seconds |
+| mcs_vote_countdown_time                          | 投票開始まで何秒カウントダウンするか                                                       | 13            | 有効な範囲: 0 - 120 seconds     |
+| mcs_vote_runoff_map_pickup_threshold             | もし、mcs_vote_winner_pickup_thresholdを超えるマップがなかった場合、最終投票を開始する際にピック対象になる投票率 | 0.3           | 有効な範囲: 0.0 - 1.0           |
+| mcs_vote_winner_pickup_threshold                 | もし、このパーセントより高い投票を得たマップがある場合そのまま投票を終了します                                  | 0.7           | 有効な範囲: 0.0 - 1.0           |
+| mcs_vote_exclude_spectators                      | 観戦者を投票参加者から除外するか                                                         | false         |                            |
+| mcs_vote_change_map_immediately_rtv_vote_success | 有効の場合、RTVで次のマップが決まった際即座にマップを変更します                                        | false         |                            |
 
 ## Nomination Command
 
@@ -57,14 +58,14 @@ ConVarのコンフィグファイルは `game/csgo/cfg/MapChooserSharp/convars.c
 
 ## RTV Controller
 
-| ConVar                                         | Description                          | Default Value | note                         |
-|------------------------------------------------|--------------------------------------|---------------|------------------------------|
-| mcs_rtv_command_unlock_time_next_map_confirmed | 次のマップが決まってからRTV出来るようになるまでの秒数         | 60.0          | 有効な範囲: 0.0 - 1200.0          |
-| mcs_rtv_command_unlock_time_map_dont_change    | RTVでマップを変更しないと決まってからRTV出来るようになるまでの秒数 | 240.0         | 有効な範囲: 0.0 - 1200.0          |
-| mcs_rtv_command_unlock_time_map_extend         | マップの延長が決まってからRTV出来るようになるまでの秒数        | 120.0         | 有効な範囲: 0.0 - 1200.0          |
-| mcs_rtv_command_unlock_time_map_start          | マップがスタートしてからRTV出来るようになるまでの秒数         | 300.0         | 有効な範囲: 0.0 - 1200.0          |
-| mcs_rtv_vote_start_threshold                   | RTV投票を始めるために必要な投票率                   | 0.5           | 有効な範囲: 0.0 - 1.0             |
-| mcs_rtv_map_change_timing                      | RTV完了後にマップを変更するまでの時間 (秒で指定)          | 3.0           | 有効な範囲: 0.0 - 60.0            |
+| ConVar                                         | Description                                    | Default Value | note                         |
+|------------------------------------------------|------------------------------------------------|---------------|------------------------------|
+| mcs_rtv_command_unlock_time_next_map_confirmed | 次のマップが決まってからRTV出来るようになるまでの秒数                   | 60.0          | 有効な範囲: 0.0 - 1200.0          |
+| mcs_rtv_command_unlock_time_map_dont_change    | RTVでマップを変更しないと決まってからRTV出来るようになるまでの秒数           | 240.0         | 有効な範囲: 0.0 - 1200.0          |
+| mcs_rtv_command_unlock_time_map_extend         | マップの延長が決まってからRTV出来るようになるまでの秒数                  | 120.0         | 有効な範囲: 0.0 - 1200.0          |
+| mcs_rtv_command_unlock_time_map_start          | マップがスタートしてからRTV出来るようになるまでの秒数                   | 300.0         | 有効な範囲: 0.0 - 1200.0          |
+| mcs_rtv_vote_start_threshold                   | RTV投票を始めるために必要な投票率                             | 0.5           | 有効な範囲: 0.0 - 1.0             |
+| mcs_rtv_map_change_timing                      | 次のマップが確定している際にRTVが可決された場合にマップを変更するまでの時間 (秒で指定) | 3.0           | 有効な範囲: 0.0 - 60.0            |
 
 
 ## Timeleft Util

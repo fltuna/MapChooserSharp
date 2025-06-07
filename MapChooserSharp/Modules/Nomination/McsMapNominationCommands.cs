@@ -53,6 +53,11 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
         _mapCycleController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleControllerApi>();
         
+        Plugin.RegisterListener<Listeners.OnMapEnd>(() =>
+        {
+            _playerNextCommandAvaiableTime.Clear();
+        });
+        
         Plugin.AddCommand("css_nominate", "Nominate a map", CommandNominateMap);
         Plugin.AddCommand("css_nomlist", "Shows nomination list", CommandNomList);
         Plugin.AddCommand("css_nominate_addmap", "Insert a map to nomination", CommandNominateAddMap);

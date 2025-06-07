@@ -9,6 +9,7 @@ using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation;
 using TNCSSPluginFoundation.Interfaces;
 
@@ -56,8 +57,8 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
         _debugLogger.LogTrace($"[Player {playerController.PlayerName}] Creating vote menu");
         CS2MenuManager.API.Menu.ScreenMenu menu = new CS2MenuManager.API.Menu.ScreenMenu(menuTitle.ToString(), _plugin)
         {
-            ShowResolutionsOption = false,
-            MenuType = MenuType.Both,
+            ScreenMenu_ShowResolutionsOption = false,
+            ScreenMenu_MenuType = MenuType.Both,
         };
 
         // If menu option is already exists (this is intended for !revote feature)
@@ -119,7 +120,16 @@ public class McsCs2MenuManagerScreenMenuUi(CCSPlayerController playerController,
 
     public void CloseMenu()
     {
-        MenuManager.CloseActiveMenu(playerController);
+        // Because CS2MenuManager doesn't have foolproof so check here
+        // Also playerController.IsValid is crashes server, so we'll use try catch
+        try
+        {
+            MenuManager.CloseActiveMenu(playerController);
+        }
+        catch (Exception e)
+        {
+            _plugin.Logger.LogError($"CS2MenuManager Screen Menu UI method {nameof(CloseMenu)} has thrown an exception: {e}");
+        }
     }
 
     public void SetVoteOptions(List<IMcsVoteOption> voteOptions)

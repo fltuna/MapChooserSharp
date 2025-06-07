@@ -114,6 +114,17 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private void OnClientDisconnect(int slot)
     {
         RemovePlayerVote(slot);
+        
+        // TO HANDLE CS2MenuManager's UNMANAGED EXCEPTION
+        if (_mapVoteContent != null)
+        {
+            _mapVoteContent.GetVoteParticipants().Remove(slot);
+            
+            if (_mapVoteContent.VoteUi.Remove(slot, out var vote))
+            {
+                vote.CloseMenu();
+            }
+        }
     }
     
     
@@ -126,17 +137,24 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     
     public readonly FakeConVar<bool> ShouldShuffleVoteMenu = new("mcs_vote_shuffle_menu", "Should vote menu elements is shuffled per player?", false);
     
-    public readonly FakeConVar<float> MapVoteEndTime = new("mcs_vote_end_time", "How long to take vote ends in seconds?", 15.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(5.0F, 120.0F));
+    public readonly FakeConVar<float> MapVoteEndTime = new(
+        "mcs_vote_end_time", "How long to take vote ends in seconds?", 15.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(5.0F, 120.0F));
     public int VoteEndTime => (int)MapVoteEndTime.Value;
     
-    public readonly FakeConVar<int> VoteStartCountDownTime = new("mcs_vote_countdown_time", "How long to take vote starts in seconds", 13, ConVarFlags.FCVAR_NONE, new RangeValidator<int>(0, 120));
+    public readonly FakeConVar<int> VoteStartCountDownTime = new(
+        "mcs_vote_countdown_time", "How long to take vote starts in seconds", 13, ConVarFlags.FCVAR_NONE, new RangeValidator<int>(0, 120));
     
     
     // If there is no vote that higher than _mapVoteWinnerPickUpThreshold, then it will pick up maps higher than this percentage for runoff vote
-    public readonly FakeConVar<float> MapVoteRunoffMapPickupThreshold = new("mcs_vote_runoff_map_pickup_threshold", "If there is no vote that higher than _mapVoteWinnerPickUpThreshold, then it will pick up maps higher than this percentage for runoff vote", 0.3F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1.0F));
+    public readonly FakeConVar<float> MapVoteRunoffMapPickupThreshold = new(
+        "mcs_vote_runoff_map_pickup_threshold", "If there is no vote that higher than _mapVoteWinnerPickUpThreshold, then it will pick up maps higher than this percentage for runoff vote",
+        0.3F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1.0F));
     
     // If vote is higher than this percent, it will picked up as winner.
     public readonly FakeConVar<float> MapVoteWinnerPickUpThreshold = new("mcs_vote_winner_pickup_threshold", "If vote is higher than this percent, it will picked up as winner.", 0.7F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 1.0F));
+
+    public readonly FakeConVar<bool> ChangeMapImmediatelyWhenRtvVoteSuccess =
+        new("mcs_vote_change_map_immediately_rtv_vote_success", "Change to next map immediately when enabled and RTV vote is success", false);
 
     private void TrackVoteSettingsConVar()
     {
@@ -518,6 +536,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         EndVotePostInitialization();
         CurrentVoteState = McsMapVoteState.NextMapConfirmed;
+
+        TryChangeMap();
     }
     
     #endregion
@@ -729,6 +749,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         
         EndVotePostInitialization();
         CurrentVoteState = McsMapVoteState.NextMapConfirmed;
+
+        TryChangeMap();
     }
     
     #endregion
@@ -1187,6 +1209,15 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
                 PrintLocalizedChatToAll("MapVote.Broadcast.VoteResult.ExtendForRound", extendRound);
                 FireMapExtendEvent(extendRound, type);
                 break;
+        }
+    }
+
+    private void TryChangeMap()
+    {
+        Logger.LogCritical("Trying to change map!");
+        if (ChangeMapImmediatelyWhenRtvVoteSuccess.Value)
+        {
+            _mapCycleController.ChangeToNextMap(0.1F);
         }
     }
     #endregion
