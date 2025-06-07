@@ -154,7 +154,7 @@ internal class McsWorkshopMapSynchronizer(IServiceProvider serviceProvider) : Pl
                         newMapConfig.ProhibitAdminNomination = defaultMapConfig.ProhibitAdminNomination;
                         newMapConfig.DaysAllowed = defaultMapConfig.DaysAllowed ?? new List<DayOfWeek>();
                         newMapConfig.AllowedTimeRanges = defaultMapConfig.AllowedTimeRanges ?? new List<ITimeRange>();
-                        newMapConfig.GroupSettingsArray = defaultMapConfig.GroupSettingsArray ?? new List<string> { "default" };
+                        newMapConfig.GroupSettingsArray = defaultMapConfig.GroupSettingsArray ?? new List<string>();
                     }
                     else
                     {
@@ -174,23 +174,21 @@ internal class McsWorkshopMapSynchronizer(IServiceProvider serviceProvider) : Pl
                         newMapConfig.ProhibitAdminNomination = false;
                         newMapConfig.DaysAllowed = new List<DayOfWeek>();
                         newMapConfig.AllowedTimeRanges = new List<ITimeRange>();
-                        newMapConfig.GroupSettingsArray = new List<string> { "default" };
+                        newMapConfig.GroupSettingsArray = new List<string>();
                     }
 
                     try
                     {
-                        string mapConfigToml = ConvertMapConfigToTomlString(newMapConfig);
-                        string configDir = Path.Combine(Plugin.ModuleDirectory, "config");
-                        Directory.CreateDirectory(configDir); // Ensure directory exists
-                                                              // Individual map files are typically stored in a 'maps' subdirectory within 'config'
-                        string mapsDir = Path.Combine(configDir, "maps");
-                        Directory.CreateDirectory(mapsDir);
-                        string filePath = Path.Combine(mapsDir, $"{validMapName}.toml");
-
-                        File.WriteAllText(filePath, mapConfigToml);
-                        Logger.LogInformation($"[MCS WS] Created map settings for '{mapTitle}' (ID: {currentWorkshopId}) as '{filePath}'");
-                        newMapsAdded++;
-                        processedInThisFrame++;
+                        if (AddMapConfigToSystem(newMapConfig, validMapName))
+                        {
+                            Logger.LogInformation($"[MCS WS] Created map settings for '{mapTitle}' (ID: {currentWorkshopId})");
+                            newMapsAdded++;
+                            processedInThisFrame++;
+                        }
+                        else
+                        {
+                            Logger.LogWarning($"[MCS WS] Failed to add map settings for '{mapTitle}' (ID: {currentWorkshopId})");
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -230,7 +228,49 @@ internal class McsWorkshopMapSynchronizer(IServiceProvider serviceProvider) : Pl
 
     private NullableMapConfig? GetDefaultMapConfig()
     {
-        string defaultConfigPath = Path.Combine(Plugin.ModuleDirectory, "config", "maps", "default.toml");
+        string configDir = Path.Combine(Plugin.ModuleDirectory, "config");
+        string mapsTomlPath = Path.Combine(configDir, "maps.toml");
+        
+        // Check if using unified configuration (maps.toml exists)
+        if (File.Exists(mapsTomlPath))
+        {
+            return GetDefaultMapConfigFromUnifiedFile(mapsTomlPath);
+        }
+        else
+        {
+            // Check for default.toml in split configuration
+            return GetDefaultMapConfigFromSplitFile(configDir);
+        }
+    }
+
+    private NullableMapConfig? GetDefaultMapConfigFromUnifiedFile(string mapsTomlPath)
+    {
+        try
+        {
+            string tomlContent = File.ReadAllText(mapsTomlPath);
+            var toml = Tomlyn.Toml.ToModel(tomlContent);
+
+            // Look for MapChooserSharpSettings.Default section
+            if (toml.TryGetValue("MapChooserSharpSettings", out var settingsObj) && settingsObj is Tomlyn.Model.TomlTable settingsTable)
+            {
+                if (settingsTable.TryGetValue("Default", out var defaultObj) && defaultObj is Tomlyn.Model.TomlTable defaultTable)
+                {
+                    return ParseDefaultConfigFromTomlTable(defaultTable);
+                }
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"[MCS WS] Error reading default config from unified file: {ex.Message}");
+            return null;
+        }
+    }
+
+    private NullableMapConfig? GetDefaultMapConfigFromSplitFile(string configDir)
+    {
+        string defaultConfigPath = Path.Combine(configDir, "default.toml");
         if (!File.Exists(defaultConfigPath))
         {
             return null;
@@ -240,80 +280,162 @@ internal class McsWorkshopMapSynchronizer(IServiceProvider serviceProvider) : Pl
         {
             string tomlContent = File.ReadAllText(defaultConfigPath);
             var toml = Tomlyn.Toml.ToModel(tomlContent);
-
-            var defaultConfig = new NullableMapConfig();
-
-            if (toml.TryGetValue("MapNameAlias", out var mapNameAliasObj) && mapNameAliasObj is string mapNameAlias)
-                defaultConfig.MapNameAlias = mapNameAlias;
-
-            if (toml.TryGetValue("MapDescription", out var mapDescriptionObj) && mapDescriptionObj is string mapDescription)
-                defaultConfig.MapDescription = mapDescription;
-
-            if (toml.TryGetValue("IsDisabled", out var isDisabledObj) && isDisabledObj is bool isDisabled)
-                defaultConfig.IsDisabled = isDisabled;
-
-            if (toml.TryGetValue("WorkshopId", out var workshopIdObj) && workshopIdObj is long workshopId)
-                defaultConfig.WorkshopId = workshopId;
-
-            if (toml.TryGetValue("OnlyNomination", out var onlyNominationObj) && onlyNominationObj is bool onlyNomination)
-                defaultConfig.OnlyNomination = onlyNomination;
-
-            if (toml.TryGetValue("MaxExtends", out var maxExtendsObj) && maxExtendsObj is long maxExtends)
-                defaultConfig.MaxExtends = (int)maxExtends;
-
-            if (toml.TryGetValue("MaxExtCommandUses", out var maxExtCommandUsesObj) && maxExtCommandUsesObj is long maxExtCommandUses)
-                defaultConfig.MaxExtCommandUses = (int)maxExtCommandUses;
-
-            if (toml.TryGetValue("MapTime", out var mapTimeObj) && mapTimeObj is long mapTime)
-                defaultConfig.MapTime = (int)mapTime;
-
-            if (toml.TryGetValue("ExtendTimePerExtends", out var extendTimePerExtendsObj) && extendTimePerExtendsObj is long extendTimePerExtends)
-                defaultConfig.ExtendTimePerExtends = (int)extendTimePerExtends;
-
-            if (toml.TryGetValue("MapRounds", out var mapRoundsObj) && mapRoundsObj is long mapRounds)
-                defaultConfig.MapRounds = (int)mapRounds;
-
-            if (toml.TryGetValue("ExtendRoundsPerExtends", out var extendRoundsPerExtendsObj) && extendRoundsPerExtendsObj is long extendRoundsPerExtends)
-                defaultConfig.ExtendRoundsPerExtends = (int)extendRoundsPerExtends;
-
-            if (toml.TryGetValue("Cooldown", out var cooldownObj) && cooldownObj is long cooldown)
-                defaultConfig.Cooldown = (int)cooldown;
-
-            if (toml.TryGetValue("RestrictToAllowedUsersOnly", out var restrictToAllowedUsersOnlyObj) && restrictToAllowedUsersOnlyObj is bool restrictToAllowedUsersOnly)
-                defaultConfig.RestrictToAllowedUsersOnly = restrictToAllowedUsersOnly;
-
-            if (toml.TryGetValue("MaxPlayers", out var maxPlayersObj) && maxPlayersObj is long maxPlayers)
-                defaultConfig.MaxPlayers = (int)maxPlayers;
-
-            if (toml.TryGetValue("MinPlayers", out var minPlayersObj) && minPlayersObj is long minPlayers)
-                defaultConfig.MinPlayers = (int)minPlayers;
-
-            if (toml.TryGetValue("ProhibitAdminNomination", out var prohibitAdminNominationObj) && prohibitAdminNominationObj is bool prohibitAdminNomination)
-                defaultConfig.ProhibitAdminNomination = prohibitAdminNomination;
-
-            return defaultConfig;
+            return ParseDefaultConfigFromTomlTable(toml);
         }
         catch (Exception ex)
         {
-            Logger.LogError($"[MCS WS] Error reading default config: {ex.Message}");
+            Logger.LogError($"[MCS WS] Error reading default config from split file: {ex.Message}");
             return null;
         }
+    }
+
+    private NullableMapConfig ParseDefaultConfigFromTomlTable(Tomlyn.Model.TomlTable toml)
+    {
+        var defaultConfig = new NullableMapConfig();
+
+        if (toml.TryGetValue("MapNameAlias", out var mapNameAliasObj) && mapNameAliasObj is string mapNameAlias)
+            defaultConfig.MapNameAlias = mapNameAlias;
+
+        if (toml.TryGetValue("MapDescription", out var mapDescriptionObj) && mapDescriptionObj is string mapDescription)
+            defaultConfig.MapDescription = mapDescription;
+
+        if (toml.TryGetValue("IsDisabled", out var isDisabledObj) && isDisabledObj is bool isDisabled)
+            defaultConfig.IsDisabled = isDisabled;
+
+        if (toml.TryGetValue("WorkshopId", out var workshopIdObj) && workshopIdObj is long workshopId)
+            defaultConfig.WorkshopId = workshopId;
+
+        if (toml.TryGetValue("OnlyNomination", out var onlyNominationObj) && onlyNominationObj is bool onlyNomination)
+            defaultConfig.OnlyNomination = onlyNomination;
+
+        if (toml.TryGetValue("MaxExtends", out var maxExtendsObj) && maxExtendsObj is long maxExtends)
+            defaultConfig.MaxExtends = (int)maxExtends;
+
+        if (toml.TryGetValue("MaxExtCommandUses", out var maxExtCommandUsesObj) && maxExtCommandUsesObj is long maxExtCommandUses)
+            defaultConfig.MaxExtCommandUses = (int)maxExtCommandUses;
+
+        if (toml.TryGetValue("MapTime", out var mapTimeObj) && mapTimeObj is long mapTime)
+            defaultConfig.MapTime = (int)mapTime;
+
+        if (toml.TryGetValue("ExtendTimePerExtends", out var extendTimePerExtendsObj) && extendTimePerExtendsObj is long extendTimePerExtends)
+            defaultConfig.ExtendTimePerExtends = (int)extendTimePerExtends;
+
+        if (toml.TryGetValue("MapRounds", out var mapRoundsObj) && mapRoundsObj is long mapRounds)
+            defaultConfig.MapRounds = (int)mapRounds;
+
+        if (toml.TryGetValue("ExtendRoundsPerExtends", out var extendRoundsPerExtendsObj) && extendRoundsPerExtendsObj is long extendRoundsPerExtends)
+            defaultConfig.ExtendRoundsPerExtends = (int)extendRoundsPerExtends;
+
+        if (toml.TryGetValue("Cooldown", out var cooldownObj) && cooldownObj is long cooldown)
+            defaultConfig.Cooldown = (int)cooldown;
+
+        if (toml.TryGetValue("RestrictToAllowedUsersOnly", out var restrictToAllowedUsersOnlyObj) && restrictToAllowedUsersOnlyObj is bool restrictToAllowedUsersOnly)
+            defaultConfig.RestrictToAllowedUsersOnly = restrictToAllowedUsersOnly;
+
+        if (toml.TryGetValue("MaxPlayers", out var maxPlayersObj) && maxPlayersObj is long maxPlayers)
+            defaultConfig.MaxPlayers = (int)maxPlayers;
+
+        if (toml.TryGetValue("MinPlayers", out var minPlayersObj) && minPlayersObj is long minPlayers)
+            defaultConfig.MinPlayers = (int)minPlayers;
+
+        if (toml.TryGetValue("ProhibitAdminNomination", out var prohibitAdminNominationObj) && prohibitAdminNominationObj is bool prohibitAdminNomination)
+            defaultConfig.ProhibitAdminNomination = prohibitAdminNomination;
+
+        return defaultConfig;
+    }
+
+    private bool AddMapConfigToSystem(NullableMapConfig mapConfig, string validMapName)
+    {
+        try
+        {
+            string configDir = Path.Combine(Plugin.ModuleDirectory, "config");
+            string mapsTomlPath = Path.Combine(configDir, "maps.toml");
+            
+            Directory.CreateDirectory(configDir); // Ensure directory exists
+            
+            // Check if maps.toml exists (unified configuration mode)
+            if (File.Exists(mapsTomlPath))
+            {
+                return AddMapConfigToUnifiedFile(mapConfig, validMapName, mapsTomlPath);
+            }
+            else
+            {
+                // Split configuration mode - create individual file
+                return AddMapConfigToSplitFile(mapConfig, validMapName, configDir);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"[MCS WS] Error adding map config to system: {ex.Message}");
+            return false;
+        }
+    }
+
+    private bool AddMapConfigToUnifiedFile(NullableMapConfig mapConfig, string validMapName, string mapsTomlPath)
+    {
+        try
+        {
+            string existingContent = File.ReadAllText(mapsTomlPath);
+            string newMapSection = ConvertMapConfigToTomlSectionString(mapConfig, validMapName);
+            
+            // Append the new map section to the existing file
+            string updatedContent = existingContent.TrimEnd() + Environment.NewLine + Environment.NewLine + newMapSection;
+            
+            File.WriteAllText(mapsTomlPath, updatedContent);
+            Logger.LogDebug($"[MCS WS] Added map '{validMapName}' to unified maps.toml file");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"[MCS WS] Error adding map to unified file: {ex.Message}");
+            return false;
+        }
+    }
+
+    private bool AddMapConfigToSplitFile(NullableMapConfig mapConfig, string validMapName, string configDir)
+    {
+        try
+        {
+            string mapConfigToml = ConvertMapConfigToTomlString(mapConfig);
+            
+            // Individual map files are typically stored in a 'maps' subdirectory within 'config'
+            string mapsDir = Path.Combine(configDir, "synced_workshopmaps");
+            Directory.CreateDirectory(mapsDir);
+            string filePath = Path.Combine(mapsDir, $"{validMapName}.toml");
+
+            File.WriteAllText(filePath, mapConfigToml);
+            Logger.LogDebug($"[MCS WS] Created individual map file: {filePath}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"[MCS WS] Error creating individual map file: {ex.Message}");
+            return false;
+        }
+    }
+
+    private string ConvertMapConfigToTomlSectionString(NullableMapConfig mapConfig, string validMapName)
+    {
+        var sb = new StringBuilder();
+        
+        // Add section header for unified file
+        sb.AppendLine($"[{validMapName}]");
+        
+        // Add the map configuration content
+        sb.Append(ConvertMapConfigToTomlString(mapConfig));
+        
+        return sb.ToString();
     }
 
     private string ConvertMapConfigToTomlString(NullableMapConfig mapConfig)
     {
         var sb = new StringBuilder();
-        // Section name should be the map's actual name (filename without .toml)
-        // However, the parser structure seems to use the map name as the key in the main TOML structure.
-        // For individual files, the filename itself is the key.
-        // So, the content of workshop_map_xyz.toml would be:
-        // DisplayName = "Workshop Map XYZ"
-        // WorkshopId = 12345...
-        // etc., without the [workshop_map_xyz] header inside the file itself.
-        // The parser combines these files, and the filename becomes the section header.
+        // For individual files (split mode), we don't include the section header
+        // The filename itself becomes the section name when parsed
+        // For unified files, the section header is added by ConvertMapConfigToTomlSectionString
 
-        sb.AppendLine($"DisplayName = \"{TomlEncode(mapConfig.MapNameAlias)}\""); // mapConfig.Name is the sanitized one, MapNameAlias is closer to original title
-        sb.AppendLine($"MapDescription = \"{TomlEncode(mapConfig.MapDescription)}\"");
+        sb.AppendLine($"MapNameAlias = \"{TomlEncode(mapConfig.MapNameAlias ?? "empty")}\"");
+        sb.AppendLine($"MapDescription = \"{TomlEncode(mapConfig.MapDescription ?? "empty")}\"");
         sb.AppendLine($"IsDisabled = {mapConfig.IsDisabled?.ToString().ToLowerInvariant() ?? "false"}");
         if (mapConfig.WorkshopId.HasValue && mapConfig.WorkshopId.Value > 0)
             sb.AppendLine($"WorkshopId = {mapConfig.WorkshopId.Value}");

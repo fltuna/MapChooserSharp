@@ -328,7 +328,7 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         }
 
         var workshopCollectionIds = generalTable.TryGetValue("WorkshopCollectionIds", out var workshopCollectionIdsObj) && workshopCollectionIdsObj is TomlArray workshopCollectionIdsArray
-            ? workshopCollectionIdsArray.Select(x => x.ToString() ?? string.Empty).ToArray()
+            ? workshopCollectionIdsArray.Select(x => x?.ToString() ?? string.Empty).ToArray()
             : Array.Empty<string>();
         
         bool shouldAutoFixMapName = generalTable.TryGetValue("ShouldAutoFixMapName", out var shouldAutoFixMapNameObj) && shouldAutoFixMapNameObj is bool autoFixMapNameSetting
