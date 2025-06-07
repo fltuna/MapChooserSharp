@@ -9,6 +9,7 @@ using MapChooserSharp.API.Nomination;
 using MapChooserSharp.API.RtvController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Models;
+using MapChooserSharp.Modules.AutoFixMapWorkshopId;
 using MapChooserSharp.Modules.DebugCommands;
 using MapChooserSharp.Modules.EventManager;
 using MapChooserSharp.Modules.MapConfig;
@@ -26,6 +27,7 @@ using MapChooserSharp.Modules.Nomination.Interfaces;
 using MapChooserSharp.Modules.PluginConfig;
 using MapChooserSharp.Modules.RockTheVote;
 using MapChooserSharp.Modules.RockTheVote.Interfaces;
+using MapChooserSharp.Modules.WorkshopSync;
 using MapChooserSharp.Util;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -89,6 +91,9 @@ public sealed class MapChooserSharp: TncssPluginBase
         RegisterModule<McsMapCycleExtendController>(hotReload);
         RegisterModule<McsMapCycleExtendVoteController>();
         RegisterModule<McsMapCycleExtendCommands>();
+
+        RegisterModule<McsWorkshopMapSynchronizer>();
+        RegisterModule<McsAutoFixMapWorkshopId>();
         
         #if DEBUG
         RegisterModule<McsDebugCommands>();

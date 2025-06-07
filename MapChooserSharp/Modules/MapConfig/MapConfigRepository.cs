@@ -26,6 +26,7 @@ internal sealed class MapConfigRepository(IServiceProvider serviceProvider): Plu
 
     public override void RegisterServices(IServiceCollection services)
     {
+        services.AddSingleton(this);
         services.AddSingleton(_mcsInternalMapConfigProviderApi);
     }
 

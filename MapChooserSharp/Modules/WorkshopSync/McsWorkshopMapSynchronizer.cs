@@ -396,7 +396,7 @@ internal class McsWorkshopMapSynchronizer(IServiceProvider serviceProvider) : Pl
     {
         try
         {
-            string mapConfigToml = ConvertMapConfigToTomlString(mapConfig);
+            string mapConfigToml = ConvertMapConfigToTomlSectionString(mapConfig, validMapName);
             
             // Individual map files are typically stored in a 'maps' subdirectory within 'config'
             string mapsDir = Path.Combine(configDir, "synced_workshopmaps");
