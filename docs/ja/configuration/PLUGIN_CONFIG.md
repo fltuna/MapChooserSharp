@@ -16,6 +16,14 @@ ShouldUseAliasMapNameIfAvailable = true
 # if false, and commands in cooldown, it will show only cooldown message
 VerboseCooldownPrint = true
 
+# Workshop Collection IDs to automatically fetch maps from
+# Example: WorkshopCollectionIds = [ "3070257939", "1234567890" ]
+WorkshopCollectionIds = []
+
+# Should automatically fix map name in map settings when map starts?
+# This will update the map name in settings to match the actual map name from the server
+ShouldAutoFixMapName = true
+
 ```
 
 ### ShouldUseAliasMapNameIfAvailable
@@ -25,6 +33,14 @@ VerboseCooldownPrint = true
 ### VerboseCooldownPrint
 
 RTVコマンドなどがクールダウンのときに秒数を表示するかどうか
+
+### WorkshopCollectionIds
+
+Steamワークショップのコレクションからマップを自動的に取得するためのコレクションIDの配列です。プラグイン起動時に、指定されたコレクションからマップ情報を取得し、マップ設定を自動的に作成します。同じワークショップIDを持つ既存のマップ設定があるものはスキップされます。
+
+### ShouldAutoFixMapName
+
+マップスタート時に、マップ設定のマップ名を実際のマップ名（Server.MapName）で自動的に修正するかどうかを指定します。これは、主に自動生成されたワークショップマップの設定に置いてタイトルとマップ名が異なる場合に役立ちます。(ワークショップのタイトルは制作者が自由に決めれるため、異なる場合があるのです)
 
 
 ## SQL設定

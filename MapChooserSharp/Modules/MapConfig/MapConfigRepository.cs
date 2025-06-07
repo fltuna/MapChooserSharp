@@ -1,4 +1,4 @@
-﻿using MapChooserSharp.Modules.MapConfig.Interfaces;
+﻿﻿using MapChooserSharp.Modules.MapConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 
@@ -26,10 +26,11 @@ internal sealed class MapConfigRepository(IServiceProvider serviceProvider): Plu
 
     public override void RegisterServices(IServiceCollection services)
     {
+        services.AddSingleton(this);
         services.AddSingleton(_mcsInternalMapConfigProviderApi);
     }
 
-    private void ReloadMapConfiguration()
+    public void ReloadMapConfiguration()
     {
         _mapConfigLocation = Path.Combine(Plugin.ModuleDirectory, "config", "maps.toml");
         _mcsInternalMapConfigProviderApi = new MapConfigParser(_mapConfigLocation).Load();

@@ -8,5 +8,9 @@ internal interface IMcsGeneralConfig
     
     internal bool VerboseCooldownPrint { get; }
     
+    internal string[] WorkshopCollectionIds { get; }
+    
+    internal bool ShouldAutoFixMapName { get; }
+    
     internal IMcsSqlConfig SqlConfig { get; }
 }
