@@ -361,11 +361,12 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
             player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.MinPlayers", mapConfig.NominationConfig.MinPlayers));
 
         if (mapConfig.MapCooldown.CurrentCooldown > 0 ||
-            mapConfig.GroupSettings.Count(g => g.GroupCooldown.CurrentCooldown > 0) > 0)
+            mapConfig.GroupSettings.Any(g => g.GroupCooldown.CurrentCooldown > 0))
         {
-            var maxGroupCooldown = mapConfig.GroupSettings
-                .Where(g => g.GroupCooldown.CurrentCooldown > 0)
-                .Max(g => g.GroupCooldown.CurrentCooldown);
+            var gorupCooldowns = mapConfig.GroupSettings.Where(g => g.GroupCooldown.CurrentCooldown > 0).ToList();
+            var maxGroupCooldown = gorupCooldowns.Any() 
+                ? gorupCooldowns.Max(g => g.GroupCooldown.CurrentCooldown) 
+                : 0;
             
             int cooldown = Math.Max(mapConfig.MapCooldown.CurrentCooldown, maxGroupCooldown);
             player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.Cooldown", cooldown));
