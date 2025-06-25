@@ -16,6 +16,14 @@ ShouldUseAliasMapNameIfAvailable = true
 # if false, and commands in cooldown, it will show only cooldown message
 VerboseCooldownPrint = true
 
+# Workshop Collection IDs to automatically fetch maps from
+# Example: WorkshopCollectionIds = [ "3070257939", "1234567890" ]
+WorkshopCollectionIds = []
+
+# Should automatically fix map name in map settings when map starts?
+# This will update the map name in settings to match the actual map name from the server
+ShouldAutoFixMapName = true
+
 ```
 
 ### ShouldUseAliasMapNameIfAvailable
@@ -25,6 +33,14 @@ Whether to display the alias name in the Nomination menu and voting menu if Alia
 ### VerboseCooldownPrint
 
 Whether to display the number of seconds when RTV commands and other commands are in cooldown.
+
+### WorkshopCollectionIds
+
+An array of collection IDs to automatically fetch maps from Steam Workshop. When the plugin loads, it retrieves map information from the specified collections and automatically creates map settings. Existing map settings (with the same Workshop ID) are skipped.
+
+### ShouldAutoFixMapName
+
+Specifies whether to automatically correct the map name in map settings with the actual map name (Server.MapName) when a map starts. This is useful when the Workshop map title differs from the actual map name.
 
 ## SQL Settings
 

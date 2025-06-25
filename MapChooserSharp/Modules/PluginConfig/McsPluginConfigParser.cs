@@ -324,12 +324,20 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         
         if (!generalTable.TryGetValue("VerboseCooldownPrint", out var verboseCooldownPrintObj) || verboseCooldownPrintObj is not bool verboseCooldownPrint)
         {
-            throw new InvalidOperationException("General.ShouldUseAliasMapNameIfAvailable is not found or invalid");
+            throw new InvalidOperationException("General.VerboseCooldownPrint is not found or invalid");
         }
 
+        var workshopCollectionIds = generalTable.TryGetValue("WorkshopCollectionIds", out var workshopCollectionIdsObj) && workshopCollectionIdsObj is TomlArray workshopCollectionIdsArray
+            ? workshopCollectionIdsArray.Select(x => x?.ToString() ?? string.Empty).ToArray()
+            : Array.Empty<string>();
+        
+        bool shouldAutoFixMapName = generalTable.TryGetValue("ShouldAutoFixMapName", out var shouldAutoFixMapNameObj) && shouldAutoFixMapNameObj is bool autoFixMapNameSetting
+            ? autoFixMapNameSetting
+            : false;
+        
         var sqlConfig = ParseSqlConfig(generalTable);
         
-        return new McsGeneralConfig(aliasNameSetting, verboseCooldownPrint, sqlConfig);
+        return new McsGeneralConfig(aliasNameSetting, verboseCooldownPrint, workshopCollectionIds, shouldAutoFixMapName, sqlConfig);
     }
 
     private McsSqlConfig ParseSqlConfig(TomlTable tomlModel)
@@ -462,6 +470,14 @@ ShouldUseAliasMapNameIfAvailable = true
 # if true, and commands in cooldown, it will show cooldown message with seconds
 # if false, and commands in cooldown, it will show only cooldown message
 VerboseCooldownPrint = true
+
+# Workshop Collection IDs to automatically fetch maps from
+# Example: WorkshopCollectionIds = [ ""3070257939"", ""1234567890"" ]
+WorkshopCollectionIds = []
+
+# Should automatically fix map name in map settings when map starts?
+# This will update the map name in settings to match the actual map name from the server
+ShouldAutoFixMapName = true
 
 
 [General.Sql]
