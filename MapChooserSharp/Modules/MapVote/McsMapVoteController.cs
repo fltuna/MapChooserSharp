@@ -114,17 +114,8 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
     private void OnClientDisconnect(int slot)
     {
         RemovePlayerVote(slot);
-        
-        // TO HANDLE CS2MenuManager's UNMANAGED EXCEPTION
-        if (_mapVoteContent != null)
-        {
-            _mapVoteContent.GetVoteParticipants().Remove(slot);
-            
-            if (_mapVoteContent.VoteUi.Remove(slot, out var vote))
-            {
-                vote.CloseMenu();
-            }
-        }
+        _mapVoteContent?.GetVoteParticipants().Remove(slot);
+        _mapVoteContent?.VoteUi.Remove(slot);
     }
     
     
