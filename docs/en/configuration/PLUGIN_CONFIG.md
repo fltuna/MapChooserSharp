@@ -105,6 +105,9 @@ FallbackExtendTimePerExtends = 15
 
 # How long to extend when map is extended in round based game?
 FallbackExtendRoundsPerExtends = 5
+
+# Should execute tv_stoprecord on before map change? (this is required to prevent crash when you using sourceTV in your server.)
+ShouldStopSourceTvRecording = false
 ```
 
 ### FallbackMaxExtends
@@ -119,9 +122,13 @@ You can specify the default maximum number of extensions by `!ext` command when 
 
 You can specify the default extension time for `mp_timelimit` or `mp_roundtime` in minutes when playing a map that doesn't exist in the config.
 
-#### FallbackExtendRoundsPerExtends
+### FallbackExtendRoundsPerExtends
 
 You can specify the default extension for `mp_maxrounds` in rounds when playing a map that doesn't exist in the config.
+
+### ShouldStopSourceTvRecording
+
+This settings specify wether to execute tv_stoprecord command before map transition. This setting will help to prevent server crash when you using SourceTV and when map transition.
 
 ## MapVote
 

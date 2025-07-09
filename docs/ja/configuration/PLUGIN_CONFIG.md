@@ -106,6 +106,9 @@ FallbackExtendTimePerExtends = 15
 
 # How long to extend when map is extended in round based game?
 FallbackExtendRoundsPerExtends = 5
+
+# Should execute tv_stoprecord on before map change? (this is required to prevent crash when you using sourceTV in your server.)
+ShouldStopSourceTvRecording = false
 ```
 
 ### FallbackMaxExtends
@@ -120,9 +123,13 @@ FallbackExtendRoundsPerExtends = 5
 
 コンフィグに存在しないマップを遊んでいる際のデフォルトの`mp_timelimit`もしくは`mp_roundtime`の延長時間を分単位で指定できます。
 
-#### FallbackExtendRoundsPerExtends
+### FallbackExtendRoundsPerExtends
 
 コンフィグに存在しないマップを遊んでいる際のデフォルトの`mp_maxrounds`をラウンド単位で指定できます。
+
+### ShouldStopSourceTvRecording
+
+tv_stoprecordコマンドをマップ変更前に実行するかの設定です。 この設定はSourceTVを有効にしているサーバーがマップ変更時のクラッシュを防止するのに役立ちます。
 
 ## MapVote
 
