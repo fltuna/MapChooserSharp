@@ -9,4 +9,6 @@ internal interface IMcsMapCycleConfig
     internal int FallbackExtendRoundsPerExtends { get; }
     
     internal int FallbackMaxExtCommandUses { get; }
+    
+    internal bool ShouldStopSourceTvRecording { get; }
 }

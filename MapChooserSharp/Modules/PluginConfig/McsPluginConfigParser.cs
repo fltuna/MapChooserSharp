@@ -153,10 +153,14 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         }
         
         int fallbackExtendRoundsPerExtends = (int)defaultExtendsRoundLong;
+
+        if (!mapCycleTable.TryGetValue("ShouldStopSourceTvRecording", out var shouldStopSourceTvRecording) ||
+            shouldStopSourceTvRecording is not bool shouldStopSourceTvRecordingBool)
+        {
+            throw new InvalidOperationException("MapCycle.ShouldStopSourceTvRecording is not found or invalid");
+        }
         
-        
-        
-        return new McsMapCycleConfig(defaultMaxExtends, defaultExtCmdUses, fallbackExtendTimePerExtends, fallbackExtendRoundsPerExtends);
+        return new McsMapCycleConfig(defaultMaxExtends, defaultExtCmdUses, fallbackExtendTimePerExtends, fallbackExtendRoundsPerExtends, shouldStopSourceTvRecordingBool);
     }
 
     private IMcsNominationConfig ParseNominationConfig(TomlTable tomlModel)
@@ -518,6 +522,8 @@ FallbackExtendTimePerExtends = 15
 # How long to extend when map is extended in round based game?
 FallbackExtendRoundsPerExtends = 5
 
+# Should execute tv_stoprecord on before map change? (this is required to prevent crash when you using sourceTV in your server.)
+ShouldStopSourceTvRecording = false
 
 
 [MapVote]
