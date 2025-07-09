@@ -1205,7 +1205,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
     private void TryChangeMap()
     {
-        Logger.LogCritical("Trying to change map!");
+        Logger.LogInformation("Trying to change the map by RTV!");
         if (ChangeMapImmediatelyWhenRtvVoteSuccess.Value)
         {
             _mapCycleController.ChangeToNextMap(0.1F);

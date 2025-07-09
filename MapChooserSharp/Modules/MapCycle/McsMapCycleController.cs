@@ -211,10 +211,17 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
     private void ChangeToNextMapInternal()
     {
+        
         if (NextMap == null)
         {
             Logger.LogError("Failed to change map: next map is null");
             return;
+        }
+        
+        if (_mcsPluginConfigProvider.PluginConfig.MapCycleConfig.ShouldStopSourceTvRecording)
+        {
+            Logger.LogInformation("Executing tv_stoprecord before map change to prevent server crash.");
+            Server.ExecuteCommand("tv_stoprecord");
         }
 
         DebugLogger.LogDebug("Changing to next map!");
