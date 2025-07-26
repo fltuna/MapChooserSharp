@@ -67,9 +67,11 @@ public class McsCs2MenuManagerScreenMenuNominationUi(CCSPlayerController playerC
         {
             StringBuilder builder = new();
             
+            // TODO() Use Alias name if enabled and available
+            // TODO() Truncate MapName if too long
             builder.Append(_mcsInternalMapConfigProviderApi.GetMapName(option.NominationOption.MapConfig));
             
-            menuOptions.Add(new ItemOption(builder.ToString(), option.NominationOption.MapConfig.IsDisabled ? DisableOption.DisableShowNumber : DisableOption.None, (_, _) =>
+            menuOptions.Add(new ItemOption(builder.ToString(), option.MenuDisabled ? DisableOption.DisableShowNumber : DisableOption.None, (_, _) =>
             {
                 _nominationMenuOptions[index].SelectionCallback.Invoke(playerController, option.NominationOption);
             }));
