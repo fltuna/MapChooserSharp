@@ -1071,8 +1071,10 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         var shuffledMaps = unusedMapList
             .OrderBy(_ => _random.Next()).ToList();
 
+        var disabledMaps = shuffledMaps.Where(map => !map.IsDisabled).ToList();
+        DebugLogger.LogTrace($"[Filter | Disabled Maps] {disabledMaps.Count} maps found.");
         
-        var cooldownEndedMaps = shuffledMaps.Where(map => map.MapCooldown.CurrentCooldown <= 0).ToList();
+        var cooldownEndedMaps = disabledMaps.Where(map => map.MapCooldown.CurrentCooldown <= 0).ToList();
         DebugLogger.LogTrace($"[Filter | Map Cooldown] {cooldownEndedMaps.Count} maps found.");
 
         
@@ -1114,7 +1116,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         DebugLogger.LogTrace($"[Filter | Without Current Map] {withoutCurrentMap.Count} maps found.");
         
 
-        var pickedMaps = whithinAllowedTimeRange.Take(numToPick).ToList();
+        var pickedMaps = withoutCurrentMap.Take(numToPick).ToList();
         DebugLogger.LogTrace($"[Filter | Finally] {pickedMaps.Count} maps picked.");
         
         return pickedMaps;
