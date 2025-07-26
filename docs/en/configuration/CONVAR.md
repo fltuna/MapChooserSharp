@@ -66,6 +66,7 @@ ConVar configuration file is located in `game/csgo/cfg/MapChooserSharp/convars.c
 | mcs_rtv_command_unlock_time_map_start          | Seconds to take unlock RTV command after map started                                                     | 300.0         | Valid Range is 0.0 - 1200.0 |
 | mcs_rtv_vote_start_threshold                   | How many percent to require start rtv vote?                                                              | 0.5           | Valid Range is 0.0 - 1.0    |
 | mcs_rtv_map_change_timing                      | Seconds to change map when next map is confirmed and after RTV is success. Set 0.0 to change immediately | 3.0           | Valid Range is 0.0 - 60.0   |
+| mcs_rtv_minimum_requirements                   | Minimum RTV requirements to start RTV vote. Set 0 to disable this requirement                            | 0             | Valid Range is 0 - 64       |
 
 
 ## Timeleft Util
