@@ -54,6 +54,9 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
         new("mcs_rtv_map_change_timing", 
             "Seconds to change map after RTV is success. Set 0.0 to change immediately", 3.0F, ConVarFlags.FCVAR_NONE, new RangeValidator<float>(0.0F, 60.0F));
 
+    public readonly FakeConVar<int> MinimumRtvRequirements =
+        new("mcs_rtv_minimum_requirements",
+            "Minimum RTV requirements to start RTV vote. Set 0 to disable this requirement", 0, ConVarFlags.FCVAR_NONE, new RangeValidator<int>(0, 64));
     
     
     public RtvStatus RtvCommandStatus { get; private set; } = RtvStatus.Enabled;
@@ -112,19 +115,19 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
             
             if (Utilities.GetPlayerFromSlot(slot)?.IsHLTV ?? true)
                 return;
-            
-            CountsRequiredToInitiateRtv = (int)Math.Truncate(Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }) * RtvVoteStartThreshold.Value);
+
+            RefreshRtvRequirementCounts();
         });
 
         Plugin.RegisterListener<Listeners.OnClientDisconnect>((slot) =>
         {
             _rtvVoteParticipants.Remove(slot);
-            CountsRequiredToInitiateRtv = (int)Math.Truncate(Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }) * RtvVoteStartThreshold.Value);
+            RefreshRtvRequirementCounts();
         });
 
         if (hotReload)
         {
-            CountsRequiredToInitiateRtv = (int)Math.Truncate(Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }) * RtvVoteStartThreshold.Value);
+            RefreshRtvRequirementCounts();
         }
     }
 
@@ -168,14 +171,11 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
             return PlayerRtvResult.NotAllowed;
         }
 
-
-        // CountsRequiredToInitiateRtv is possibly 0, so if 0 visual required count is set to 1, otherwise actual count.
-        int visualRequiredCount = CountsRequiredToInitiateRtv > 0 ? CountsRequiredToInitiateRtv : 1;
-        
-        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.PlayerCastRtv", player.PlayerName, _rtvVoteParticipants.Count, visualRequiredCount);
+        int requiredCount = GetMinimumRtvRequirementCounts();
+        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.PlayerCastRtv", player.PlayerName, _rtvVoteParticipants.Count, requiredCount);
         
 
-        if (_rtvVoteParticipants.Count >= CountsRequiredToInitiateRtv)
+        if (_rtvVoteParticipants.Count >= requiredCount)
         {
             if (_mcsMapCycleController.IsNextMapConfirmed)
             {
@@ -335,6 +335,21 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
         RtvCommandStatus = RtvStatus.Enabled;
         RtvCommandUnlockTimer?.Kill();
         _rtvVoteParticipants.Clear();
+    }
+    
+    private void RefreshRtvRequirementCounts()
+    {
+        CountsRequiredToInitiateRtv = (int)Math.Truncate(Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }) * RtvVoteStartThreshold.Value);
+    }
+
+    private int GetMinimumRtvRequirementCounts()
+    {
+        int count = Math.Max(CountsRequiredToInitiateRtv, MinimumRtvRequirements.Value);
+        
+        if (count <= 0)
+            return 1;
+        
+        return count;
     }
     
     
