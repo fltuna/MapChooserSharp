@@ -67,7 +67,7 @@ public class McsBuiltInHtmlNominationUi(CCSPlayerController playerController, IS
             // TODO() Truncate MapName if too long
             builder.Append(_mcsInternalMapConfigProviderApi.GetMapName(option.NominationOption.MapConfig));
             
-            chatMenuOptions.Add(new ChatMenuOption(builder.ToString(), option.NominationOption.MapConfig.IsDisabled, (_, _) =>
+            chatMenuOptions.Add(new ChatMenuOption(builder.ToString(), option.MenuDisabled, (_, _) =>
             {
                 _nominationMenuOptions[index].SelectionCallback.Invoke(playerController, option.NominationOption);
             }));
