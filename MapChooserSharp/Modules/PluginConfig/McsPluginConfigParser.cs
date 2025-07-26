@@ -1,5 +1,4 @@
 ﻿using CounterStrikeSharp.API;
-using MapChooserSharp.Models;
 using MapChooserSharp.Modules.MapVote.Countdown;
 using MapChooserSharp.Modules.McsDatabase;
 using MapChooserSharp.Modules.McsMenu;

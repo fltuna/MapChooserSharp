@@ -4,7 +4,6 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
-using CS2ScreenMenuAPI;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapVote.Interfaces;

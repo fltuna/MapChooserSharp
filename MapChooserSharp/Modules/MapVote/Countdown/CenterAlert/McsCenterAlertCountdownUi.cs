@@ -1,5 +1,4 @@
-﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API.Core;
 using MapChooserSharp.Modules.MapVote.Countdown.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation;

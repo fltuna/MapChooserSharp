@@ -1,5 +1,4 @@
-﻿using CounterStrikeSharp.API.Core;
-using MapChooserSharp.Modules.MapVote.Interfaces;
+﻿using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsMenu.Interfaces;
 
 namespace MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;

@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using MapChooserSharp.API.Events;
+﻿using MapChooserSharp.API.Events;
 using MapChooserSharp.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

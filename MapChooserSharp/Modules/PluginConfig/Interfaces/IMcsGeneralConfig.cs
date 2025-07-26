@@ -1,6 +1,4 @@
-﻿using MapChooserSharp.Modules.McsDatabase;
-
-namespace MapChooserSharp.Modules.PluginConfig.Interfaces;
+﻿namespace MapChooserSharp.Modules.PluginConfig.Interfaces;
 
 internal interface IMcsGeneralConfig
 {

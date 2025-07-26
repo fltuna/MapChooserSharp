@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using MapChooserSharp.Modules.McsMenu;
+﻿using MapChooserSharp.Modules.McsMenu;
 
 namespace MapChooserSharp.Modules.McsDatabase.Entities;
 
