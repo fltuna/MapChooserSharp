@@ -9,6 +9,8 @@ using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
+using Tomlyn;
+using Tomlyn.Model;
 
 namespace MapChooserSharp.Modules.WorkshopSync;
 
@@ -248,12 +250,12 @@ internal class McsWorkshopMapSynchronizer(IServiceProvider serviceProvider) : Pl
         try
         {
             string tomlContent = File.ReadAllText(mapsTomlPath);
-            var toml = Tomlyn.Toml.ToModel(tomlContent);
+            var toml = Toml.ToModel(tomlContent);
 
             // Look for MapChooserSharpSettings.Default section
-            if (toml.TryGetValue("MapChooserSharpSettings", out var settingsObj) && settingsObj is Tomlyn.Model.TomlTable settingsTable)
+            if (toml.TryGetValue("MapChooserSharpSettings", out var settingsObj) && settingsObj is TomlTable settingsTable)
             {
-                if (settingsTable.TryGetValue("Default", out var defaultObj) && defaultObj is Tomlyn.Model.TomlTable defaultTable)
+                if (settingsTable.TryGetValue("Default", out var defaultObj) && defaultObj is TomlTable defaultTable)
                 {
                     return ParseDefaultConfigFromTomlTable(defaultTable);
                 }
@@ -279,7 +281,7 @@ internal class McsWorkshopMapSynchronizer(IServiceProvider serviceProvider) : Pl
         try
         {
             string tomlContent = File.ReadAllText(defaultConfigPath);
-            var toml = Tomlyn.Toml.ToModel(tomlContent);
+            var toml = Toml.ToModel(tomlContent);
             return ParseDefaultConfigFromTomlTable(toml);
         }
         catch (Exception ex)
@@ -289,7 +291,7 @@ internal class McsWorkshopMapSynchronizer(IServiceProvider serviceProvider) : Pl
         }
     }
 
-    private NullableMapConfig ParseDefaultConfigFromTomlTable(Tomlyn.Model.TomlTable toml)
+    private NullableMapConfig ParseDefaultConfigFromTomlTable(TomlTable toml)
     {
         var defaultConfig = new NullableMapConfig();
 

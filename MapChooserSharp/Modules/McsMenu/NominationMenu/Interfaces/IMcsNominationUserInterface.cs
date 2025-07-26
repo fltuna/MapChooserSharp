@@ -1,5 +1,4 @@
-﻿using MapChooserSharp.API.MapConfig;
-using MapChooserSharp.Modules.McsMenu.Interfaces;
+﻿using MapChooserSharp.Modules.McsMenu.Interfaces;
 
 namespace MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
 

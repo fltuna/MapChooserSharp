@@ -4,7 +4,6 @@ using MapChooserSharp.Modules.McsMenu.NominationMenu.BuiltInHtml;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Cs2MenuManager.ScreenMenu;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Cs2ScreenMenuApi;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
-using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;

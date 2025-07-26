@@ -3,7 +3,6 @@ using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.Modules.MapConfig;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
-using MapChooserSharp.Util;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;

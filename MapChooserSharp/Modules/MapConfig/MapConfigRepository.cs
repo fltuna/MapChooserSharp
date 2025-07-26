@@ -1,4 +1,4 @@
-﻿﻿using MapChooserSharp.Modules.MapConfig.Interfaces;
+﻿using MapChooserSharp.Modules.MapConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation.Models.Plugin;
 

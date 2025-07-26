@@ -1,8 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using MapChooserSharp.Models;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.BuiltInHtml;
-using MapChooserSharp.Modules.McsMenu.VoteMenu.Cs2MenuManager;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Cs2MenuManager.ScreenMenu;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Cs2ScreenMenuApi;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;

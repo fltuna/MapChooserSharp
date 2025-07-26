@@ -1,12 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Capabilities;
-using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API;
-using MapChooserSharp.API.Events;
-using MapChooserSharp.API.MapVoteController;
-using MapChooserSharp.API.Nomination;
-using MapChooserSharp.API.RtvController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Models;
 using MapChooserSharp.Modules.AutoFixMapWorkshopId;

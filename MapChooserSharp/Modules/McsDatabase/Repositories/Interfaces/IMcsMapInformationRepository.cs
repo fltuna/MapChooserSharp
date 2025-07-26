@@ -1,6 +1,4 @@
-﻿using MapChooserSharp.Modules.McsDatabase.Entities;
-
-namespace MapChooserSharp.Modules.McsDatabase.Repositories.Interfaces;
+﻿namespace MapChooserSharp.Modules.McsDatabase.Repositories.Interfaces;
 
 internal interface IMcsMapInformationRepository
 {

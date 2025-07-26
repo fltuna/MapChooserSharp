@@ -3,7 +3,6 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using MapChooserSharp.API.MapVoteController;
-using MapChooserSharp.Modules.MapCycle;
 using MapChooserSharp.Modules.MapCycle.Interfaces;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using Microsoft.Extensions.DependencyInjection;

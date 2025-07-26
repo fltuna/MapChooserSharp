@@ -1,9 +1,6 @@
 ﻿using System.Text;
-using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
-using CounterStrikeSharp.API.Modules.Menu;
-using CounterStrikeSharp.API.Modules.Timers;
 using CS2ScreenMenuAPI;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
