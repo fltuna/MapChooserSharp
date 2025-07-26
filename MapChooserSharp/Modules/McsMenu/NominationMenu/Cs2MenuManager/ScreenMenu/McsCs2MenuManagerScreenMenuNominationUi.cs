@@ -10,6 +10,8 @@ using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsMenu.Interfaces;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
+using MapChooserSharp.Modules.Nomination;
+using MapChooserSharp.Modules.Nomination.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using TNCSSPluginFoundation;
 using TNCSSPluginFoundation.Interfaces;
@@ -30,6 +32,8 @@ public class McsCs2MenuManagerScreenMenuNominationUi(CCSPlayerController playerC
     private readonly IDebugLogger _debugLogger = provider.GetRequiredService<IDebugLogger>();
     
     private readonly IMcsInternalMapVoteControllerApi _voteController = provider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
+    
+    private readonly IMcsInternalNominationApi _nominationApi = provider.GetRequiredService<IMcsInternalNominationApi>();
     
     public int NominationOptionCount => _nominationMenuOptions.Count;
     
@@ -67,11 +71,11 @@ public class McsCs2MenuManagerScreenMenuNominationUi(CCSPlayerController playerC
         {
             StringBuilder builder = new();
             
-            // TODO() Use Alias name if enabled and available
-            // TODO() Truncate MapName if too long
             builder.Append(_mcsInternalMapConfigProviderApi.GetMapName(option.NominationOption.MapConfig));
+
+            bool cannotNominate = _nominationApi.PlayerCanNominateMap(playerController, option.NominationOption.MapConfig) != McsMapNominationController.NominationCheck.Success;
             
-            menuOptions.Add(new ItemOption(builder.ToString(), option.MenuDisabled ? DisableOption.DisableShowNumber : DisableOption.None, (_, _) =>
+            menuOptions.Add(new ItemOption(builder.ToString(), cannotNominate ? DisableOption.DisableShowNumber : DisableOption.None, (_, _) =>
             {
                 _nominationMenuOptions[index].SelectionCallback.Invoke(playerController, option.NominationOption);
             }));
