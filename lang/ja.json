@@ -28,6 +28,7 @@
     "RTV.Broadcast.Admin.ForceRtv": "管理者 {0} が強制的にRTVを使用しました",
     "RTV.Broadcast.PlayerCastRtv": "{0} がマップの変更を希望しています! (チャットに{lime}rtv{default}で賛同) ({1}/{2})",
     "RTV.Broadcast.ChangeToNextMapImmediately": "Rock The Voteによって {lime}{1}{default} 秒後に {lime}{0}{default} にマップを変更します!",
+    "RTV.Broadcast.ChangeToNextMapCs2EndMatchScreen": "Rock The Voteによって {lime}{0}{default} にマップを変更します!",
     "Nomination.Menu.MenuTitle": "ノミネーションメニュー",
     "Nomination.Menu.MenuTitle.Html": "ノミネーションメニュー",
     "Nomination.Broadcast.Nominated": "{0} が {lime}{1}{default} をノミネートしました",

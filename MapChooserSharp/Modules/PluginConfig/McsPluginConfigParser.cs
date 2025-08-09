@@ -4,6 +4,7 @@ using MapChooserSharp.Modules.McsDatabase;
 using MapChooserSharp.Modules.McsMenu;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Models;
+using MapChooserSharp.Modules.RockTheVote;
 using MapChooserSharp.Util;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -340,7 +341,13 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         
         var sqlConfig = ParseSqlConfig(generalTable);
         
-        return new McsGeneralConfig(aliasNameSetting, verboseCooldownPrint, workshopCollectionIds, shouldAutoFixMapName, sqlConfig);
+        
+        if (!generalTable.TryGetValue("RtvMapChangeBehaviour", out var rtvMapChangeBehaviourObj) || rtvMapChangeBehaviourObj is not string rtvMapChangeBehaviourStr || !Enum.TryParse(typeof(RtvMapChangeBehaviourType), rtvMapChangeBehaviourStr, true, out var rtvMapChangeBehaviourEnum))
+        {
+            throw new InvalidOperationException("General.RtvMapChangeBehaviour is not found or invalid");
+        }
+        
+        return new McsGeneralConfig(aliasNameSetting, verboseCooldownPrint, workshopCollectionIds, shouldAutoFixMapName, sqlConfig, (RtvMapChangeBehaviourType)rtvMapChangeBehaviourEnum);
     }
 
     private McsSqlConfig ParseSqlConfig(TomlTable tomlModel)
@@ -466,6 +473,14 @@ WorkshopCollectionIds = []
 # Should automatically fix map name in map settings when map starts?
 # This will update the map name in settings to match the actual map name from the server
 ShouldAutoFixMapName = true
+
+# What map transition method to use when map change triggered by RTV?
+# 
+# Available types:
+# - ImmediatelyWithTime
+# - Cs2EndMatchScreen
+# 
+RtvMapChangeBehaviour = ""ImmediatelyWithTime""
 
 
 [General.Sql]

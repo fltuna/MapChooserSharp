@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Cvars.Validators;
 using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API.Modules.Entities.Constants;
 using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -234,8 +235,56 @@ internal sealed class TimeLeftUtil(IServiceProvider serviceProvider, bool hotRel
         }
         return true;
     }
+    
+    
+    public bool Extend(int minutesOrRounds)
+    {
+        switch (ExtendType)
+        {
+            case McsMapExtendType.TimeLimit:
+                return ExtendTimeLimit(minutesOrRounds);
+            case McsMapExtendType.Rounds:
+                return ExtendRounds(minutesOrRounds);
+            case McsMapExtendType.RoundTime:
+                return ExtendRoundTime(minutesOrRounds);
+            default:
+                return false;
+        }
+    }
 
+    public bool Set(int minutesOrRounds)
+    {
+        switch (ExtendType)
+        {
+            case McsMapExtendType.TimeLimit:
+                mp_timelimit?.SetValue(minutesOrRounds);
+                return true;
+            case McsMapExtendType.Rounds:
+                mp_maxrounds?.SetValue(minutesOrRounds);
+                return true;
+            case McsMapExtendType.RoundTime:
+                mp_roundtime?.SetValue(minutesOrRounds);
+                return true;
+            default:
+                return false;
+        }
+    }
 
+    public void ForceEndMatch()
+    {
+        Set(1);
+        Server.NextFrame(() =>
+        {
+            if (GameRulesUtil.IsWarmup())
+                Server.ExecuteCommand("mp_warmup_end");
+            
+            Server.NextFrame(() =>
+            {
+                GameRulesUtil.TerminateRound(0.0f, RoundEndReason.RoundDraw);
+            });
+        });
+    }
+    
     public string GetFormattedTimeLeft(int timeLeft)
     {
         if (timeLeft < 0)
@@ -322,13 +371,13 @@ internal sealed class TimeLeftUtil(IServiceProvider serviceProvider, bool hotRel
         if (MapTimeTypeOverride.Value > 0)
             return (McsMapExtendType)MapTimeTypeOverride.Value - 1;
         
-        if (TimeLimit > 0)
+        if (TimeLimit > 0 || mp_timelimit?.GetPrimitiveValue<float>() > 0.0)
             return McsMapExtendType.TimeLimit;
         
-        if (RoundsLeft > 0)
+        if (RoundsLeft > 0 || mp_maxrounds?.GetPrimitiveValue<int>() > 0)
             return McsMapExtendType.Rounds;
         
-        if (RoundTimeLeft > 0)
+        if (RoundTimeLeft > 0 || mp_roundtime?.GetPrimitiveValue<float>() > 0.0)
             return McsMapExtendType.RoundTime;
 
         throw new InvalidOperationException("Failed to determine extend type! the server is possibly misconfigured.");
