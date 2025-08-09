@@ -101,20 +101,20 @@ internal class McsMapCycleExtendVoteController(IServiceProvider serviceProvider)
         var potentialClients = Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }).ToList();
         var potentialClientsIndex = potentialClients.Select(p => p.Index).ToList();
 
-        string detailsString = "";
+        string translationKey = string.Empty;
 
         switch (_timeLeftUtil.ExtendType)
         {
             case McsMapExtendType.TimeLimit:
-                detailsString = LocalizeString(null, "MapCycleVoteExtend.Vote.DetailsString.TimeLeft", TimesToExtend);
+                translationKey = "MapCycleVoteExtend.Vote.DetailsString.TimeLeft";
                 break;
             
             case McsMapExtendType.RoundTime:
-                detailsString = LocalizeString(null, "MapCycleVoteExtend.Vote.DetailsString.RoundTime", TimesToExtend);
+                translationKey = "MapCycleVoteExtend.Vote.DetailsString.RoundTime";
                 break;
             
             case McsMapExtendType.Rounds:
-                detailsString = LocalizeString(null, "MapCycleVoteExtend.Vote.DetailsString.Rounds", TimesToExtend);
+                translationKey = "MapCycleVoteExtend.Vote.DetailsString.Rounds";
                 break;
         }
         
@@ -123,9 +123,13 @@ internal class McsMapCycleExtendVoteController(IServiceProvider serviceProvider)
         // 99 means Server
         int slot = client?.Slot ?? 99;
 
+        VoteTranslations voteTranslations = new VoteTranslations(translationKey, TimesToExtend);
+
+        TranslatableVoteTexts voteTexts = new TranslatableVoteTexts(Plugin.Localizer, detailsTranslation: voteTranslations);
+
         NativeVoteInfo nInfo = new NativeVoteInfo(NativeVoteIdentifier, displayString,
-            detailsString, potentialClientsIndex, VoteThresholdType.Percentage,
-            VoteExtendSuccessThreshold.Value, VoteExtendVoteTime.Value, initiator: slot);
+            string.Empty, potentialClientsIndex, VoteThresholdType.Percentage,
+            VoteExtendSuccessThreshold.Value, VoteExtendVoteTime.Value, initiator: slot, translatableVoteTexts: voteTexts);
 
         NativeVoteState state = _nativeVoteApi.InitiateVote(nInfo);
 
