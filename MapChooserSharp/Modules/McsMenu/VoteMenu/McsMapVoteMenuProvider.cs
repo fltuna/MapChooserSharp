@@ -1,8 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.BuiltInHtml;
-using MapChooserSharp.Modules.McsMenu.VoteMenu.Cs2MenuManager.ScreenMenu;
-using MapChooserSharp.Modules.McsMenu.VoteMenu.Cs2ScreenMenuApi;
 using MapChooserSharp.Modules.McsMenu.VoteMenu.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,14 +84,6 @@ public sealed class McsMapVoteMenuProvider(IServiceProvider serviceProvider, boo
             {
                 case McsSupportedMenuType.BuiltInHtml:
                     _uiFactories[type] = new McsBuiltInHtmlVoteUiFactory(ServiceProvider);
-                    break;
-                
-                case McsSupportedMenuType.Cs2ScreenMenuApi:
-                    _uiFactories[type] = new McsCs2ScreenMenuApiUiFactory(ServiceProvider);
-                    break;
-                
-                case McsSupportedMenuType.Cs2MenuManagerScreen:
-                    _uiFactories[type] = new McsCs2MenuManagerScreenMenuUiFactory(ServiceProvider);
                     break;
             }
         }

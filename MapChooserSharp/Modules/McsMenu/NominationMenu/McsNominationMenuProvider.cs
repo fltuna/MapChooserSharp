@@ -1,8 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.BuiltInHtml;
-using MapChooserSharp.Modules.McsMenu.NominationMenu.Cs2MenuManager.ScreenMenu;
-using MapChooserSharp.Modules.McsMenu.NominationMenu.Cs2ScreenMenuApi;
 using MapChooserSharp.Modules.McsMenu.NominationMenu.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,14 +84,6 @@ public sealed class McsNominationMenuProvider(IServiceProvider serviceProvider, 
             {
                 case McsSupportedMenuType.BuiltInHtml:
                     _uiFactories[type] = new McsBuiltInHtmlNominationUiFactory(ServiceProvider);
-                    break;
-                
-                case McsSupportedMenuType.Cs2ScreenMenuApi:
-                    _uiFactories[type] = new McsCs2ScreenMenuApiNominationUiFactory(ServiceProvider);
-                    break;
-                
-                case McsSupportedMenuType.Cs2MenuManagerScreen:
-                    _uiFactories[type] = new McsCs2MenuManagerScreenMenuNominationUiFactory(ServiceProvider);
                     break;
             }
         }

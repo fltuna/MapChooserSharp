@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Attributes;
 using CounterStrikeSharp.API.Core.Capabilities;
 using MapChooserSharp.API;
 using MapChooserSharp.Interfaces;
@@ -30,6 +31,7 @@ using TNCSSPluginFoundation;
 
 namespace MapChooserSharp;
 
+[MinimumApiVersion(333)]
 public sealed class MapChooserSharp: TncssPluginBase
 {
     public override string ModuleName => "MapChooserSharp";

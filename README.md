@@ -37,7 +37,7 @@ This plugin is supported `mp_maxrounds` and `mp_roundtime` based gamemode, such 
 - !revote support
 - Admin command to cancel vote `!cancelvote`
 - Multiple UI support
-   - Currently supports: BuiltInHtml, CS2ScreenMenuAPI, CS2MenuManager(Screen)
+   - Currently supports: BuiltInHtml
 - Play sounds when countdown start, countdown, vote start, vote finish
 
 ### Nomination
@@ -47,7 +47,7 @@ This plugin is supported `mp_maxrounds` and `mp_roundtime` based gamemode, such 
 - Very clear nomination list with `!nomlist`
 - Admin map nomination and removal with `!nominate_addmap <MapName>`, `!nominate_removemap <MapName>`
 - Multiple UI support
-   - Currently supports: BuiltInHtml, CS2ScreenMenuAPI, CS2MenuManager(Screen)
+   - Currently supports: BuiltInHtml
 
 ### RTV
 
@@ -111,14 +111,7 @@ These dependencies are already packed in to `MapChooserSharp-osname-with-depende
 
 ### Optional Dependency
 
-These optinal dependency is not required, but you need to install them if you want to use the screen menu in UI.
-
-Our plugin currently supports 2 plugins for screen menu.
-
-You don't need to install both of them, but you need to install at least one of them for using screen menu.
-
-- [CS2ScreenMenuAPI](https://github.com/T3Marius/CS2ScreenMenuAPI) - To use screen menu (Version 3.0.4 Required)
-- [CS2MenuManager](https://github.com/schwarper/CS2MenuManager) - To use screen menu (Version 1.0.32 Required)
+Currently no optional dependcy is provided
 
 ### Installation
 

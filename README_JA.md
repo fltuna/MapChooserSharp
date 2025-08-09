@@ -35,7 +35,7 @@ CounterStrikeSharpで実装された強力なAPIとカスタマイズ性を備�
 - !revote での再投票
 - 管理者コマンド `!cancelvote` での投票のキャンセル
 - 複数のUIサポート
-   - 現在は次をサポートしてます: BuiltInHtml, CS2ScreenMenuAPI, CS2MenuManager(Screen)
+   - 現在は次をサポートしてます: BuiltInHtml
 - カウントダウン開始、カウントダウン、投票開始、投票完了での音声の再生
 
 ### ノミネート
@@ -45,7 +45,7 @@ CounterStrikeSharpで実装された強力なAPIとカスタマイズ性を備�
 - 見やすい `!nomlist` を使用したノミネーションリスト
 - 管理者コマンド `!nominate_addmap <MapName>`, `!nominate_removemap <MapName>` での、ノミネートへのマップの追加、削除のサポート
 - 複数のUIサポート
-   - 現在は次をサポートしてます: BuiltInHtml, CS2ScreenMenuAPI, CS2MenuManager(Screen)
+   - 現在は次をサポートしてます: BuiltInHtml
 
 ### RTV
 
@@ -109,14 +109,7 @@ Map Configについては [Configドキュメント](docs/ja/configuration/MAP_C
 
 ### 依存関係 (オプション)
 
-これらの依存関係は必須ではありませんが、Screen Menuをサポートするにはどちらか、もしくは両方をインストールする必要があります。
-
-このプラグインは現在2個のScreen Menu APIをサポートしています。
-
-両方をインストールする必要はありませんが、Screen Menuを使用するにはどちらか一つをインストールする必要があります。
-
-- [CS2ScreenMenuAPI](https://github.com/T3Marius/CS2ScreenMenuAPI) (バージョン 3.0.4 が必要)
-- [CS2MenuManager](https://github.com/schwarper/CS2MenuManager) (バージョン 1.0.32 が必要)
+現在は特にありません。
 
 ### インストール
 
