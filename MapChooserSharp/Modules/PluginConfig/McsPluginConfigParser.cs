@@ -438,21 +438,6 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
                 case McsSupportedMenuType.BuiltInHtml:
                     availableMenuTypes.Add(McsSupportedMenuType.BuiltInHtml);
                     break;
-                
-                case McsSupportedMenuType.Cs2ScreenMenuApi:
-                    if (!AssemblyUtility.IsAssemblyLoaded("CS2ScreenMenuAPI"))
-                        break;
-
-                    availableMenuTypes.Add(McsSupportedMenuType.Cs2ScreenMenuApi);
-                    break;
-                
-                case McsSupportedMenuType.Cs2MenuManagerScreen:
-                    Server.PrintToConsole("CHECKING");
-                    if (!AssemblyUtility.IsAssemblyLoaded("CS2MenuManager"))
-                        break;
-                    
-                    availableMenuTypes.Add(McsSupportedMenuType.Cs2MenuManagerScreen);
-                    break;
             }
         }
         
@@ -530,8 +515,6 @@ ShouldStopSourceTvRecording = false
 #
 # Currently supports:
 # - BuiltInHtml
-# - Cs2ScreenMenuApi
-# - Cs2MenuManagerScreen
 #
 # See GitHub readme for more and updated information.
 MenuType = ""BuiltInHtml""
@@ -625,8 +608,6 @@ RunoffVoteCountdownSound10 = """"
 #
 # Currently supports:
 # - BuiltInHtml
-# - Cs2ScreenMenuApi
-# - Cs2MenuManagerScreen
 #
 # See GitHub readme for more and updated information.
 MenuType = ""BuiltInHtml""

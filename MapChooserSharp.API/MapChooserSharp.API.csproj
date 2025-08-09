@@ -26,7 +26,7 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="CounterStrikeSharp.API" Version="1.0.316" />
+    <PackageReference Include="CounterStrikeSharp.API" Version="1.0.333" />
     <None Include="..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
