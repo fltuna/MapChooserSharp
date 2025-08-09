@@ -37,6 +37,7 @@
     "Nomination.Broadcast.Admin.ChangedToAdminNomination": "管理者 {0} が {lime}{1}{default} を管理者ノミネーションに変更しました",
     "Nomination.Broadcast.Admin.RemovedNomiantion": "管理者 {0} が {lime}{1}{default} をノミネーションから削除しました",
     "Nomination.Notification.Failure.Generic": "マップのノミネートに失敗しました。",
+    "Nomination.Notification.Failure.MapDisabled": "このマップは無効化されています",
     "Nomination.Notification.Failure.SpectatorsCannotNominate": "このサーバーは観戦状態でのノミネートを禁止しています",
     "Nomination.Notification.Failure.SameMap": "現在プレイ中のマップをノミネートすることはできません!",
     "Nomination.Notification.Failure.Generic.WithMapName": "{lime}{0}{default} のノミネートに失敗しました",

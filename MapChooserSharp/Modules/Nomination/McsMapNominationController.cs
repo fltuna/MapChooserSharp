@@ -346,6 +346,9 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
 
     public NominationCheck PlayerCanNominateMap(CCSPlayerController player, IMapConfig mapConfig)
     {
+        if (mapConfig.IsDisabled)
+            return NominationCheck.Disabled;
+        
         if (_mcsMapCycleController.CurrentMap?.MapName == mapConfig.MapName)
             return NominationCheck.SameMap;
         
@@ -417,6 +420,10 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
             case NominationCheck.Failed:
                 player.PrintToChat(LocalizeWithModulePrefix(player, "Nomination.Notification.Failure.Generic.WithMapName", _mcsInternalMapConfigProviderApi.GetMapName(mapConfig)));
                 return false;
+            
+            case NominationCheck.Disabled:
+                player.PrintToChat(LocalizeWithModulePrefix(player, "Nomination.Notification.Failure.MapDisabled", _mcsInternalMapConfigProviderApi.GetMapName(mapConfig)));
+                break;
             
             case NominationCheck.NotEnoughPermissions:
                 player.PrintToChat(LocalizeWithModulePrefix(player, "Nomination.Notification.Failure.NotEnoughPermission", _mcsInternalMapConfigProviderApi.GetMapName(mapConfig)));
@@ -529,6 +536,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
     {
         Success,
         Failed,
+        Disabled,
         NotEnoughPermissions,
         TooMuchPlayers,
         NotEnoughPlayers,
