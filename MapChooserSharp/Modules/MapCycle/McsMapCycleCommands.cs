@@ -113,43 +113,21 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     
     private void CommandTimeLeft(CCSPlayerController? player, CommandInfo info)
     {
-        // TODO() Support round time and round count
         switch (_timeLeftUtil.ExtendType)
         {
             case McsMapExtendType.TimeLimit:
                 string timeleft = _timeLeftUtil.GetFormattedTimeLeft(_timeLeftUtil.TimeLimit, player);
-                if (player == null)
-                {
-                    Server.PrintToConsole(Plugin.LocalizeString("MapCycle.Command.Notification.TimeLeft", timeleft));
-                }
-                else
-                {
-                    player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.TimeLeft", timeleft));
-                }
+                PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.TimeLeft", timeleft));
                 break;
 
             case McsMapExtendType.RoundTime:
                 string roundTimeLeft = _timeLeftUtil.GetFormattedTimeLeft(_timeLeftUtil.RoundTimeLeft, player);
-                if (player == null)
-                {
-                    Server.PrintToConsole(Plugin.LocalizeString("MapCycle.Command.Notification.TimeLeft", roundTimeLeft));
-                }
-                else
-                {
-                    player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.TimeLeft", roundTimeLeft));
-                }
+                PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.TimeLeft", roundTimeLeft));
                 break;
             
             case McsMapExtendType.Rounds:
                 string roundsLeft = _timeLeftUtil.GetFormattedRoundsLeft(_timeLeftUtil.RoundsLeft, player);
-                if (player == null)
-                {
-                    Server.PrintToConsole(Plugin.LocalizeString("MapCycle.Command.Notification.RoundLeft", roundsLeft));
-                }
-                else
-                {
-                    player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.RoundLeft", roundsLeft));
-                }
+                PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.RoundLeft", roundsLeft));
                 break;
         }
     }
@@ -158,27 +136,13 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     private void CommandNextMap(CCSPlayerController? player, CommandInfo info)
     {
         var nextMap = _mapCycleController.NextMap;
-        if (player == null)
+        if (nextMap != null)
         {
-            if (nextMap != null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.NextMap", _mcsInternalMapConfigProviderApi.GetMapName(nextMap)));
-            }
-            else
-            {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.NextMap", LocalizeString("Word.VotePending")));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.NextMap", _mcsInternalMapConfigProviderApi.GetMapName(nextMap)));
         }
         else
         {
-            if (nextMap != null)
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mcsInternalMapConfigProviderApi.GetMapName(nextMap)));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", LocalizeStringForPlayer(player, "Word.VotePending")));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.NextMap", LocalizeString(player, "Word.VotePending")));
         }
     }
 
@@ -187,15 +151,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     {
         if (info.ArgCount < 2)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetNextMap.Usage"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetNextMap.Usage"));
-            }
-            
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Admin.Notification.SetNextMap.Usage"));
             return;
         }
         
@@ -205,15 +161,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
 
         if (newNextMap == null)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("General.Notification.MapNotFound", mapName));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.MapNotFound", mapName));
-            }
-            
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "General.Notification.MapNotFound", mapName));
             return;
         }
         
@@ -225,15 +173,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         
         if (!_mapCycleController.SetNextMap(newNextMap!))
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetNextMap.Failed", _mcsInternalMapConfigProviderApi.GetMapName(newNextMap)));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetNextMap.Failed", _mcsInternalMapConfigProviderApi.GetMapName(newNextMap)));
-            }
-            
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Admin.Notification.SetNextMap.Failed", _mcsInternalMapConfigProviderApi.GetMapName(newNextMap)));
             return;
         }
         
@@ -255,53 +195,31 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     {
         if (_mapCycleController.NextMap == null)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.RemoveNextmap.NextMapIsNotSet"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.RemoveNextmap.NextMapIsNotSet"));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Admin.Notification.RemoveNextmap.NextMapIsNotSet"));
+            return;
         }
-        else
-        {
-            string nextMapName = _mcsInternalMapConfigProviderApi.GetMapName(_mapCycleController.NextMap);
-            string nextMapActualName = _mapCycleController.NextMap.MapName;
-            
-            _mapCycleController.RemoveNextMap();
-            
-            string executorName = PlayerUtil.GetPlayerName(player);
-            
-            PrintLocalizedChatToAll("MapCycle.Command.Admin.Broadcast.RemoveNextmap.Removed", executorName, nextMapName);
-            Logger.LogInformation($"Admin {executorName} removed {nextMapActualName} from next map");
-        }
+
+        string nextMapName = _mcsInternalMapConfigProviderApi.GetMapName(_mapCycleController.NextMap);
+        string nextMapActualName = _mapCycleController.NextMap.MapName;
+        
+        _mapCycleController.RemoveNextMap();
+        
+        string executorName = PlayerUtil.GetPlayerName(player);
+        
+        PrintLocalizedChatToAll("MapCycle.Command.Admin.Broadcast.RemoveNextmap.Removed", executorName, nextMapName);
+        Logger.LogInformation($"Admin {executorName} removed {nextMapActualName} from next map");
     }
     
     private void CommandCurrentMap(CCSPlayerController? player, CommandInfo info)
     {
         var currentMap = _mapCycleController.CurrentMap;
-        if (player == null)
+        if (currentMap != null)
         {
-            if (currentMap != null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.CurrentMap", _mcsInternalMapConfigProviderApi.GetMapName(currentMap)));
-            }
-            else
-            {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.CurrentMap", Server.MapName));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.CurrentMap", _mcsInternalMapConfigProviderApi.GetMapName(currentMap)));
         }
         else
         {
-            if (currentMap != null)
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.CurrentMap", _mcsInternalMapConfigProviderApi.GetMapName(currentMap)));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.CurrentMap", Server.MapName));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.CurrentMap", Server.MapName));
         }
     }
 
@@ -324,37 +242,37 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         
         if (mapConfig == null)
         {
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.NotAvailable"));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.NotAvailable"));
             return;
         }
         
         
         
-        player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo", mapConfig.MapName));
+        player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo", mapConfig.MapName));
         
         if (mapConfig.MapNameAlias != String.Empty)
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.AliasName", mapConfig.MapNameAlias));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.AliasName", mapConfig.MapNameAlias));
         
         if (mapConfig.MapDescription != String.Empty)
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.Description", mapConfig.MapDescription));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.Description", mapConfig.MapDescription));
         
         if (mapConfig.MaxExtends > 0)
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.MaxExtends", mapConfig.MaxExtends));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.MaxExtends", mapConfig.MaxExtends));
         
         if (mapConfig.WorkshopId > 0)
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.WorkshopId", mapConfig.WorkshopId));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.WorkshopId", mapConfig.WorkshopId));
         
         if (mapConfig.NominationConfig.DaysAllowed.Any())
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.DaysAllowed", string.Join(", ", mapConfig.NominationConfig.DaysAllowed)));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.DaysAllowed", string.Join(", ", mapConfig.NominationConfig.DaysAllowed)));
         
         if (mapConfig.NominationConfig.AllowedTimeRanges.Any())
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.AllowedTimeRanges", string.Join(", ", mapConfig.NominationConfig.AllowedTimeRanges)));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.AllowedTimeRanges", string.Join(", ", mapConfig.NominationConfig.AllowedTimeRanges)));
 
         if (mapConfig.NominationConfig.MaxPlayers > 0)
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.MaxPlayers", mapConfig.NominationConfig.MaxPlayers));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.MaxPlayers", mapConfig.NominationConfig.MaxPlayers));
 
         if (mapConfig.NominationConfig.MinPlayers > 0)
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.MinPlayers", mapConfig.NominationConfig.MinPlayers));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.MinPlayers", mapConfig.NominationConfig.MinPlayers));
 
         if (mapConfig.MapCooldown.CurrentCooldown > 0 ||
             mapConfig.GroupSettings.Any(g => g.GroupCooldown.CurrentCooldown > 0))
@@ -365,18 +283,18 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
                 : 0;
             
             int cooldown = Math.Max(mapConfig.MapCooldown.CurrentCooldown, maxGroupCooldown);
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.Cooldown", cooldown));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.Cooldown", cooldown));
         }
 
         var canNominate = _mcsInternalNominationApi.PlayerCanNominateMap(player, mapConfig);
 
         string yesOrNo = canNominate == McsMapNominationController.NominationCheck.Success
-            ? LocalizeStringForPlayer(player, "Word.Yes")
-            : LocalizeStringForPlayer(player, "Word.No");
+            ? LocalizeString(player, "Word.Yes")
+            : LocalizeString(player, "Word.No");
         
-        player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.MapInfo.YouCanNominate", yesOrNo));
+        player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.YouCanNominate", yesOrNo));
 
-        var infoCommandExecutedEvent = new McsMapInfoCommandExecutedEvent(GetTextWithPluginPrefixForPlayer(player, ""), player, mapConfig);
+        var infoCommandExecutedEvent = new McsMapInfoCommandExecutedEvent(GetTextWithPluginPrefix(player, ""), player, mapConfig);
         _mcsInternalEventManager.FireEventNoResult(infoCommandExecutedEvent);
     }
 
@@ -385,7 +303,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
         if (player == null)
             return;
         
-        player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.ExtendsLeft", _mapCycleController.ExtendsLeft));
+        player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.ExtendsLeft", _mapCycleController.ExtendsLeft));
     }
 
     [RequiresPermissions(@"css/root")]
@@ -393,14 +311,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     {
         if (info.ArgCount < 3)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetMapCooldown.Usage"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetMapCooldown.Usage"));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Admin.Notification.SetMapCooldown.Usage"));
             return;
         }
 
@@ -408,27 +319,13 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
 
         if (mapConfig == null)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("General.Notification.MapNotFound"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.MapNotFound"));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "General.Notification.MapNotFound"));
             return;
         }
 
         if (!int.TryParse(info.ArgByIndex(2), out int cooldown))
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("General.Notification.InvalidArgument.WithParam", info.ArgByIndex(2)));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.InvalidArgument.WithParam", info.ArgByIndex(2)));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "General.Notification.InvalidArgument.WithParam", info.ArgByIndex(2)));
             return;
         }
         
@@ -458,14 +355,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
                 }
                 else
                 {
-                    if (player == null)
-                    {
-                        Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetMapCooldown.Failed.NoDatabaseConnection"));
-                    }
-                    else
-                    {
-                        player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetMapCooldown.Failed.NoDatabaseConnection"));
-                    }
+                    PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Admin.Notification.SetMapCooldown.Failed.NoDatabaseConnection"));
                     Logger.LogInformation($"Admin {executorName} is tried to update map {mapConfig.MapName} cooldown to {cooldown}, but failed to connect to database.");
                 }
             });
@@ -477,14 +367,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
     {
         if (info.ArgCount < 3)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetGroupCooldown.Usage"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetGroupCooldown.Usage"));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Admin.Notification.SetGroupCooldown.Usage"));
             return;
         }
 
@@ -494,27 +377,13 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
 
         if (setting.Count == 0)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("General.Notification.GroupNotFound"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.GroupNotFound"));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "General.Notification.GroupNotFound"));
             return;
         }
 
         if (!int.TryParse(info.ArgByIndex(2), out int cooldown))
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("General.Notification.InvalidArgument.WithParam", info.ArgByIndex(2)));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.InvalidArgument.WithParam", info.ArgByIndex(2)));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "General.Notification.InvalidArgument.WithParam", info.ArgByIndex(2)));
             return;
         }
         
@@ -546,14 +415,7 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
                 }
                 else
                 {
-                    if (player == null)
-                    {
-                        Server.PrintToConsole(LocalizeString("MapCycle.Command.Admin.Notification.SetGroupCooldown.Failed.NoDatabaseConnection"));
-                    }
-                    else
-                    {
-                        player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Admin.Notification.SetGroupCooldown.Failed.NoDatabaseConnection"));
-                    }
+                    PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Admin.Notification.SetGroupCooldown.Failed.NoDatabaseConnection"));
                     Logger.LogInformation($"Admin {executorName} is tried to update group {groupSetting.GroupName} cooldown to {cooldown}, but failed to connect to database.");
                 }
             });

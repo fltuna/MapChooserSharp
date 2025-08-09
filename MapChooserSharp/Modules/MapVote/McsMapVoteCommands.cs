@@ -42,13 +42,13 @@ public sealed class McsMapVoteCommands(IServiceProvider serviceProvider) : Plugi
 
         if (_mcsMapVoteController.CurrentVoteState == McsMapVoteState.NextMapConfirmed)
         {
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
             return;
         }
 
         if (_mcsMapVoteController.CurrentVoteState != McsMapVoteState.Voting && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.RunoffVoting)
         {
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapVote.Command.Notification.Revote.NoActiveVote"));
+            player.PrintToChat(LocalizeWithPluginPrefix(player, "MapVote.Command.Notification.Revote.NoActiveVote"));
             return;
         }
         
@@ -60,27 +60,13 @@ public sealed class McsMapVoteCommands(IServiceProvider serviceProvider) : Plugi
     {
         if (_mcsMapVoteController.CurrentVoteState == McsMapVoteState.NextMapConfirmed)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.NextMap", _mapCycleController.NextMap!.MapName));
             return;
         }
 
         if (_mcsMapVoteController.CurrentVoteState != McsMapVoteState.Voting && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.RunoffVoting && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.Initializing && _mcsMapVoteController.CurrentVoteState != McsMapVoteState.Finalizing)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapVote.Command.Notification.Revote.NoActiveVote"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapVote.Command.Notification.Revote.NoActiveVote"));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapVote.Command.Notification.Revote.NoActiveVote"));
             return;
         }
 

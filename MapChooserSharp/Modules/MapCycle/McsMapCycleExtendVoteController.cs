@@ -93,14 +93,7 @@ internal class McsMapCycleExtendVoteController(IServiceProvider serviceProvider)
         if (_nativeVoteApi.GetCurrentVoteState() != NativeVoteState.NoActiveVote)
         {
             DebugLogger.LogDebug($"[VoteExtend] [Admin {executorName}] Already an active vote.");
-            if (client == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycleVoteExtend.Command.Notification.AnotherVoteInProgress"));
-            }
-            else
-            {
-                client.PrintToChat(LocalizeWithPluginPrefixForPlayer(client, "MapCycleVoteExtend.Command.Notification.AnotherVoteInProgress"));
-            }
+            PrintMessageToServerOrPlayerChat(client, LocalizeWithPluginPrefix(client, "MapCycleVoteExtend.Command.Notification.AnotherVoteInProgress"));
             return;
         }
 
@@ -113,15 +106,15 @@ internal class McsMapCycleExtendVoteController(IServiceProvider serviceProvider)
         switch (_timeLeftUtil.ExtendType)
         {
             case McsMapExtendType.TimeLimit:
-                detailsString = LocalizeString("MapCycleVoteExtend.Vote.DetailsString.TimeLeft", TimesToExtend);
+                detailsString = LocalizeString(null, "MapCycleVoteExtend.Vote.DetailsString.TimeLeft", TimesToExtend);
                 break;
             
             case McsMapExtendType.RoundTime:
-                detailsString = LocalizeString("MapCycleVoteExtend.Vote.DetailsString.RoundTime", TimesToExtend);
+                detailsString = LocalizeString(null, "MapCycleVoteExtend.Vote.DetailsString.RoundTime", TimesToExtend);
                 break;
             
             case McsMapExtendType.Rounds:
-                detailsString = LocalizeString("MapCycleVoteExtend.Vote.DetailsString.Rounds", TimesToExtend);
+                detailsString = LocalizeString(null, "MapCycleVoteExtend.Vote.DetailsString.Rounds", TimesToExtend);
                 break;
         }
         
@@ -146,15 +139,7 @@ internal class McsMapCycleExtendVoteController(IServiceProvider serviceProvider)
         else
         {
             DebugLogger.LogDebug($"[VoteExtend] [Admin {executorName}] extend vote initiation failed. Vote Identifier: {nInfo.voteIdentifier}");
-            
-            if (client == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycleVoteExtend.Command.Notification.FailedToInitiateVote"));
-            }
-            else
-            {
-                client.PrintToChat(LocalizeWithPluginPrefix("MapCycleVoteExtend.Command.Notification.FailedToInitiateVote"));
-            }
+            PrintMessageToServerOrPlayerChat(client, LocalizeWithPluginPrefix(client, "MapCycleVoteExtend.Command.Notification.FailedToInitiateVote"));
         }
     }
     

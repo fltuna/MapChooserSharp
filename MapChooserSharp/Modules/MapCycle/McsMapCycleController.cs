@@ -451,13 +451,13 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     
     private void FireNextMapChangedEvent(IMapConfig newConfig)
     {
-        var confirmedEvent = new McsNextMapChangedEvent(GetTextWithPluginPrefix(""), newConfig);
+        var confirmedEvent = new McsNextMapChangedEvent(GetTextWithPluginPrefix(null, ""), newConfig);
         _mcsEventManager.FireEventNoResult(confirmedEvent);
     }
     
     private void FireNextMapRemovedEvent(IMapConfig newConfig)
     {
-        var nextMapRemovedEvent = new McsNextMapRemovedEvent(GetTextWithPluginPrefix(""), newConfig);
+        var nextMapRemovedEvent = new McsNextMapRemovedEvent(GetTextWithPluginPrefix(null, ""), newConfig);
         _mcsEventManager.FireEventNoResult(nextMapRemovedEvent);
     }
 }
