@@ -161,6 +161,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
             IsFirstMapEnded = true;
         });
         Plugin.RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
+        Plugin.RegisterEventHandler<EventCsIntermission>(OnIntermission);
         
         // This is for late timer start
         // Since we cannot obtain McsMapExtendType before map is fully loaded
@@ -195,6 +196,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         
         Plugin.RemoveListener<Listeners.OnMapStart>(OnMapStart);
         Plugin.DeregisterEventHandler<EventRoundEnd>(OnRoundEnd);
+        Plugin.DeregisterEventHandler<EventCsIntermission>(OnIntermission);
     }
 
 
@@ -334,6 +336,20 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
             ChangeToNextMap(1.0F);
             return HookResult.Continue;
         }
+        
+        return HookResult.Continue;
+    }
+
+    private HookResult OnIntermission(EventCsIntermission @event, GameEventInfo info)
+    {
+        if (!_isMapStarted)
+            return HookResult.Continue;
+
+        if (NextMap == null)
+            return HookResult.Continue;
+
+        if (ChangeMapOnNextRoundEnd)
+            return HookResult.Continue;
 
         McsMapExtendType extendType = _timeLeftUtil.ExtendType;
 
@@ -346,7 +362,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         if (extendType == McsMapExtendType.RoundTime && _timeLeftUtil.RoundTimeLeft > 0)
             return HookResult.Continue;
         
-
+        // TODO() 将来的に、nativeなmap投票を使うようになる可能性もあるので、取得するConVarを柔軟に変更できるようにする
         ConVar? mp_competitive_endofmatch_extra_time = ConVar.Find("mp_competitive_endofmatch_extra_time");
 
         float delay = mp_competitive_endofmatch_extra_time?.GetPrimitiveValue<float>() ?? DefaultRoundRestartDelay;
