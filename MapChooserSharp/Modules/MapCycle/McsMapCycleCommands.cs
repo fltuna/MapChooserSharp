@@ -286,13 +286,9 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
             player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.Cooldown", cooldown));
         }
 
-        var canNominate = _mcsInternalNominationApi.PlayerCanNominateMap(player, mapConfig);
+        string nominationCheckResult = GetNominationCheckReuslt(player, mapConfig);
+        player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.YouCanNominate", nominationCheckResult));
 
-        string yesOrNo = canNominate == McsMapNominationController.NominationCheck.Success
-            ? LocalizeString(player, "Word.Yes")
-            : LocalizeString(player, "Word.No");
-        
-        player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycle.Command.Notification.MapInfo.YouCanNominate", yesOrNo));
 
         var infoCommandExecutedEvent = new McsMapInfoCommandExecutedEvent(GetTextWithPluginPrefix(player, ""), player, mapConfig);
         _mcsInternalEventManager.FireEventNoResult(infoCommandExecutedEvent);
@@ -420,5 +416,68 @@ internal sealed class McsMapCycleCommands(IServiceProvider serviceProvider) : Pl
                 }
             });
         });
+    }
+
+
+    private string GetNominationCheckReuslt(CCSPlayerController player, IMapConfig mapConfig)
+    {
+        
+
+        var nominationCheck = _mcsInternalNominationApi.PlayerCanNominateMap(player, mapConfig);
+
+        string canNominate = nominationCheck == McsMapNominationController.NominationCheck.Success
+            ? LocalizeString(player, "Word.Yes")
+            : LocalizeString(player, "Word.No");
+        
+        switch (nominationCheck)
+        {
+            case McsMapNominationController.NominationCheck.Success:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.Success")}";
+            
+            case McsMapNominationController.NominationCheck.Failed:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.Failed")}";
+            
+            case McsMapNominationController.NominationCheck.Disabled:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.Disabled")}";
+            
+            case McsMapNominationController.NominationCheck.NotEnoughPermissions:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.NotEnoughPermissions", string.Join(", ", mapConfig.NominationConfig.RequiredPermissions))}";
+            
+            case McsMapNominationController.NominationCheck.TooMuchPlayers:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.TooMuchPlayers")}";
+            
+            case McsMapNominationController.NominationCheck.NotEnoughPlayers:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.NotEnoughPlayers")}";
+            
+            case McsMapNominationController.NominationCheck.NotAllowed:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.NotAllowed")}";
+            
+            case McsMapNominationController.NominationCheck.DisabledAtThisTime:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.DisabledAtThisTime")}";
+            
+            case McsMapNominationController.NominationCheck.OnlySpecificDay:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.OnlySpecificDay")}";
+            
+            case McsMapNominationController.NominationCheck.OnlySpecificTime:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.OnlySpecificTime")}";
+            
+            case McsMapNominationController.NominationCheck.MapIsInCooldown:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.MapIsInCooldown")}";
+            
+            case McsMapNominationController.NominationCheck.AlreadyNominated:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.AlreadyNominated")}";
+            
+            case McsMapNominationController.NominationCheck.NominatedByAdmin:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.NominatedByAdmin")}";
+            
+            case McsMapNominationController.NominationCheck.SameMap:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.SameMap")}";
+            
+            case McsMapNominationController.NominationCheck.GroupNominationLimitReached:
+                return $"{canNominate} {LocalizeString(player, "Word.MapInfo.NominationCheck.GroupNominationLimitReached")}";
+            
+            default:
+                return "Error";
+        }
     }
 }
