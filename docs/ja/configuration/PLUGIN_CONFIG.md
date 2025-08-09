@@ -24,6 +24,14 @@ WorkshopCollectionIds = []
 # This will update the map name in settings to match the actual map name from the server
 ShouldAutoFixMapName = true
 
+# What map transition method to use when map change triggered by RTV?
+# 
+# Available types:
+# - ImmediatelyWithTime
+# - Cs2EndMatchScreen
+# 
+RtvMapChangeBehaviour = "ImmediatelyWithTime"
+
 ```
 
 ### ShouldUseAliasMapNameIfAvailable
@@ -42,6 +50,9 @@ Steamワークショップのコレクションからマップを自動的に取
 
 マップスタート時に、マップ設定のマップ名を実際のマップ名（Server.MapName）で自動的に修正するかどうかを指定します。これは、主に自動生成されたワークショップマップの設定に置いてタイトルとマップ名が異なる場合に役立ちます。(ワークショップのタイトルは制作者が自由に決めれるため、異なる場合があるのです)
 
+### RtvMapChangeBehaviour
+
+RTVによってマップ変更が入る際に、どのような方法でマップが変更されるかを指定します。
 
 ## SQL設定
 

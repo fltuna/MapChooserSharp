@@ -18,7 +18,11 @@ public interface ITimeLeftUtil
     public bool ExtendTimeLimit(int minutes);
     public bool ExtendRounds(int rounds);
     public bool ExtendRoundTime(int minutes);
-    
+
+    public bool Extend(int minutesOrRounds);
+    public bool Set(int minutesOrRounds);
+    public void ForceEndMatch();
+
     public string GetFormattedTimeLeft(int timeLeft);
     public string GetFormattedTimeLeft(int timeLeft, CCSPlayerController? player);
 

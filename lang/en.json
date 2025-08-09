@@ -28,6 +28,7 @@
     "RTV.Broadcast.Admin.ForceRtv": "Admin {0} forcefully triggered the RTV",
     "RTV.Broadcast.PlayerCastRtv": "{0} wants to Rock The Vote! (type {lime}rtv{default} in chat to vote!) ({1}/{2})",
     "RTV.Broadcast.ChangeToNextMapImmediately": "Rock The Vote is spoken! Changing to {lime}{0}{default} in {lime}{1}{default} seconds!",
+    "RTV.Broadcast.ChangeToNextMapCs2EndMatchScreen": "Rock The Vote is spoken! Changing to {lime}{0}{default}!",
     "Nomination.Menu.MenuTitle": "Nomination Menu",
     "Nomination.Menu.MenuTitle.Html": "Nomination Menu",
     "Nomination.Broadcast.Nominated": "{0} nominated {lime}{1}{default}",

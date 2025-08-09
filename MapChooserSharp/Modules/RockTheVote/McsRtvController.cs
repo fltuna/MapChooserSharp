@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Cvars.Validators;
+using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Timers;
 using MapChooserSharp.API.Events;
 using MapChooserSharp.API.Events.MapVote;
@@ -11,6 +12,7 @@ using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle.Interfaces;
 using MapChooserSharp.Modules.MapVote.Interfaces;
+using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using MapChooserSharp.Modules.RockTheVote.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -66,6 +68,8 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
     private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
     private IMcsInternalMapCycleControllerApi _mcsMapCycleController = null!;
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
+    private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
+    private ITimeLeftUtil _timeLeftUtil = null!;
 
 
     private readonly HashSet<int> _rtvVoteParticipants = new();
@@ -93,6 +97,8 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
         _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
         _mcsMapCycleController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleControllerApi>();
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
+        _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
+        _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         
         _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
         _mcsEventManager.RegisterEventHandler<McsMapNotChangedEvent>(OnMapNotChanged);
@@ -247,8 +253,20 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
     private void ChangeToNextMap()
     {
         RtvCommandStatus = RtvStatus.Triggered;
-        PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.ChangeToNextMapImmediately", _mcsInternalMapConfigProviderApi.GetMapName(_mcsMapCycleController.NextMap!), MapChangeTimingAfterRtvSuccess.Value);
-        _mcsMapCycleController.ChangeToNextMap(MapChangeTimingAfterRtvSuccess.Value);
+
+        switch (_mcsPluginConfigProvider.PluginConfig.GeneralConfig.RtvMapChangeBehaviour)
+        {
+            case RtvMapChangeBehaviourType.ImmediatelyWithTime:
+                PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.ChangeToNextMapImmediately", _mcsInternalMapConfigProviderApi.GetMapName(_mcsMapCycleController.NextMap!), MapChangeTimingAfterRtvSuccess.Value);
+                _mcsMapCycleController.ChangeToNextMap(MapChangeTimingAfterRtvSuccess.Value);
+                break;
+            case RtvMapChangeBehaviourType.Cs2EndMatchScreen:
+                PrintLocalizedChatToAllWithModulePrefix("RTV.Broadcast.ChangeToNextMapCs2EndMatchScreen", _mcsInternalMapConfigProviderApi.GetMapName(_mcsMapCycleController.NextMap!));
+                _timeLeftUtil.ForceEndMatch();
+                break;
+            default:
+                throw new InvalidOperationException("Failed to determine RTV Map Change Behaviour Type! We cannot change the map!!");
+        }
     }
 
     #endregion
