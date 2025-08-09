@@ -159,7 +159,7 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
         if (!_rtvVoteParticipants.Add(player.Slot))
             return PlayerRtvResult.AlreadyInRtv;
         
-        var rtvCastEvent = new McsPlayerRtvCastEvent(player, GetTextWithModulePrefix(""));
+        var rtvCastEvent = new McsPlayerRtvCastEvent(player, GetTextWithModulePrefix(null, ""));
         var result = _mcsEventManager.FireEvent(rtvCastEvent);
         
         if (result > McsEventResult.Handled)
@@ -195,7 +195,7 @@ internal sealed class McsRtvController(IServiceProvider serviceProvider, bool ho
 
     public void InitiateForceRtvVote(CCSPlayerController? client)
     {
-        var forceRtvEvent = new McsAdminForceRtvEvent(client, GetTextWithModulePrefix(""));
+        var forceRtvEvent = new McsAdminForceRtvEvent(client, GetTextWithModulePrefix(null, ""));
         var result = _mcsEventManager.FireEvent(forceRtvEvent);
         
         if (result > McsEventResult.Handled)

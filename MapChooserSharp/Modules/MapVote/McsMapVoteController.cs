@@ -296,7 +296,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         {
             if (controller.Team == CsTeam.Spectator || controller.Team == CsTeam.None)
             {
-                controller.PrintToChat(LocalizeWithPluginPrefixForPlayer(controller, "MapVote.Notification.SpectatorIsExcluded"));
+                controller.PrintToChat(LocalizeWithPluginPrefix(controller, "MapVote.Notification.SpectatorIsExcluded"));
                 voteParticipantsCandinate.Remove(controller);
             }
         }
@@ -803,43 +803,43 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
 
     private void FireNextMapConfirmedEvent(IMapConfig mapConfig)
     {
-        var confirmedEvent = new McsNextMapConfirmedEvent(GetTextWithPluginPrefix(""), mapConfig);
+        var confirmedEvent = new McsNextMapConfirmedEvent(GetTextWithPluginPrefix(null, ""), mapConfig);
         _mcsEventManager.FireEventNoResult(confirmedEvent);
     }
 
     private void FireMapNotChangedEvent()
     {
-        var notChangedEvent = new McsMapNotChangedEvent(GetTextWithPluginPrefix(""));
+        var notChangedEvent = new McsMapNotChangedEvent(GetTextWithPluginPrefix(null, ""));
         _mcsEventManager.FireEventNoResult(notChangedEvent);
     }
 
     private void FireMapExtendEvent(int extendTime, McsMapExtendType extendType)
     {
-        var extendEvent = new McsMapExtendEvent(GetTextWithPluginPrefix(""), extendTime, extendType);
+        var extendEvent = new McsMapExtendEvent(GetTextWithPluginPrefix(null, ""), extendTime, extendType);
         _mcsEventManager.FireEventNoResult(extendEvent);
     }
 
     private void FireVoteInitiatedEvent()
     {
-        var voteInitiatedEvent = new McsMapVoteInitiatedEvent(GetTextWithPluginPrefix(""));
+        var voteInitiatedEvent = new McsMapVoteInitiatedEvent(GetTextWithPluginPrefix(null, ""));
         _mcsEventManager.FireEventNoResult(voteInitiatedEvent);
     }
 
     private void FireVoteStartedEvent()
     {
-        var voteStartedEvent = new McsMapVoteStartedEvent(GetTextWithPluginPrefix(""));
+        var voteStartedEvent = new McsMapVoteStartedEvent(GetTextWithPluginPrefix(null, ""));
         _mcsEventManager.FireEventNoResult(voteStartedEvent);
     }
 
     private void FireVoteFinishedEvent()
     {
-        var voteFinishedEvent = new McsMapVoteFinishedEvent(GetTextWithPluginPrefix(""));
+        var voteFinishedEvent = new McsMapVoteFinishedEvent(GetTextWithPluginPrefix(null, ""));
         _mcsEventManager.FireEventNoResult(voteFinishedEvent);
     }
 
     private void FireVoteCancelEvent()
     {
-        var voteCancelledEvent = new McsMapVoteCancelledEvent(GetTextWithPluginPrefix(""));
+        var voteCancelledEvent = new McsMapVoteCancelledEvent(GetTextWithPluginPrefix(null, ""));
         _mcsEventManager.FireEventNoResult(voteCancelledEvent);
     }
     
@@ -1021,7 +1021,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         {
             foreach (CCSPlayerController cl in Utilities.GetPlayers().Where(p => p is { IsBot: false, IsHLTV: false }))
             {
-                cl.PrintToChat(LocalizeWithPluginPrefixForPlayer(cl, "MapVote.Broadcast.VoteCast", player.PlayerName, GetMapName(votedMap, cl).ToString()));
+                cl.PrintToChat(LocalizeWithPluginPrefix(cl, "MapVote.Broadcast.VoteCast", player.PlayerName, GetMapName(votedMap, cl).ToString()));
             }
         }
         
@@ -1124,10 +1124,10 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
             mapName.Append(votedMap.MapName
                 // If string contains Extend placeholder, then replace it.
                 .Replace(IdExtendMap,
-                    LocalizeStringForPlayer(player, "Word.ExtendMap"))
+                    LocalizeString(player, "Word.ExtendMap"))
                 // If string contains Don't change placeholder, then replace it.
                 .Replace(IdDontChangeMap,
-                    LocalizeStringForPlayer(player, "Word.DontChangeMap")));
+                    LocalizeString(player, "Word.DontChangeMap")));
         }
         else
         {
@@ -1154,7 +1154,7 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
                 continue;
             
             controller.PrintToChat(
-                LocalizeWithPluginPrefixForPlayer(controller, "MapVote.Broadcast.VoteResult.NextMapConfirmed", 
+                LocalizeWithPluginPrefix(controller, "MapVote.Broadcast.VoteResult.NextMapConfirmed", 
                     GetMapName(winMap, controller).ToString(), $"{mapVotePercentage:F2}", totalVotes));
         }
     }

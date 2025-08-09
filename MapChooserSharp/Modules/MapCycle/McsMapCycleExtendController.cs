@@ -124,7 +124,7 @@ internal class McsMapCycleExtendController(IServiceProvider serviceProvider, boo
         if (!_extCommandVoteParticipants.Add(player.Slot))
             return PlayerExtResult.AlreadyVoted;
 
-        var cmdExecutedEvt = new McsExtCommandExecutedEvent(GetTextWithPluginPrefix(""), player);
+        var cmdExecutedEvt = new McsExtCommandExecutedEvent(GetTextWithPluginPrefix(null, ""), player);
         var result = _internalEventManager.FireEvent(cmdExecutedEvt);
 
         

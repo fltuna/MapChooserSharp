@@ -78,26 +78,26 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
                 break;
             
             case PlayerExtResult.AlreadyVoted:
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.AlreadyVoted"));
+                player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycleExtend.ExtCommand.Notification.AlreadyVoted"));
                 break;
             
             case PlayerExtResult.CommandInCooldown:
                 if (_mcsPluginConfigProvider.PluginConfig.GeneralConfig.VerboseCooldownPrint)
                 {
-                    player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.InCooldown.Verbose"));
+                    player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycleExtend.ExtCommand.Notification.InCooldown.Verbose"));
                 }
                 else
                 {
-                    player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.InCooldown"));
+                    player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycleExtend.ExtCommand.Notification.InCooldown"));
                 }
                 break;
             
             case PlayerExtResult.CommandDisabled:
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.Disabled"));
+                player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycleExtend.ExtCommand.Notification.Disabled"));
                 break;
             
             case PlayerExtResult.NotAllowed:
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.NotAllowed"));
+                player.PrintToChat(LocalizeWithPluginPrefix(player, "MapCycleExtend.ExtCommand.Notification.NotAllowed"));
                 break;
             
             case PlayerExtResult.ReachedLimit:
@@ -137,14 +137,7 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
     {
         if (info.ArgCount < 2)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycleExtend.Command.Admin.Notification.MapExtended.Usage"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.Command.Admin.Notification.MapExtended.Usage"));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycleExtend.Command.Admin.Notification.MapExtended.Usage"));
             return;
         }
 
@@ -152,14 +145,7 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
         
         if (!int.TryParse(info.ArgByIndex(1), out var extendTime))
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("General.Notification.InvalidArgument.WithParam", arg1));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.InvalidArgument.WithParam", arg1));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "General.Notification.InvalidArgument.WithParam", arg1));
             return;
         }
         
@@ -168,28 +154,13 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
 
         if (result == McsMapCycleExtendResult.FailedToExtend)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycleExtend.Command.Admin.Notification.MapExtended.FailedToExtend"));
-            }
-            else
-            {
-                player.PrintToConsole(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.Command.Admin.Notification.MapExtended.FailedToExtend"));
-            }
-            
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycleExtend.Command.Admin.Notification.MapExtended.FailedToExtend"));
             Logger.LogWarning("Failed to extend current map, this may be caused by a misconfigured map time type.");
             return;
         }
         else if (result == McsMapCycleExtendResult.FailedTimeCannotBeZeroOrNegative)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycleExtend.Command.Admin.Notification.MapExtended.FailedToExtend.FailedTimeCannotBeZeroOrNegative"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.Command.Admin.Notification.MapExtended.FailedToExtend.FailedTimeCannotBeZeroOrNegative"));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycleExtend.Command.Admin.Notification.MapExtended.FailedToExtend.FailedTimeCannotBeZeroOrNegative"));
             return;
         }
 
@@ -247,14 +218,7 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
     {
         if (info.ArgCount < 2)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycleExtend.ExtCommand.Admin.Broadcast.ChangeExtCount.Usage"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Admin.Broadcast.ChangeExtCount.Usage"));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycleExtend.ExtCommand.Admin.Broadcast.ChangeExtCount.Usage"));
             return;
         }
         
@@ -263,14 +227,7 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
 
         if (!int.TryParse(arg1, out int count))
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("General.Notification.InvalidArgument.WithParam", arg1));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.InvalidArgument.WithParam", arg1));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "General.Notification.InvalidArgument.WithParam", arg1));
             return;
         }
 
@@ -287,14 +244,7 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
     {
         if (info.ArgCount < 2)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycleVoteExtend.Command.Notification.Usage"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleVoteExtend.Command.Notification.Usage"));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycleVoteExtend.Command.Notification.Usage"));
             return;
         }
         
@@ -303,28 +253,14 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
 
         if (!int.TryParse(arg1, out int count))
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("General.Notification.InvalidArgument.WithParam", arg1));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "General.Notification.InvalidArgument.WithParam", arg1));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "General.Notification.InvalidArgument.WithParam", arg1));
             return;
         }
 
 
         if (count < 1)
         {
-            if (player == null)
-            {
-                Server.PrintToConsole(LocalizeString("MapCycleVoteExtend.Command.Notification.CannotBeZeroOrNegative"));
-            }
-            else
-            {
-                player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleVoteExtend.Command.Notification.CannotBeZeroOrNegative"));
-            }
+            PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycleVoteExtend.Command.Notification.CannotBeZeroOrNegative"));
             return;
         }
         
@@ -338,13 +274,6 @@ internal sealed class McsMapCycleExtendCommands(IServiceProvider serviceProvider
 
     private void NotifyNoExtsLeft(CCSPlayerController? player)
     {
-        if (player == null)
-        {
-            Server.PrintToConsole(LocalizeString("MapCycleExtend.ExtCommand.Notification.NoExtsRemain"));
-        }
-        else
-        {
-            player.PrintToChat(LocalizeWithPluginPrefixForPlayer(player, "MapCycleExtend.ExtCommand.Notification.NoExtsRemain"));
-        }
+        PrintMessageToServerOrPlayerChat(player, LocalizeWithPluginPrefix(player, "MapCycleExtend.ExtCommand.Notification.NoExtsRemain"));
     }
 }
