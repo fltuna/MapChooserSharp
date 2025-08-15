@@ -395,12 +395,16 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         if (CurrentVoteState != McsMapVoteState.Initializing)
         {
             DebugLogger.LogWarning($"CurrentVoteState: {CurrentVoteState} is not initializing, so vote is cancelled");
+            FireVoteCancelEvent();
+            EndVotePostInitialization();
             return;
         }
 
         if (_mapVoteContent == null)
         {
             DebugLogger.LogError($"MapVoteContent is null, vote cannot be started!");
+            FireVoteCancelEvent();
+            EndVotePostInitialization();
             return;
         }
         
@@ -619,12 +623,16 @@ internal sealed class McsMapVoteController(IServiceProvider serviceProvider) : P
         if (CurrentVoteState != McsMapVoteState.Initializing)
         {
             DebugLogger.LogWarning($"CurrentVoteState: {CurrentVoteState} is not initializing, so runoff vote is cancelled");
+            FireVoteCancelEvent();
+            EndVotePostInitialization();
             return;
         }
 
         if (_mapVoteContent == null)
         {
             DebugLogger.LogError("MapVoteContent is null, runoff vote cannot be started!");
+            FireVoteCancelEvent();
+            EndVotePostInitialization();
             return;
         }
         
