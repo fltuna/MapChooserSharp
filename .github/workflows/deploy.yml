@@ -1,9 +1,8 @@
 ﻿name: .NET CI/CD
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
   release:

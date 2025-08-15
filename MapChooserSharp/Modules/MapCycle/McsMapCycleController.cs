@@ -259,7 +259,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         
 
         // Wait for first people joined
-        Plugin.AddTimer(0.0F, () =>
+        Plugin.AddTimer(0.1F, () =>
         {
             ObtainCurrentMap(mapName);
         });
