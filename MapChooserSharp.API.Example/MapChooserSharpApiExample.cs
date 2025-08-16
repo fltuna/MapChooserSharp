@@ -13,7 +13,7 @@ namespace MapChooserSharp.API.Example;
 public class MapChooserSharpApiExample: BasePlugin
 {
     public override string ModuleName => "MapChooserSharp API Example";
-    public override string ModuleVersion => "0.0.1";
+    public override string ModuleVersion => "0.1.5";
 
     private IMapChooserSharpApi _mcsApi = null!;
     
