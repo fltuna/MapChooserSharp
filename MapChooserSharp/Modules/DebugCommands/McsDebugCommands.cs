@@ -5,6 +5,7 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
+using MapChooserSharp.Modules.MapCycle.Services;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,12 +22,14 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
+    private McsMapConfigExecutionService _mapconfigexecutionService = null!;
     
     protected override void OnAllPluginsLoaded()
     {
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
         _mcsPluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
+        _mapconfigexecutionService = ServiceProvider.GetRequiredService<McsMapConfigExecutionService>();
         
         Plugin.AddCommand("mcs_maplist", "", CommandMapList);
         Plugin.AddCommand("mcs_mapinfo", "", CommandMapInfo);
@@ -34,6 +37,7 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
         Plugin.AddCommand("mcs_removevote", "test", CommandTestRemoveVote);
         Plugin.AddCommand("mcs_state", "test", CommandTestCurrentState);
         Plugin.AddCommand("mcs_pluginconf", "", CommandTestPluginConfing);
+        Plugin.AddCommand("mcs_testexec", "", CommandTestExecMapConfigs);
     }
 
     protected override void OnUnloadModule()
@@ -44,6 +48,7 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
         Plugin.RemoveCommand("mcs_removevote", CommandTestRemoveVote);
         Plugin.RemoveCommand("mcs_state", CommandTestCurrentState);
         Plugin.RemoveCommand("mcs_pluginconf", CommandTestPluginConfing);
+        Plugin.RemoveCommand("mcs_testexec", CommandTestExecMapConfigs);
     }
 
     private void CommandMapList(CCSPlayerController? client, CommandInfo info)
@@ -206,5 +211,13 @@ internal sealed class McsDebugCommands(IServiceProvider serviceProvider): Plugin
         info.ReplyToCommand("=============== VOTE SETTINGS ===============");
         info.ReplyToCommand($"Avaiable menu types: {string.Join(", ", config.NominationConfig.AvailableMenuTypes)}");
         info.ReplyToCommand($"Server menu type: {config.NominationConfig.CurrentMenuType}");
+    }
+
+
+    private void CommandTestExecMapConfigs(CCSPlayerController? player, CommandInfo info)
+    {
+        info.ReplyToCommand("Start executing");
+        _mapconfigexecutionService.ExecuteMapConfigs();
+        info.ReplyToCommand("Done");
     }
 }

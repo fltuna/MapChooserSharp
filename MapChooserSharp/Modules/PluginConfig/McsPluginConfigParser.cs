@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API;
+using MapChooserSharp.Modules.MapCycle.Services;
 using MapChooserSharp.Modules.MapVote.Countdown;
 using MapChooserSharp.Modules.McsDatabase;
 using MapChooserSharp.Modules.McsMenu;
@@ -159,8 +160,39 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         {
             throw new InvalidOperationException("MapCycle.ShouldStopSourceTvRecording is not found or invalid");
         }
+
         
-        return new McsMapCycleConfig(defaultMaxExtends, defaultExtCmdUses, fallbackExtendTimePerExtends, fallbackExtendRoundsPerExtends, shouldStopSourceTvRecordingBool);
+        if (!mapCycleTable.TryGetValue("MapConfigExecutionType", out var mapConfigExecutionTypeObj) ||
+            mapConfigExecutionTypeObj is not string mapConfigExecutionTypeString)
+        {
+            throw new InvalidOperationException("MapCycle.MapConfigExecutionType is not found or invalid");
+        }
+        
+        McsMapConfigExecutionType mapConfigExecutionType = DecideMapConfigExecutionType(mapConfigExecutionTypeString);
+
+
+        if (!mapCycleTable.TryGetValue("MapConfigDirectoryPath", out var mapConfigDirectoryPathObj) ||
+            mapConfigDirectoryPathObj is not string mapConfigDirectoryPathString)
+        {
+            throw new InvalidOperationException("MapCycle.MapConfigDirectoryPath is not found or invalid");
+        }
+
+
+        if (!mapCycleTable.TryGetValue("GroupConfigDirectoryPath", out var groupConfigDirectoryPathObj) ||
+            groupConfigDirectoryPathObj is not string groupConfigDirectoryPathString)
+        {
+            throw new InvalidOperationException("MapCycle.GroupConfigDirectoryPath is not found or invalid");
+        }
+        
+        return new McsMapCycleConfig(
+            defaultMaxExtends,
+            defaultExtCmdUses,
+            fallbackExtendTimePerExtends,
+            fallbackExtendRoundsPerExtends,
+            shouldStopSourceTvRecordingBool,
+            mapConfigExecutionType,
+            mapConfigDirectoryPathString,
+            groupConfigDirectoryPathString);
     }
 
     private IMcsNominationConfig ParseNominationConfig(TomlTable tomlModel)
@@ -409,6 +441,16 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         
         return sqlConfig;
     }
+
+    private McsMapConfigExecutionType DecideMapConfigExecutionType(string executionTypeStr)
+    {
+        if (!Enum.TryParse(executionTypeStr, true, out McsMapConfigExecutionType executionType))
+        {
+            throw new InvalidOperationException("MapCycle.MapConfigExecutionType is invalid");
+        }
+        
+        return executionType;
+    }
     
     
     private McsSupportedMenuType DecideMenuType(string menuTypeStr, List<McsSupportedMenuType> availableMenus)
@@ -523,6 +565,18 @@ FallbackExtendRoundsPerExtends = 5
 
 # Should execute tv_stoprecord on before map change? (this is required to prevent crash when you using sourceTV in your server.)
 ShouldStopSourceTvRecording = false
+
+# You can choose map config execution type from below.
+# - ExactMatch | Only executes configs that names are fully matches with ignore case (e.g. de_dust2 will executes only de_dust2.cfg)
+# - StartWithMach | Only executes configs that names are start with map name with ignore case (e.g. de_dust2 will executes de_.cfg, de_dust.cfg, de_dust2.cfg)
+# - PartialMatch | Executes all configs that matches partially with ignore case (e.g. de_dust2 will executes de_.cfg, dust.cfg, 2.cfg)
+MapConfigExecutionType = ""ExactMatch""
+
+# Relative path from game/csgo/cfg/ directory (e.g. if config directory located in game/csgo/cfg/MapChooserSharp/maps/, then put MapChooserSharp/maps/)
+MapConfigDirectoryPath = ""MapChooserSharp/maps/""
+
+# Relative path from game/csgo/cfg/ directory (e.g. if config directory located in game/csgo/cfg/MapChooserSharp/groups/, then put MapChooserSharp/groups/)
+GroupConfigDirectoryPath = ""MapChooserSharp/groups/""
 
 
 [MapVote]
