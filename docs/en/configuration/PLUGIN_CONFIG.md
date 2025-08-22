@@ -120,6 +120,18 @@ FallbackExtendRoundsPerExtends = 5
 
 # Should execute tv_stoprecord on before map change? (this is required to prevent crash when you using sourceTV in your server.)
 ShouldStopSourceTvRecording = false
+
+# You can choose map config execution type from below.
+# - ExactMatch | Only executes configs that names are fully matches with ignore case (e.g. de_dust2 will executes only de_dust2.cfg)
+# - StartWithMach | Only executes configs that names are start with map name with ignore case (e.g. de_dust2 will executes de_.cfg, de_dust.cfg, de_dust2.cfg)
+# - PartialMatch | Executes all configs that matches partially with ignore case (e.g. de_dust2 will executes de_.cfg, dust.cfg, 2.cfg)
+MapConfigExecutionType = "ExactMatch"
+
+# Relative path from game/csgo/cfg/ directory (e.g. if config directory located in game/csgo/cfg/MapChooserSharp/maps/, then put MapChooserSharp/maps/)
+MapConfigDirectoryPath = "MapChooserSharp/maps/"
+
+# Relative path from game/csgo/cfg/ directory (e.g. if config directory located in game/csgo/cfg/MapChooserSharp/groups/, then put MapChooserSharp/groups/)
+GroupConfigDirectoryPath = "MapChooserSharp/groups/"
 ```
 
 ### FallbackMaxExtends
@@ -141,6 +153,19 @@ You can specify the default extension for `mp_maxrounds` in rounds when playing 
 ### ShouldStopSourceTvRecording
 
 This settings specify wether to execute tv_stoprecord command before map transition. This setting will help to prevent server crash when you using SourceTV and when map transition.
+
+### MapConfigExecutionType
+
+You can specify config execution type for map config.
+
+### MapConfigDirectoryPath
+
+The directory path for map config (to game readable .cfg file). This is relative path from `game/csgo/cfg/` directory.
+
+### GroupConfigDirectoryPath
+
+The directory path for group config (to game readable .cfg file). This is relative path from `game/csgo/cfg/` directory.
+
 
 ## MapVote
 

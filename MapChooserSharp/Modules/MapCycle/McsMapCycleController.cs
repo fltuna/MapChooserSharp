@@ -10,6 +10,7 @@ using MapChooserSharp.API.MapVoteController;
 using MapChooserSharp.Interfaces;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle.Interfaces;
+using MapChooserSharp.Modules.MapCycle.Services;
 using MapChooserSharp.Modules.MapVote.Interfaces;
 using MapChooserSharp.Modules.McsDatabase.Interfaces;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
@@ -33,6 +34,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private IMcsPluginConfigProvider _mcsPluginConfigProvider = null!;
     private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
     private IMcsInternalRtvControllerApi _mcsRtvController = null!;
+    private McsMapConfigExecutionService _mapConfigExecutionService = null!;
     private IMcsDatabaseProvider _mcsDatabaseProvider = null!;
     private ITimeLeftUtil _timeLeftUtil = null!;
 
@@ -147,6 +149,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         _mcsEventManager = ServiceProvider.GetRequiredService<IMcsInternalEventManager>();
         _timeLeftUtil = ServiceProvider.GetRequiredService<ITimeLeftUtil>();
         _mcsDatabaseProvider = ServiceProvider.GetRequiredService<IMcsDatabaseProvider>();
+        _mapConfigExecutionService = ServiceProvider.GetRequiredService<McsMapConfigExecutionService>();
         
         _mcsEventManager.RegisterEventHandler<McsNextMapConfirmedEvent>(OnNextMapConfirmed);
         _mcsEventManager.RegisterEventHandler<McsMapExtendEvent>(OnMapExtended);
@@ -259,9 +262,11 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         
 
         // Wait for first people joined
+        // TODO() Maybe we can use Server.NextWorldUpdate() to execute things?
         Plugin.AddTimer(0.1F, () =>
         {
             ObtainCurrentMap(mapName);
+            _mapConfigExecutionService.ExecuteMapConfigs();
         });
     }
 

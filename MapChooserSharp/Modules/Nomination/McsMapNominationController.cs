@@ -156,6 +156,7 @@ internal sealed class McsMapNominationController(IServiceProvider serviceProvide
         {
             if (value.NominationParticipants.Contains(player.Slot))
             {
+                // TODO() This can be improved, because Remove method is returns boolean that indicates player is removed or not from list.
                 value.NominationParticipants.Remove(player.Slot);
 
                 // If there is no nomination participants left, remove the nomination

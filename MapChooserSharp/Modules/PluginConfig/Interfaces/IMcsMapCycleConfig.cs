@@ -1,4 +1,6 @@
-﻿namespace MapChooserSharp.Modules.PluginConfig.Interfaces;
+﻿using MapChooserSharp.Modules.MapCycle.Services;
+
+namespace MapChooserSharp.Modules.PluginConfig.Interfaces;
 
 internal interface IMcsMapCycleConfig
 {
@@ -11,4 +13,10 @@ internal interface IMcsMapCycleConfig
     internal int FallbackMaxExtCommandUses { get; }
     
     internal bool ShouldStopSourceTvRecording { get; }
+    
+    internal McsMapConfigExecutionType MapConfigExecutionType { get; }
+    
+    internal string MapConfigDirectoryPath { get; }
+    
+    internal string GroupConfigDirectoryPath { get; }
 }
