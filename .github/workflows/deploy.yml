@@ -97,6 +97,8 @@ jobs:
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\MySqlConnector.dll" -Destination "artifacts-linux-x64-with-dependencies\plugins\MapChooserSharp\MySqlConnector.dll" -Force
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\Npgsql.dll" -Destination "artifacts-windows-x64-with-dependencies\plugins\MapChooserSharp\Npgsql.dll" -Force
           Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\Npgsql.dll" -Destination "artifacts-linux-x64-with-dependencies\plugins\MapChooserSharp\Npgsql.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\ZLinq.dll" -Destination "artifacts-windows-x64-with-dependencies\plugins\MapChooserSharp\ZLinq.dll" -Force
+          Copy-Item -Path "MapChooserSharp\bin\Release\net8.0\publish\ZLinq.dll" -Destination "artifacts-linux-x64-with-dependencies\plugins\MapChooserSharp\ZLinq.dll" -Force
           
       - name: Copy runtime artifacts
         run: |

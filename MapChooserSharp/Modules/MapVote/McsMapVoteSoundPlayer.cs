@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.Modules.PluginConfig.Interfaces;
+using ZLinq;
 
 namespace MapChooserSharp.Modules.MapVote;
 
