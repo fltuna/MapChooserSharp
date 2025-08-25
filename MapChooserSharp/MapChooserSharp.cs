@@ -30,6 +30,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation;
 
+[assembly: ZLinq.ZLinqDropInAttribute("MapChooserSharp", ZLinq.DropInGenerateTypes.Everything)]
 namespace MapChooserSharp;
 
 [MinimumApiVersion(333)]
