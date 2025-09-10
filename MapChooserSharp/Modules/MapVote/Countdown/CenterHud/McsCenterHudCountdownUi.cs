@@ -16,6 +16,6 @@ public class McsCenterHudCountdownUi(IServiceProvider provider): IMcsCountdownUi
 
     public void Close(CCSPlayerController player)
     {
-        player.PrintToCenter("");
+        player.PrintToCenter(" ");
     }
 }
