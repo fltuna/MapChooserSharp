@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
 using TNCSSPluginFoundation.Utils.Other;
+using ZLinq;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace MapChooserSharp.Modules.MapCycle;
@@ -244,6 +245,15 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
 
     private void OnClientPutInServer(int slot)
     {
+        // If current timelimit/round is lowerthan vote start time/round threshold
+        // And first player is joined to server, then set nextmap randomly
+        if (!GetCorrespondTimelimitCheck().Invoke() && Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false }) == 0)
+        {
+            NextMap = PickRandomMapForNextMap();
+            Logger.LogWarning($"{NextMap.MapName} has picked for nextmap because not enough time to vote, but no nextmap has specified.");
+            FireNextMapChangedEvent(NextMap);
+        }
+        
         // TODO if current map is official maps, then set IsSecondMapIsPassed to true.
         if (IsSecondMapIsPassed || !IsFirstMapEnded)
             return;
@@ -413,24 +423,12 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     {
         _voteStartTimer?.Kill();
 
-        switch (_timeLeftUtil.ExtendType)
-        {
-            case McsMapExtendType.TimeLimit:
-                CreateVoteStartTimer(() => _timeLeftUtil.TimeLimit  > VoteStartTimingTime.Value) ;
-                break;
-            
-            case McsMapExtendType.RoundTime:
-                CreateVoteStartTimer(() => _timeLeftUtil.RoundTimeLeft > VoteStartTimingTime.Value);
-                break;
-            
-            case McsMapExtendType.Rounds:
-                CreateVoteStartTimer(() => _timeLeftUtil.RoundsLeft > VoteStartTimingRound.Value);
-                break;
-        }
+        CreateVoteStartTimer();
     }
     
-    private void CreateVoteStartTimer(Func<bool> shouldContinueCheck)
+    private void CreateVoteStartTimer()
     {
+        var shouldContinueCheck = GetCorrespondTimelimitCheck();
         _voteStartTimer = Plugin.AddTimer(VoteStartCheckInterval, () =>
         {
             if (!_isMapStarted)
@@ -451,6 +449,83 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
                 InitiateVote();
             }
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+    }
+
+    private Func<bool> GetCorrespondTimelimitCheck()
+    {
+        switch (_timeLeftUtil.ExtendType)
+        {
+            case McsMapExtendType.TimeLimit:
+                return () => _timeLeftUtil.TimeLimit > VoteStartTimingTime.Value;
+            
+            case McsMapExtendType.RoundTime:
+                return () => _timeLeftUtil.RoundTimeLeft > VoteStartTimingTime.Value;
+            
+            case McsMapExtendType.Rounds:
+                return () => _timeLeftUtil.RoundsLeft > VoteStartTimingRound.Value;
+            
+            default:
+                throw new InvalidOperationException($"This extend type {_timeLeftUtil.ExtendType} is not supported");
+        }
+    }
+    
+    // tuna: I know same method exists in vote controller, but I don't have mutch time to refactor so I simply copy paste it.
+    // TODO() Needs refactor
+    private IMapConfig PickRandomMapForNextMap()
+    {
+        // This method will not use Linq to make debug logging easier
+        var shuffledMaps = _mcsInternalMapConfigProviderApi.GetMapConfigs().Values.ToList()
+            .OrderBy(_ => Random.Shared.Next()).ToList();
+
+        var disabledMaps = shuffledMaps.Where(map => !map.IsDisabled).ToList();
+        DebugLogger.LogTrace($"[Filter | Disabled Maps] {disabledMaps.Count} maps found.");
+        
+        var cooldownEndedMaps = disabledMaps.Where(map => map.MapCooldown.CurrentCooldown <= 0).ToList();
+        DebugLogger.LogTrace($"[Filter | Map Cooldown] {cooldownEndedMaps.Count} maps found.");
+
+        
+        var alsoGroupCooldownEnded = cooldownEndedMaps.Where(map =>
+            !map.GroupSettings.Any() ||
+            map.GroupSettings.Count(setting => setting.GroupCooldown.CurrentCooldown > 0) == 0).ToList();
+        DebugLogger.LogTrace($"[Filter | Gorup Cooldown] {cooldownEndedMaps.Count} maps found.");
+        
+
+        var notRestrectedToNominationOnly = alsoGroupCooldownEnded.Where(map => !map.OnlyNomination).ToList();
+        DebugLogger.LogTrace($"[Filter | No Nomination Restriction] {notRestrectedToNominationOnly.Count} maps found.");
+        
+
+        var notRestrictedToCertainUsers = notRestrectedToNominationOnly.Where(map => !map.NominationConfig.RestrictToAllowedUsersOnly).ToList();
+        DebugLogger.LogTrace($"[Filter | Not Restricted Certain users] {notRestrictedToCertainUsers.Count} maps found.");
+        
+
+        var greaterThanMinPlayers = notRestrictedToCertainUsers.Where(map => map.NominationConfig.MinPlayers == 0 || map.NominationConfig.MinPlayers <= Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false })).ToList();
+        DebugLogger.LogTrace($"[Filter | Greater Than Min Players] {greaterThanMinPlayers.Count} maps found.");
+        
+
+        var lowerThanMaxPlayers = greaterThanMinPlayers.Where(map => map.NominationConfig.MaxPlayers == 0 || map.NominationConfig.MaxPlayers >= Utilities.GetPlayers().Count(p => p is { IsBot: false, IsHLTV: false })).ToList();
+        DebugLogger.LogTrace($"[Filter | Lower Than Max Players] {lowerThanMaxPlayers.Count} maps found.");
+        
+
+        var notRequiresPermission = lowerThanMaxPlayers.Where(map => !map.NominationConfig.RequiredPermissions.Any()).ToList();
+        DebugLogger.LogTrace($"[Filter | Not Requires Permission] {notRequiresPermission.Count} maps found.");
+        
+
+        var withinAllowedDays = notRequiresPermission.Where(map => !map.NominationConfig.DaysAllowed.Any() || map.NominationConfig.DaysAllowed.Contains(DateTime.Today.DayOfWeek)).ToList();
+        DebugLogger.LogTrace($"[Filter | Within Allowed Days] {withinAllowedDays.Count} maps found.");
+        
+
+        var whithinAllowedTimeRange = withinAllowedDays.Where(map => !map.NominationConfig.AllowedTimeRanges.Any() || map.NominationConfig.AllowedTimeRanges.Count(range => range.IsInRange(TimeOnly.FromDateTime(DateTime.Now))) >= 1).ToList();
+        DebugLogger.LogTrace($"[Filter | Within Allowed Time Range] {whithinAllowedTimeRange.Count} maps found.");
+        
+
+        var withoutCurrentMap = whithinAllowedTimeRange.Where(map => !map.MapName.Equals(CurrentMap?.MapName)).ToList();
+        DebugLogger.LogTrace($"[Filter | Without Current Map] {withoutCurrentMap.Count} maps found.");
+        
+
+        var pickedMap = withoutCurrentMap.Take(1).First();
+        DebugLogger.LogTrace($"[Filter | Finally] {pickedMap.MapName} has been picked for nextmap");
+        
+        return pickedMap;
     }
 
     internal void InitiateRtvVote()
