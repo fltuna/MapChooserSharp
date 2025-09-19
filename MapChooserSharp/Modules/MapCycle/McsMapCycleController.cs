@@ -270,6 +270,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         CurrentMap = NextMap;
         NextMap = null;
         
+        Server.NextFrame(ExecuteMapLimitConfig);
 
         // Wait for first people joined
         // TODO() Maybe we can use Server.NextWorldUpdate() to execute things?
@@ -466,6 +467,42 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
             
             default:
                 throw new InvalidOperationException($"This extend type {_timeLeftUtil.ExtendType} is not supported");
+        }
+    }
+
+    // Timelimit, Round time limit, Round Limit
+    private void ExecuteMapLimitConfig()
+    {
+        if (CurrentMap == null)
+        {
+            Logger.LogError("Failed to find current map config, we cannot execute map time/round limit config.");
+            return;
+        }
+
+        var cvarName = _timeLeftUtil.ExtendType switch
+        {
+            McsMapExtendType.TimeLimit => "mp_timelimit",
+            McsMapExtendType.RoundTime => "mp_roundtime",
+            McsMapExtendType.Rounds => "mp_maxrounds",
+            _ => throw new InvalidOperationException($"This extend type {_timeLeftUtil.ExtendType} is not supported")
+        };
+
+        var cvar = ConVar.Find(cvarName);
+        if (cvar == null)
+        {
+            Logger.LogError($"Failed to find ConVar: {cvarName}");
+            return;
+        }
+
+        switch (_timeLeftUtil.ExtendType)
+        {
+            case McsMapExtendType.TimeLimit:
+            case McsMapExtendType.RoundTime:
+                cvar.SetValue((float)CurrentMap.MapTime);
+                break;
+            case McsMapExtendType.Rounds:
+                cvar.SetValue(CurrentMap.MapRounds);
+                break;
         }
     }
     

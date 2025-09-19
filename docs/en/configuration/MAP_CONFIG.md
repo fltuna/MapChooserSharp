@@ -314,8 +314,6 @@ For time-based maps, specifies how many minutes to extend each time an extension
 
 ### MapTime
 
-Currently not in use.
-
 For time-based maps, specifies the duration of the map.
 
 ### ExtendRoundsPerExtends
@@ -323,8 +321,6 @@ For time-based maps, specifies the duration of the map.
 For round-based maps, specifies how many rounds to extend each time an extension is granted.
 
 ### MapRounds
-
-Currently not in use.
 
 For round-based maps, specifies the number of rounds for the map.
 
