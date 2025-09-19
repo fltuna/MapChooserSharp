@@ -473,54 +473,36 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     // Timelimit, Round time limit, Round Limit
     private void ExecuteMapLimitConfig()
     {
-        void LogConVarError(string cvarName)
-        {
-            Logger.LogError($"Failed to find ConVar: {cvarName}");
-        }
-
         if (CurrentMap == null)
         {
             Logger.LogError("Failed to find current map config, we cannot execute map time/round limit config.");
             return;
         }
-        
+
+        var cvarName = _timeLeftUtil.ExtendType switch
+        {
+            McsMapExtendType.TimeLimit => "mp_timelimit",
+            McsMapExtendType.RoundTime => "mp_roundtime",
+            McsMapExtendType.Rounds => "mp_maxrounds",
+            _ => throw new InvalidOperationException($"This extend type {_timeLeftUtil.ExtendType} is not supported")
+        };
+
+        var cvar = ConVar.Find(cvarName);
+        if (cvar == null)
+        {
+            Logger.LogError($"Failed to find ConVar: {cvarName}");
+            return;
+        }
+
         switch (_timeLeftUtil.ExtendType)
         {
             case McsMapExtendType.TimeLimit:
-                var cvtl = ConVar.Find("mp_timelimit");
-                if (cvtl == null)
-                {
-                    LogConVarError("mp_timelimit");
-                    return;
-                }
-                
-                cvtl.SetValue((float)CurrentMap.MapTime);
-                return;
-            
             case McsMapExtendType.RoundTime:
-                var cvrt = ConVar.Find("mp_roundtime");
-                if (cvrt == null)
-                {
-                    LogConVarError("mp_roundtime");
-                    return;
-                }
-                
-                cvrt.SetValue((float)CurrentMap.MapTime);
-                return;
-            
+                cvar.SetValue((float)CurrentMap.MapTime);
+                break;
             case McsMapExtendType.Rounds:
-                var cvmr = ConVar.Find("mp_maxrounds");
-                if (cvmr == null)
-                {
-                    LogConVarError("mp_maxrounds");
-                    return;
-                }
-                
-                cvmr.SetValue(CurrentMap.MapRounds);
-                return;
-            
-            default:
-                throw new InvalidOperationException($"This extend type {_timeLeftUtil.ExtendType} is not supported");
+                cvar.SetValue(CurrentMap.MapRounds);
+                break;
         }
     }
     
