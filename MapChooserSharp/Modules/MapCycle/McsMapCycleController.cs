@@ -264,11 +264,12 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private void OnMapStart(string mapName)
     {
         ExtendCount = 0;
-
-        DecrementAllMapCooldown(CurrentMap);
         
         CurrentMap = NextMap;
         NextMap = null;
+        
+        DecrementAllMapCooldown(CurrentMap);
+        ApplyCooldownToCurrentMap(CurrentMap);
         
         Server.NextFrame(ExecuteMapLimitConfig);
 
@@ -323,22 +324,24 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
             if (value.MapCooldown.CurrentCooldown > 0)
                 value.MapCooldown.CurrentCooldown--;
         }
-
-        // Set previous map cooldown if defined in config
-        if (previousMap != null)
-        {
-            _mcsDatabaseProvider.MapInfoRepository.UpsertMapCooldownAsync(previousMap.MapName, previousMap.MapCooldown.MapConfigCooldown).ConfigureAwait(false);
-            previousMap.MapCooldown.CurrentCooldown = previousMap.MapCooldown.MapConfigCooldown;
+    }
+    
+    private void ApplyCooldownToCurrentMap(IMapConfig? currentMap)
+    {
+        if (currentMap == null)
+            return;
             
-            foreach (IMapGroupSettings setting in previousMap.GroupSettings)
-            {
-                _mcsDatabaseProvider.GroupInfoRepository.UpsertGroupCooldownAsync(setting.GroupName, setting.GroupCooldown.MapConfigCooldown).ConfigureAwait(false);
-                setting.GroupCooldown.CurrentCooldown = setting.GroupCooldown.MapConfigCooldown;
-            }
+        _mcsDatabaseProvider.MapInfoRepository.UpsertMapCooldownAsync(currentMap.MapName, currentMap.MapCooldown.MapConfigCooldown).ConfigureAwait(false);
+        currentMap.MapCooldown.CurrentCooldown = currentMap.MapCooldown.MapConfigCooldown;
+        
+        foreach (IMapGroupSettings setting in currentMap.GroupSettings)
+        {
+            _mcsDatabaseProvider.GroupInfoRepository.UpsertGroupCooldownAsync(setting.GroupName, setting.GroupCooldown.MapConfigCooldown).ConfigureAwait(false);
+            setting.GroupCooldown.CurrentCooldown = setting.GroupCooldown.MapConfigCooldown;
         }
     }
-
         
+    
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
     {
         if (!_isMapStarted)
