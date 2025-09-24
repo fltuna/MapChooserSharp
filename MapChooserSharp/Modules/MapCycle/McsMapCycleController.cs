@@ -268,7 +268,7 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         CurrentMap = NextMap;
         NextMap = null;
 
-        Task.Run(async void() =>
+        Task.Run(async () =>
         {
             try
             {
