@@ -264,11 +264,23 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
     private void OnMapStart(string mapName)
     {
         ExtendCount = 0;
-
-        DecrementAllMapCooldown(CurrentMap);
         
         CurrentMap = NextMap;
         NextMap = null;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                await DecrementAllMapCooldown();
+                await ApplyCooldownToCurrentMap(CurrentMap);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Exception occured while applying map/group cooldown.");
+            }
+        });
+        
         
         Server.NextFrame(ExecuteMapLimitConfig);
 
@@ -303,15 +315,15 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
         ExtendLimit = CurrentMap?.MaxExtends ?? DefaultMapExtends;
     }
 
-    private void DecrementAllMapCooldown(IMapConfig? previousMap)
+    private async Task DecrementAllMapCooldown()
     {
         // To prevent unxpected cooldown reduction
         if (!IsFirstMapEnded || !IsSecondMapIsPassed)
             return;
         
         // Decrement all cooldowns
-        _mcsDatabaseProvider.MapInfoRepository.DecrementAllCooldownsAsync().ConfigureAwait(false);
-        _mcsDatabaseProvider.GroupInfoRepository.DecrementAllCooldownsAsync().ConfigureAwait(false);
+        await _mcsDatabaseProvider.MapInfoRepository.DecrementAllCooldownsAsync();
+        await _mcsDatabaseProvider.GroupInfoRepository.DecrementAllCooldownsAsync();
         foreach (var (key, value) in _mcsInternalMapConfigProviderApi.GetMapConfigs())
         {
             foreach (IMapGroupSettings setting in value.GroupSettings)
@@ -323,22 +335,24 @@ internal sealed class McsMapCycleController(IServiceProvider serviceProvider, bo
             if (value.MapCooldown.CurrentCooldown > 0)
                 value.MapCooldown.CurrentCooldown--;
         }
-
-        // Set previous map cooldown if defined in config
-        if (previousMap != null)
-        {
-            _mcsDatabaseProvider.MapInfoRepository.UpsertMapCooldownAsync(previousMap.MapName, previousMap.MapCooldown.MapConfigCooldown).ConfigureAwait(false);
-            previousMap.MapCooldown.CurrentCooldown = previousMap.MapCooldown.MapConfigCooldown;
+    }
+    
+    private async Task ApplyCooldownToCurrentMap(IMapConfig? currentMap)
+    {
+        if (currentMap == null)
+            return;
             
-            foreach (IMapGroupSettings setting in previousMap.GroupSettings)
-            {
-                _mcsDatabaseProvider.GroupInfoRepository.UpsertGroupCooldownAsync(setting.GroupName, setting.GroupCooldown.MapConfigCooldown).ConfigureAwait(false);
-                setting.GroupCooldown.CurrentCooldown = setting.GroupCooldown.MapConfigCooldown;
-            }
+        await _mcsDatabaseProvider.MapInfoRepository.UpsertMapCooldownAsync(currentMap.MapName, currentMap.MapCooldown.MapConfigCooldown);
+        currentMap.MapCooldown.CurrentCooldown = currentMap.MapCooldown.MapConfigCooldown;
+        
+        foreach (IMapGroupSettings setting in currentMap.GroupSettings)
+        {
+            await _mcsDatabaseProvider.GroupInfoRepository.UpsertGroupCooldownAsync(setting.GroupName, setting.GroupCooldown.MapConfigCooldown);
+            setting.GroupCooldown.CurrentCooldown = setting.GroupCooldown.MapConfigCooldown;
         }
     }
-
         
+    
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
     {
         if (!_isMapStarted)
