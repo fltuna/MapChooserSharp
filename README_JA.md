@@ -2,7 +2,16 @@
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fltuna/MapChooserSharp) ![NuGet Version](https://img.shields.io/nuget/v/MapChooserSharp.API)
 
-CounterStrikeSharpで実装された強力なAPIとカスタマイズ性を備えたMapChooserプラグインです。 
+CounterStrikeSharpで実装された強力なAPIとカスタマイズ性を備えたMapChooserプラグインです。
+
+# サポート終了のお知らせ
+
+CounterStrikeSharp 版の MapChooserSharp は今後メンテナンスされません.
+
+ModSharpバージョンへの乗り換えを検討してください.
+
+https://github.com/fltuna/MapChooserSharpMS
+
 
 ## Translated readme is available
 
