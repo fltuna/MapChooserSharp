@@ -8,6 +8,7 @@ internal sealed class UnsupportedSqlProvider: IMcsSqlQueryProvider
     public IMcsMapInformationSqlQueries MapInfoSqlQueries() => throw new NotSupportedException("Database provider not supported");
     
     public IMcsGroupSqlQueries GroupSqlQueries() => throw new NotSupportedException("Database provider not supported");
+    public IMcsUserInformationSqlQueries UserInfoSqlQueries() => throw new NotSupportedException("Database provider not supported");
 
     public IDbConnection CreateConnection(string connectionString) => throw new NotSupportedException("Database provider not supported");
 }

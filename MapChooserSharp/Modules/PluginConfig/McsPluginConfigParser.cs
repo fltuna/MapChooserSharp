@@ -212,7 +212,24 @@ internal sealed class McsPluginConfigParser(string configPath, IServiceProvider 
         
         var currentMenuType = DecideMenuType(menuTypeStr, availableMenus);
 
-        return new McsNominationConfig(availableMenus, currentMenuType);
+        if (!nominationTable.TryGetValue("LoginSessionExpiringTime", out var loginSessionExpiringTimeObj) ||
+            loginSessionExpiringTimeObj is not string loginSessionExprTimeStr)
+        {
+            throw new InvalidOperationException("Nomination.LoginSessionExpiringTime is not found or  invalid");
+        }
+
+        if (!DateTime.TryParse(loginSessionExprTimeStr, out var loginSessionExprTime))
+        {
+            throw new InvalidOperationException("Nomination.LoginSessionExpiringTime is invalid datetime format");
+        }
+
+        if (!nominationTable.TryGetValue("RequiredTimeToLogin", out var requiredTimeToLoginObj) ||
+            requiredTimeToLoginObj is not long requiredTimeToLoginInt)
+        {
+            throw new InvalidOperationException("Nomination.RequiredTimeToLogin is not found or  invalid");
+        }
+
+        return new McsNominationConfig(availableMenus, currentMenuType, loginSessionExprTime, (int)requiredTimeToLoginInt);
     }
 
     private IMcsVoteConfig ParseVoteConfig(TomlTable tomlModel)
@@ -681,6 +698,12 @@ RunoffVoteCountdownSound10 = """"
 #
 # See GitHub readme for more and updated information.
 MenuType = ""BuiltInHtml""
+
+# Datetime | Will be removed
+LoginSessionExpiringTime = ""04:00""
+
+# Minutes | Will be removed
+RequiredTimeToLogin = 60
 
 
 [ConfigInformation]

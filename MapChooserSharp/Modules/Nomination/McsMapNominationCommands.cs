@@ -1,9 +1,13 @@
-﻿using System.Text;
+﻿using System.Collections.Concurrent;
+using System.Text;
+using System.Xml.Linq;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
+using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using MapChooserSharp.API.MapConfig;
 using MapChooserSharp.API.MapVoteController;
@@ -11,10 +15,15 @@ using MapChooserSharp.API.Nomination;
 using MapChooserSharp.Modules.MapConfig.Interfaces;
 using MapChooserSharp.Modules.MapCycle.Interfaces;
 using MapChooserSharp.Modules.MapVote.Interfaces;
+using MapChooserSharp.Modules.McsDatabase.Entities;
+using MapChooserSharp.Modules.McsDatabase.Interfaces;
 using MapChooserSharp.Modules.Nomination.Interfaces;
+using MapChooserSharp.Modules.PluginConfig.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TNCSSPluginFoundation.Models.Plugin;
 using ZLinq;
+using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace MapChooserSharp.Modules.Nomination;
 
@@ -28,6 +37,11 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
     private IMcsInternalMapConfigProviderApi _mcsInternalMapConfigProviderApi = null!;
     private IMcsInternalMapVoteControllerApi _mcsMapVoteController = null!;
     private IMcsInternalMapCycleControllerApi _mapCycleController = null!;
+    private IMcsPluginConfigProvider _pluginConfigProvider = null!;
+    private IMcsDatabaseProvider _mcsDatabaseProvider = null!;
+    
+    private ConcurrentDictionary<int, McsUserInformation> _userInformationCache = new();
+    private Dictionary<int, Timer> _sessionTimeTimers = new();
     
     
     private readonly Dictionary<int, float> _playerNextCommandAvaiableTime = new();
@@ -49,6 +63,8 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         _mcsInternalMapConfigProviderApi = ServiceProvider.GetRequiredService<IMcsInternalMapConfigProviderApi>();
         _mcsMapVoteController = ServiceProvider.GetRequiredService<IMcsInternalMapVoteControllerApi>();
         _mapCycleController = ServiceProvider.GetRequiredService<IMcsInternalMapCycleControllerApi>();
+        _mcsDatabaseProvider = ServiceProvider.GetRequiredService<IMcsDatabaseProvider>();
+        _pluginConfigProvider = ServiceProvider.GetRequiredService<IMcsPluginConfigProvider>();
         
         Plugin.RegisterListener<Listeners.OnMapEnd>(() =>
         {
@@ -61,6 +77,9 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         Plugin.AddCommand("css_nominate_removemap", "Remove a map from nomination", CommandNominateRemoveMap);
         
         Plugin.AddCommandListener("say", SayCommandListener, HookMode.Pre);
+        
+        Plugin.RegisterListener<Listeners.OnClientAuthorized>(OnClientAuthorized);
+        Plugin.RegisterEventHandler<EventPlayerDisconnect>(OnClientDisconnect);
     }
 
     protected override void OnUnloadModule()
@@ -72,7 +91,86 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         
         Plugin.RemoveCommandListener("say", SayCommandListener, HookMode.Pre);
     }
-    
+
+    // TODO() This method will be removed after migrated to ModSharp implementation.
+    private void OnClientAuthorized(int slot, SteamID steamId)
+    {
+        Task.Run(() =>
+        {
+            var info = _mcsDatabaseProvider.UserInfoRepository.GetUserInformationAsync(steamId.SteamId32).Result;
+
+            if (info == null)
+            {
+                var newInfo = new McsUserInformation
+                {
+                    SteamId = steamId.SteamId32,
+                    SessionTime = 0,
+                    LastLoggedInAt = DateTime.Now,
+                    UserSessionStartedAt = DateTime.Now
+                };
+
+                _mcsDatabaseProvider.UserInfoRepository.UpsertUserInformationAsync(steamId.SteamId32, newInfo).Wait();
+                _userInformationCache[slot] = newInfo;
+            }
+            else
+            {
+                _userInformationCache[slot] = info;
+            }
+            
+            Server.NextFrame(() =>
+            {
+                Logger.LogInformation("Starting session time timer for slot {Slot}.", slot);
+                _sessionTimeTimers[slot] = Plugin.AddTimer(60.0F, () =>
+                {
+                    foreach (var mcsUserInformation in _userInformationCache)
+                    {
+                        UpdateUserSessionTime(slot, mcsUserInformation.Value);
+                    }
+                }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+            });
+        });
+    }
+
+    private void UpdateUserSessionTime(int slot, McsUserInformation mcsUserInformation)
+    {
+        mcsUserInformation.SessionTime++;
+        _mcsDatabaseProvider.UserInfoRepository.IncrementUserSessionTimeAsync(mcsUserInformation.SteamId);
+        Logger.LogInformation("Incrementing session time for SteamID32: {SteamID32}, Current Session Time: {SessionTime} minutes.", mcsUserInformation.SteamId, mcsUserInformation.SessionTime);
+                        
+                        
+        var loginExpiringTime = _pluginConfigProvider.PluginConfig.NominationConfig.LoginSessionExpiringTime;
+                        
+
+        DateTime now = DateTime.Now;
+        TimeSpan resetTimeOfDay = loginExpiringTime.TimeOfDay;
+        DateTime todayReset = DateTime.Today.Add(resetTimeOfDay);
+        DateTime lastReset = now >= todayReset ? todayReset : todayReset.AddDays(-1);
+
+        // If the user's session started before the last reset boundary, reset session time.
+        if (mcsUserInformation.UserSessionStartedAt < lastReset)
+        {
+            mcsUserInformation.SessionTime = 0;
+            mcsUserInformation.UserSessionStartedAt = now;
+            _mcsDatabaseProvider.UserInfoRepository.UpsertUserInformationAsync(mcsUserInformation.SteamId, mcsUserInformation).Wait();
+            _userInformationCache[slot] = mcsUserInformation;
+        }
+    }
+
+    // TODO() This method will be removed after migrated to ModSharp implementation.
+    private HookResult OnClientDisconnect(EventPlayerDisconnect @event, GameEventInfo info)
+    {
+        var cl = @event.Userid;
+        
+        if (cl == null)
+            return HookResult.Continue;
+        
+        if (cl.IsBot || cl.IsHLTV)
+            return HookResult.Continue;
+
+        _userInformationCache.TryRemove(cl.AuthorizedSteamID!.SteamId32, out var value);
+        _sessionTimeTimers.Remove(cl.Slot);
+        return HookResult.Continue;
+    }
     
     private void CommandNominateMap(CCSPlayerController? player, CommandInfo info)
     {
@@ -102,6 +200,41 @@ internal sealed class McsMapNominationCommands(IServiceProvider serviceProvider)
         {
             player.PrintToChat(LocalizeWithModulePrefix(player, "Nomination.Notification.Failure.SpectatorsCannotNominate"));
             return;
+        }
+        
+        // Check Session time and login status, reset if needed, and auto-login if below threshold
+        if (player.AuthorizedSteamID != null)
+        {
+            var config = _pluginConfigProvider.PluginConfig.NominationConfig;
+            var requiredTimeToLogin = config.RequiredTimeToLogin;
+
+            int steamId = player.AuthorizedSteamID.SteamId32;
+            if (!_userInformationCache.TryGetValue(player.Slot, out var userInfo))
+            {
+                userInfo = _mcsDatabaseProvider.UserInfoRepository.GetUserInformationAsync(steamId).Result;
+                if (userInfo == null)
+                {
+                    userInfo = new McsUserInformation
+                    {
+                        SteamId = steamId,
+                        SessionTime = 0,
+                        LastLoggedInAt = DateTime.Now,
+                        UserSessionStartedAt = DateTime.Now
+                    };
+
+                    _mcsDatabaseProvider.UserInfoRepository.UpsertUserInformationAsync(steamId, userInfo).Wait();
+                }
+
+                _userInformationCache[player.Slot] = userInfo;
+            }
+
+            // If user's session time is below required threshold, consider them "not logged in" yet.
+            if (userInfo.SessionTime < requiredTimeToLogin)
+            {
+                Logger.LogInformation("Player {PlayerName} (SteamID: {SteamID}) attempted to nominate a map but is not logged in. SessionTime: {SessionTime} minutes.", player.PlayerName, player.AuthorizedSteamID.SteamId64, userInfo.SessionTime);
+                player.PrintToChat(LocalizeWithModulePrefix(player, "Nomination.Notification.Failure.NotLoggedIn", requiredTimeToLogin - userInfo.SessionTime, requiredTimeToLogin));
+                return;
+            }
         }
         
         if (info.ArgCount < 2)

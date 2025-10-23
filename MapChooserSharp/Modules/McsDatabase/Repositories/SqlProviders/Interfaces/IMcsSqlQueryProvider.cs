@@ -15,5 +15,10 @@ internal interface IMcsSqlQueryProvider
     /// </summary>
     IMcsGroupSqlQueries GroupSqlQueries();
     
+    /// <summary>
+    /// Access User SQL queries
+    /// </summary>
+    IMcsUserInformationSqlQueries UserInfoSqlQueries();
+    
     IDbConnection CreateConnection(string connectionString);
 }

@@ -15,6 +15,10 @@ internal sealed class SqliteSqlProvider(string tableName) : IMcsSqlQueryProvider
     
     public IMcsGroupSqlQueries GroupSqlQueries() => _mcsGroupSqlQueries;
     
+    private readonly IMcsUserInformationSqlQueries _mcsUserInformationSqlQueries = new SqliteUserInformationSqlQueries(tableName);
+    
+    public IMcsUserInformationSqlQueries UserInfoSqlQueries() => _mcsUserInformationSqlQueries;
+    
     public IDbConnection CreateConnection(string connectionString) => 
         new SQLiteConnection(connectionString);
 }

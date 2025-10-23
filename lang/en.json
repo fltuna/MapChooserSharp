@@ -52,6 +52,7 @@
     "Nomination.Broadcast.Admin.ChangedToAdminNomination": "Admin {0} changed {lime}{1}{default} to admin nomination",
     "Nomination.Broadcast.Admin.RemovedNomiantion": "Admin {0} removed {lime}{1}{default} from nomination",
     "Nomination.Notification.Failure.Generic": "Failed to nominate this map",
+    "Nomination.Notification.Failure.NotLoggedIn": "You need to play {lime}{0}{default} more minutes before you can nominate a map (played {lime}{1}{default} minutes)",
     "Nomination.Notification.Failure.MapDisabled": "This map is disabled",
     "Nomination.Notification.Failure.SpectatorsCannotNominate": "Nomination while spectator is disabled in this server",
     "Nomination.Notification.Failure.SameMap": "You cannot nominate a map that is currently playing!",

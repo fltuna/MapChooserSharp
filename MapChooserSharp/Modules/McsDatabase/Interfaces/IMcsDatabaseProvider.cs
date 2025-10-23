@@ -7,4 +7,5 @@ internal interface IMcsDatabaseProvider
 {
     internal IMcsMapInformationRepository MapInfoRepository { get; }
     internal McsGroupInformationRepository GroupInfoRepository { get; }
+    internal IMcsUserInformationRepository UserInfoRepository { get; }
 }

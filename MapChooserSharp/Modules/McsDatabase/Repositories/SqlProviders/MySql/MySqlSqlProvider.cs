@@ -14,6 +14,10 @@ internal sealed class MySqlSqlProvider(string tableName) : IMcsSqlQueryProvider
     private readonly IMcsGroupSqlQueries _mcsGroupSqlQueries = new MySqlGroupSqlQueries(tableName);
     
     public IMcsGroupSqlQueries GroupSqlQueries() => _mcsGroupSqlQueries;
+    
+    private readonly IMcsUserInformationSqlQueries _mcsUserInformationSqlQueries = new MySqlUserInformationSqlQueries(tableName);
+    
+    public IMcsUserInformationSqlQueries UserInfoSqlQueries() => _mcsUserInformationSqlQueries;
 
     public IDbConnection CreateConnection(string connectionString) => 
         new MySqlConnection(connectionString);

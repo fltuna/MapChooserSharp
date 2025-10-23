@@ -26,6 +26,7 @@ internal sealed class McsDatabaseProvider(IServiceProvider serviceProvider)
     public IMcsMapInformationRepository MapInfoRepository { get; private set; } = null!;
     
     public McsGroupInformationRepository GroupInfoRepository { get; private set; } = null!;
+    public IMcsUserInformationRepository UserInfoRepository { get; private set; } = null!;
 
     public override void RegisterServices(IServiceCollection services)
     {
@@ -40,6 +41,7 @@ internal sealed class McsDatabaseProvider(IServiceProvider serviceProvider)
         
         MapInfoRepository = new McsMapInformationRepository(_connectionString, _providerType, _pluginConfigProvider.PluginConfig.GeneralConfig.SqlConfig.MapSettingsSqlTableName, ServiceProvider);
         GroupInfoRepository = new McsGroupInformationRepository(_connectionString, _providerType, _pluginConfigProvider.PluginConfig.GeneralConfig.SqlConfig.GroupSettingsSqlTableName, ServiceProvider);
+        UserInfoRepository = new McsUserInformationRepository(_connectionString, _providerType, "mcs_user_settings", ServiceProvider);
         
         MapInfoRepository.EnsureAllMapInfoExistsAsync().ConfigureAwait(false);
         GroupInfoRepository.EnsureAllGroupInfoExistsAsync().ConfigureAwait(false);
